@@ -508,11 +508,15 @@ private fun HomeConnectionPage(
         label = "BluetoothControlHaloColor"
     )
     val containerColor by animateColorAsState(
-        targetValue = if (isConnected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh,
+        targetValue = if (isConnected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
         animationSpec = tween(250),
         label = "BluetoothControlContainerColor"
     )
-    val contentColor = Color(0xFF5CB67B)
+    val contentColor by animateColorAsState(
+        targetValue = if (isConnected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
+        animationSpec = tween(250),
+        label = "BluetoothControlContentColor"
+    )
     val haloSize by animateDpAsState(if (isConnected) 148.dp else 124.dp, tween(250), label = "BluetoothControlHaloSize")
     val glowSize by animateDpAsState(if (isConnected) 128.dp else 108.dp, tween(250), label = "BluetoothControlGlowSize")
     val buttonSize by animateDpAsState(if (isConnected) 92.dp else 84.dp, tween(250), label = "BluetoothControlButtonSize")
