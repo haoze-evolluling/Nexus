@@ -18,6 +18,8 @@ func main() {
 		Title: "Nexus",
 		Width: 1120,
 		Height: 720,
+		MinWidth: 840,
+		MinHeight: 580,
 		AssetServer: &assetserver.Options{Assets: assets},
 		OnStartup: app.Startup,
 		OnShutdown: app.Shutdown,

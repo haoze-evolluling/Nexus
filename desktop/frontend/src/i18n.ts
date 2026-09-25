@@ -1,8 +1,7 @@
 import { computed, ref } from 'vue';
+import type { Locale, LanguagePref, ParamValue } from './types';
 
-export type Locale = 'zh' | 'en';
-export type LanguagePref = 'system' | 'zh' | 'en';
-export type ParamValue = string | number;
+export type { Locale, LanguagePref, ParamValue };
 
 const languageKey = 'nexus.desktop.language';
 const nxmsgPrefix = 'nxmsg:';
@@ -15,6 +14,7 @@ const messages: Record<Locale, Record<string, string>> = {
   zh: {
     'header.eyebrow': '电脑音频发送端',
     'header.back': '返回',
+    'header.devices': '设备列表',
     'header.settings': '设置',
     'header.single': '已连接 {n} 台接收端，正在发送电脑音频',
     'header.multi': '已连接 {n} 台接收端 · 同步播放中',
@@ -116,6 +116,7 @@ const messages: Record<Locale, Record<string, string>> = {
   en: {
     'header.eyebrow': 'PC audio sender',
     'header.back': 'Back',
+    'header.devices': 'Receivers',
     'header.settings': 'Settings',
     'header.single': 'Connected to {n} receiver, streaming PC audio',
     'header.multi': 'Connected to {n} receivers · playing in sync',
