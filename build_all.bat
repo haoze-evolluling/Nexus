@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions
 
-rem Build both SyncTouch artifacts (Android APK and Windows Desktop) from repository root.
+rem Build both Nexus artifacts (Android APK and Windows Desktop) from repository root.
 pushd "%~dp0"
 
 set "PAUSE_AT_END=1"
@@ -11,7 +11,7 @@ set "BUILD_EXIT=1"
 set "ANDROID_APK=app\build\outputs\apk\debug\app-debug.apk"
 
 echo ========================================================
-echo  [1/2] Building SyncTouch Android Debug APK...
+echo  [1/2] Building Nexus Android Debug APK...
 echo ========================================================
 call "gradlew.bat" assembleDebug
 set "ANDROID_EXIT=%ERRORLEVEL%"
@@ -29,7 +29,7 @@ echo [OK] Android APK: %ANDROID_APK%
 echo.
 
 echo ========================================================
-echo  [2/2] Building SyncTouch Desktop Windows Artifact...
+echo  [2/2] Building Nexus Desktop Windows Artifact...
 echo ========================================================
 if exist "desktop\build.bat" (
     call "desktop\build.bat" --no-pause

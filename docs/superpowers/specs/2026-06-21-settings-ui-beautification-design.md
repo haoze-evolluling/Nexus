@@ -5,7 +5,7 @@
 
 ## Overview
 
-Optimize the SyncTouch settings page UI with a clean modern style, improved spacing/layout, and click feedback effects. This is an incremental optimization that preserves the existing RecyclerView + MaterialCardView architecture.
+Optimize the Nexus settings page UI with a clean modern style, improved spacing/layout, and click feedback effects. This is an incremental optimization that preserves the existing RecyclerView + MaterialCardView architecture.
 
 ## Current State
 

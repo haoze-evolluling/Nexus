@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.audio
+﻿package com.haoze.nexus.audio
 
 import android.content.Context
 import android.content.res.Configuration
@@ -22,7 +22,7 @@ enum class AppLanguage(val storageValue: String, val tag: String?) {
  * 配置化 Context，接收服务在构建通知时同样用 wrap() 取本地化文案。
  */
 object LocaleManager {
-    private const val PREFS_NAME = "steamvoice_language"
+    private const val PREFS_NAME = "nexus_language"
     private const val KEY_LANGUAGE = "app_language"
 
     fun current(context: Context): AppLanguage =

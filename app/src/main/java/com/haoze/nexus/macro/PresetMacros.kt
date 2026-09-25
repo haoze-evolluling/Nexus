@@ -1,7 +1,7 @@
-package com.haoze.claudekeyboard.macro
+﻿package com.haoze.nexus.macro
 
 import android.content.Context
-import com.haoze.claudekeyboard.R
+import com.haoze.nexus.R
 
 /**
  * Preset macros for Claude Code CLI.

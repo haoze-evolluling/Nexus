@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.audio
+﻿package com.haoze.nexus.audio
 
 import android.media.MediaCodec
 import android.media.MediaFormat

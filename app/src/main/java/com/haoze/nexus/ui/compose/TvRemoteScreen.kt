@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.ui.compose
+﻿package com.haoze.nexus.ui.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -45,10 +45,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.haoze.claudekeyboard.R
-import com.haoze.claudekeyboard.ui.tvremote.CircularDpad
-import com.haoze.claudekeyboard.ui.tvremote.DpadDirection
-import com.haoze.claudekeyboard.util.performKeyClick
+import com.haoze.nexus.R
+import com.haoze.nexus.ui.tvremote.CircularDpad
+import com.haoze.nexus.ui.tvremote.DpadDirection
+import com.haoze.nexus.util.performKeyClick
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

@@ -5,7 +5,7 @@
 
 ## Overview
 
-Enhance SyncTouch settings page by adding 6 new settings and refactoring the UI from a flat `LinearLayout` to a `RecyclerView`-based grouped list for better maintainability and extensibility.
+Enhance Nexus settings page by adding 6 new settings and refactoring the UI from a flat `LinearLayout` to a `RecyclerView`-based grouped list for better maintainability and extensibility.
 
 ## Current State
 
@@ -101,8 +101,8 @@ sealed class SettingsItem {
 ## File Changes
 
 ### New Files
-- `app/src/main/java/com/haoze/claudekeyboard/ui/settings/SettingsItem.kt` — Data model
-- `app/src/main/java/com/haoze/claudekeyboard/ui/settings/SettingsAdapter.kt` — RecyclerView adapter with ViewHolder types for each item type
+- `app/src/main/java/com/haoze/nexus/ui/settings/SettingsItem.kt` — Data model
+- `app/src/main/java/com/haoze/nexus/ui/settings/SettingsAdapter.kt` — RecyclerView adapter with ViewHolder types for each item type
 
 ### Modified Files
 - `content_settings.xml` — Replace `ScrollView`/`LinearLayout` with `RecyclerView`

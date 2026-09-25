@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"steamvoice-desktop/internal/config"
-	"steamvoice-desktop/internal/gateway"
-	"steamvoice-desktop/internal/protocol"
+	"nexus-desktop/internal/config"
+	"nexus-desktop/internal/gateway"
+	"nexus-desktop/internal/protocol"
 )
 
 // newTestApp returns an app with an in-memory trust store and a running

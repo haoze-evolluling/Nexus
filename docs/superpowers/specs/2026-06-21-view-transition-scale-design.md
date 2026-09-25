@@ -5,7 +5,7 @@
 
 ## Context
 
-SyncTouch is a single-Activity Android app with 6 content views stacked in a `FrameLayout`. Switching between views is done via `showOnly()` in `MainActivity.kt`, which toggles `View.VISIBLE` / `View.GONE` instantly with no animation.
+Nexus is a single-Activity Android app with 6 content views stacked in a `FrameLayout`. Switching between views is done via `showOnly()` in `MainActivity.kt`, which toggles `View.VISIBLE` / `View.GONE` instantly with no animation.
 
 ## Goal
 
@@ -21,7 +21,7 @@ Add a scale animation to view transitions, providing visual feedback when switch
 
 ### File changes
 
-Single file: `app/src/main/java/com/haoze/claudekeyboard/MainActivity.kt`
+Single file: `app/src/main/java/com/haoze/nexus/MainActivity.kt`
 
 ### Core logic
 

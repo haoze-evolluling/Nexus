@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard
+﻿package com.haoze.nexus
 
 import android.os.Build
 import android.os.Bundle
@@ -9,10 +9,10 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.haoze.claudekeyboard.sound.KeyboardSoundSynthesizer
-import com.haoze.claudekeyboard.ui.compose.SyncTouchTheme
-import com.haoze.claudekeyboard.ui.compose.getThemeColorStyle
-import com.haoze.claudekeyboard.ui.keyboard.KeyboardScreen
+import com.haoze.nexus.sound.KeyboardSoundSynthesizer
+import com.haoze.nexus.ui.compose.NexusTheme
+import com.haoze.nexus.ui.compose.getThemeColorStyle
+import com.haoze.nexus.ui.keyboard.KeyboardScreen
 
 class KeyboardActivity : InputActivity() {
 
@@ -29,7 +29,7 @@ class KeyboardActivity : InputActivity() {
         bluetoothViewModel.connectedDeviceName.observe(this) { connectedDeviceNameState = it }
 
         setContent {
-            SyncTouchTheme(colorStyle = getThemeColorStyle(this)) {
+            NexusTheme(colorStyle = getThemeColorStyle(this)) {
                 KeyboardScreen(
                     isConnected = isConnectedState,
                     connectedDeviceName = connectedDeviceNameState,

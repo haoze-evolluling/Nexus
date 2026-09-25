@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.ui.keyboard
+﻿package com.haoze.nexus.ui.keyboard
 
 import android.content.Context
 import android.view.HapticFeedbackConstants
@@ -52,12 +52,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.edit
-import com.haoze.claudekeyboard.sound.KeyboardSoundSynthesizer
-import com.haoze.claudekeyboard.sound.SwitchType
-import com.haoze.claudekeyboard.ui.component.animation.rememberScreenEntranceTransition
-import com.haoze.claudekeyboard.ui.component.animation.screenEntranceMain
-import com.haoze.claudekeyboard.ui.component.animation.screenEntranceTopBar
-import com.haoze.claudekeyboard.ui.compose.ThemeController
+import com.haoze.nexus.sound.KeyboardSoundSynthesizer
+import com.haoze.nexus.sound.SwitchType
+import com.haoze.nexus.ui.component.animation.rememberScreenEntranceTransition
+import com.haoze.nexus.ui.component.animation.screenEntranceMain
+import com.haoze.nexus.ui.component.animation.screenEntranceTopBar
+import com.haoze.nexus.ui.compose.ThemeController
 
 /**
  * 机械键盘页面（Bluke 的 Keyboard 界面完整移植）：

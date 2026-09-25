@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Optimize the SyncTouch settings page UI with modern card styling, improved spacing, and click feedback effects.
+**Goal:** Optimize the Nexus settings page UI with modern card styling, improved spacing, and click feedback effects.
 
 **Architecture:** Incremental visual-only changes to existing XML layouts and adapter code. No new features or behavioral changes. All existing functionality preserved.
 
@@ -199,7 +199,7 @@ git commit -m "feat: update RecyclerView padding for better spacing"
 ### Task 5: Update Toggle Group Button Style
 
 **Files:**
-- Modify: `app/src/main/java/com/haoze/claudekeyboard/ui/settings/SettingsAdapter.kt`
+- Modify: `app/src/main/java/com/haoze/nexus/ui/settings/SettingsAdapter.kt`
 
 **Interfaces:**
 - Consumes: Existing MaterialButton styling
@@ -231,7 +231,7 @@ Expected: BUILD SUCCESSFUL
 - [ ] **Step 3: Commit**
 
 ```bash
-git add app/src/main/java/com/haoze/claudekeyboard/ui/settings/SettingsAdapter.kt
+git add app/src/main/java/com/haoze/nexus/ui/settings/SettingsAdapter.kt
 git commit -m "feat: update toggle button style - 12sp, no caps"
 ```
 

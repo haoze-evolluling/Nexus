@@ -1,5 +1,5 @@
 <resources>
-  <string name="app_name">SyncTouch</string>
+  <string name="app_name">Nexus</string>
   <!-- Button labels -->
   <string name="btn_yes">确认</string>
   <string name="btn_no">拒绝</string>
@@ -17,7 +17,7 @@
   <!-- Notification -->
   <string name="notification_channel_name">蓝牙 HID 服务</string>
   <string name="notification_channel_description">显示蓝牙 HID 键盘连接状态</string>
-  <string name="notification_title">SyncTouch</string>
+  <string name="notification_title">Nexus</string>
   <string name="notification_waiting">等待配对…</string>
   <string name="notification_connected">已连接: %s</string>
   <string name="notification_disconnected">设备已断开</string>
@@ -96,11 +96,11 @@
   <string name="settings_summary_input">调整移动灵敏度、光标速度和滚动方向</string>
   <string name="settings_summary_feedback">控制操作时的触感反馈</string>
   <string name="settings_summary_about">查看版本、应用名称和许可信息</string>
-  <string name="settings_summary_sponsor">支持 SyncTouch 的持续开发与维护</string>
+  <string name="settings_summary_sponsor">支持 Nexus 的持续开发与维护</string>
   <string name="settings_state_on">开启</string>
   <string name="settings_state_off">关闭</string>
   <string name="settings_github_repo">GitHub 仓库</string>
-  <string name="settings_github_url">https://github.com/haoze-evolluling/SyncTouch</string>
+  <string name="settings_github_url">https://github.com/haoze-evolluling/Nexus</string>
   <string name="dialog_reset_macros_confirm">恢复后会删除自定义命令，并重新生成内置快捷命令。</string>
   <string name="dialog_reset">重置</string>
   <string name="settings_version">版本</string>
@@ -193,7 +193,7 @@
   <string name="home_audio_stream_desc">超低延迟接收电脑音频串流</string>
   <string name="dialog_confirm">确定</string>
 
-  <!-- SteamVoice Audio Stream Strings -->
+  <!-- Nexus Audio Stream Strings -->
   <string name="receiver_active">正在接收 %1$s 的音频</string>
   <string name="receiver_idle">接收服务运行中 · 等待电脑连接</string>
   <string name="receiver_starting">正在启动接收服务…</string>
@@ -218,7 +218,7 @@
   <string name="pc_state_connecting">连接中…</string>
   <string name="pc_state_connected">已连接</string>
   <string name="searching_title">正在搜索附近的电脑</string>
-  <string name="searching_hint">请确认电脑端 SteamVoice 正在运行，且手机和电脑连接到同一 Wi-Fi 网络。</string>
+  <string name="searching_hint">请确认电脑端 Nexus 正在运行，且手机和电脑连接到同一 Wi-Fi 网络。</string>
   <string name="android_device">Android 设备</string>
   <string name="generic_pc">电脑</string>
 
@@ -249,7 +249,7 @@
   <string name="calib_phase_done">已同步 · 回到正常播放</string>
 
   <!-- 通知 -->
-  <string name="receiver_channel">SteamVoice 接收服务</string>
+  <string name="receiver_channel">Nexus 接收服务</string>
   <string name="receiver_notification">正在接收电脑音频</string>
   <string name="receiver_notification_active">正在接收来自 %1$s 的电脑音频</string>
   <string name="auth_channel">连接请求</string>

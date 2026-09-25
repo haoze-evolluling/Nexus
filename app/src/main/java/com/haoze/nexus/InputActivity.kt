@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard
+﻿package com.haoze.nexus
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,7 +6,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import com.haoze.claudekeyboard.bluetooth.BluetoothViewModel
+import com.haoze.nexus.bluetooth.BluetoothViewModel
 
 /**
  * 输入类页面（键盘/触控板/手柄）宿主基类：横屏、全出血绘制，

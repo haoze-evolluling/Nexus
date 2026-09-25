@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.bluetooth
+﻿package com.haoze.nexus.bluetooth
 
 /**
  * Inline class wrapping a 16-byte HID gamepad report.

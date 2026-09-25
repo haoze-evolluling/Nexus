@@ -13,7 +13,7 @@ const (
 )
 
 const (
-	timeSyncMagic  = "SVTS"
+	timeSyncMagic  = "NXTS"
 	TimeSyncSize   = 40
 	timeSyncHeader = 8
 )
@@ -40,7 +40,7 @@ func EncodeTimeSync(s TimeSync) []byte {
 }
 
 func DecodeTimeSync(b []byte) (TimeSync, error) {
-	if len(b) != TimeSyncSize || string(b[:4]) != timeSyncMagic || b[4] != Version {
+	if len(b) != TimeSyncSize || (string(b[:4]) != timeSyncMagic && string(b[:4]) != "SVTS") || b[4] != Version {
 		return TimeSync{}, errors.New("invalid time sync datagram")
 	}
 	kind := b[5]

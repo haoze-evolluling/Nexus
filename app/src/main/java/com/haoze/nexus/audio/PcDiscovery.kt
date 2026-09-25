@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.audio
+package com.haoze.nexus.audio
 
 import android.content.Context
 import android.net.nsd.NsdManager
@@ -8,7 +8,7 @@ import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-/** 局域网内一台可连接的 SteamVoice 电脑。 */
+/** 局域网内一台可连接的 Nexus 电脑。 */
 data class PcDevice(
     val deviceId: String,
     val name: String,
@@ -17,7 +17,7 @@ data class PcDevice(
     val seenAtMs: Long = System.currentTimeMillis(),
 )
 
-/** 局域网内可用于 SteamVoice 时钟校准的另一台 Android 设备。 */
+/** 局域网内可用于 Nexus 时钟校准的另一台 Android 设备。 */
 data class AndroidDevice(
     val deviceId: String,
     val name: String,
@@ -27,13 +27,13 @@ data class AndroidDevice(
 )
 
 /**
- * 浏览局域网中的 SteamVoice 电脑（role=pc），通过 StateFlow 发布设备列表。
+ * 浏览局域网中的 Nexus 电脑（role=pc），通过 StateFlow 发布设备列表。
  * NsdManager 同一时刻只允许一个 resolve，因此用队列串行解析。
  */
 class PcDiscovery(context: Context) {
     private companion object {
-        const val TAG = "SteamVoicePcDiscovery"
-        const val SERVICE_TYPE = "_steamvoice._udp."
+        const val TAG = "NexusPcDiscovery"
+        const val SERVICE_TYPE = "_nexus._udp."
     }
 
     private val nsd = context.getSystemService(Context.NSD_SERVICE) as NsdManager
@@ -67,7 +67,7 @@ class PcDiscovery(context: Context) {
             }
             }
             override fun onServiceFound(serviceInfo: NsdServiceInfo) {
-                if (!serviceInfo.serviceType.contains("steamvoice")) return
+                if (!serviceInfo.serviceType.contains("nexus") && !serviceInfo.serviceType.contains("steamvoice")) return
                 enqueueResolve(serviceInfo)
             }
         }
@@ -87,7 +87,7 @@ class PcDiscovery(context: Context) {
             resolving = true
         }
         // NSD callbacks share one thread on some builds; never block it.
-        kotlin.concurrent.thread(name = "steamvoice-nsd-resolve") { drainResolveQueue() }
+        kotlin.concurrent.thread(name = "nexus-nsd-resolve") { drainResolveQueue() }
     }
 
     private fun drainResolveQueue() {
@@ -119,7 +119,7 @@ class PcDiscovery(context: Context) {
         val role = attrs["role"]?.decodeToString() ?: return
         val deviceId = attrs["device_id"]?.decodeToString() ?: return
         val host = resolveHost(info) ?: return
-        val name = info.serviceName.removePrefix("SteamVoice-").ifBlank { deviceId.take(8) }
+        val name = info.serviceName.removePrefix("Nexus-").removePrefix("SteamVoice-").ifBlank { deviceId.take(8) }
         if (role == "speaker") {
             val device = AndroidDevice(deviceId, name, host, info.port)
             _androidDevices.value = (_androidDevices.value.filterNot { it.deviceId == deviceId } + device).sortedBy { it.name.lowercase() }

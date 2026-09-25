@@ -15,5 +15,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "claudekeyboard"
+rootProject.name = "Nexus"
 include(":app")

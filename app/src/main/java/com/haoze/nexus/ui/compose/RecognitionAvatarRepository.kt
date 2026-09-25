@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.ui.compose
+﻿package com.haoze.nexus.ui.compose
 
 import android.content.Context
 import android.graphics.BitmapFactory
@@ -15,7 +15,7 @@ import java.net.URL
 
 private const val AVATAR_DIRECTORY = "recognition_avatars"
 private const val AVATAR_BASE_URL =
-    "https://raw.githubusercontent.com/haoze-evolluling/SyncTouch/main/avatars/"
+    "https://raw.githubusercontent.com/haoze-evolluling/Nexus/main/avatars/"
 private const val MAX_AVATAR_BYTES = 1_024 * 1_024L
 
 sealed interface RecognitionAvatarState {

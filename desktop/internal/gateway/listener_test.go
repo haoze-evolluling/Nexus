@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"steamvoice-desktop/internal/protocol"
+	"nexus-desktop/internal/protocol"
 )
 
 func TestListenerDeliversRequestAndResponds(t *testing.T) {

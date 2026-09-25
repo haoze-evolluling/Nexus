@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.ui.compose
+﻿package com.haoze.nexus.ui.compose
 
 import android.bluetooth.BluetoothDevice
 import android.content.Intent
@@ -9,7 +9,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import com.haoze.claudekeyboard.ui.component.animation.bouncyCardClickable
+import com.haoze.nexus.ui.component.animation.bouncyCardClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -86,8 +86,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.activity.compose.BackHandler
-import com.haoze.claudekeyboard.R
-import com.haoze.claudekeyboard.macro.Macro
+import com.haoze.nexus.R
+import com.haoze.nexus.macro.Macro
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -128,7 +128,7 @@ enum class TvRemoteAction {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SyncTouchApp(
+fun NexusApp(
     isConnected: Boolean,
     connectedDeviceName: String?,
     onNavigate: (AppPage) -> Unit,
@@ -200,13 +200,13 @@ fun SyncTouchApp(
                         onOpenKeyboard = onOpenKeyboard,
                         onOpenTouchpad = onOpenTouchpad,
                         onOpenGamepad = onOpenGamepad,
-                        onOpenAudioReceiver = { context.startActivity(Intent(context, com.haoze.claudekeyboard.ui.audio.AudioReceiverActivity::class.java)) },
+                        onOpenAudioReceiver = { context.startActivity(Intent(context, com.haoze.nexus.ui.audio.AudioReceiverActivity::class.java)) },
                         onNavigateAgent = { onNavigate(AppPage.AGENT) },
                         onNavigateTvRemote = { onNavigate(AppPage.TV_REMOTE) },
                         onNavigateSettings = { onNavigate(AppPage.SETTINGS) },
-                        onNavigateAbout = { onNavigateRoute(com.haoze.claudekeyboard.ui.Routes.ABOUT) },
-                        onNavigateSponsor = { onNavigateRoute(com.haoze.claudekeyboard.ui.Routes.SPONSOR) },
-                        onNavigateSponsorList = { onNavigateRoute(com.haoze.claudekeyboard.ui.Routes.SPONSOR_LIST) }
+                        onNavigateAbout = { onNavigateRoute(com.haoze.nexus.ui.Routes.ABOUT) },
+                        onNavigateSponsor = { onNavigateRoute(com.haoze.nexus.ui.Routes.SPONSOR) },
+                        onNavigateSponsorList = { onNavigateRoute(com.haoze.nexus.ui.Routes.SPONSOR_LIST) }
                     )
                 }
             }
@@ -256,7 +256,7 @@ fun SyncTouchApp(
 }
 
 @Composable
-fun SyncTouchConfirmationDialog(title: String, message: String, confirmLabel: String, destructive: Boolean, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+fun NexusConfirmationDialog(title: String, message: String, confirmLabel: String, destructive: Boolean, onConfirm: () -> Unit, onDismiss: () -> Unit) {
     AppAlertDialog(onDismissRequest = onDismiss, title = { Text(title) }, text = { Text(message) }, confirmButton = {
         TextButton(onClick = onConfirm) { Text(confirmLabel, color = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary) }
     }, dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.dialog_cancel)) } })

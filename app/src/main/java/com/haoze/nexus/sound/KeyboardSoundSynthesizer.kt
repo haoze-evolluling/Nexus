@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.sound
+﻿package com.haoze.nexus.sound
 
 import android.content.Context
 import android.media.AudioAttributes

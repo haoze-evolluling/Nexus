@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.ui.compose
+﻿package com.haoze.nexus.ui.compose
 
 import android.content.Context
 import android.graphics.BitmapFactory
@@ -44,7 +44,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.haoze.claudekeyboard.R
+import com.haoze.nexus.R
 import kotlinx.coroutines.launch
 
 private fun Context.showToast(text: String, duration: Int = Toast.LENGTH_SHORT) {
@@ -131,7 +131,7 @@ fun SponsorListScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             SettingsInfoText(
-                text = "感谢每一位支持 SyncTouch 项目的朋友！名单默认按赞助时间由早到晚排列，可通过右上角按钮切换为由晚到早；与赞助金额无关，每一份支持都同样珍贵。",
+                text = "感谢每一位支持 Nexus 项目的朋友！名单默认按赞助时间由早到晚排列，可通过右上角按钮切换为由晚到早；与赞助金额无关，每一份支持都同样珍贵。",
                 modifier = Modifier.padding(top = 8.dp)
             )
             if (isConfigurationLoading) {

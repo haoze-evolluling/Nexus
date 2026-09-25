@@ -15,7 +15,7 @@ var assets embed.FS
 func main() {
 	app := NewApp()
 	if err := wails.Run(&options.App{
-		Title: "SyncTouch Audio",
+		Title: "Nexus",
 		Width: 1120,
 		Height: 720,
 		AssetServer: &assetserver.Options{Assets: assets},

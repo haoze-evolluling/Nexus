@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.bluetooth
+﻿package com.haoze.nexus.bluetooth
 
 import android.bluetooth.BluetoothHidDevice
 import android.bluetooth.BluetoothHidDeviceAppSdpSettings

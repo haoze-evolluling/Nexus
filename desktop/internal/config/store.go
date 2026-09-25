@@ -82,7 +82,7 @@ func DefaultPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(base, "SteamVoice", "desktop.json"), nil
+	return filepath.Join(base, "Nexus", "desktop.json"), nil
 }
 
 func newIdentity() string {

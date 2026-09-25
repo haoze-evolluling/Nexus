@@ -4,11 +4,12 @@ export type Locale = 'zh' | 'en';
 export type LanguagePref = 'system' | 'zh' | 'en';
 export type ParamValue = string | number;
 
-const languageKey = 'steamvoice.desktop.language';
+const languageKey = 'nexus.desktop.language';
+const nxmsgPrefix = 'nxmsg:';
 const svmsgPrefix = 'svmsg:';
 
 /** 会话进行中由 Go 后端报告的“正常传输”状态码，前端据此区分正常与告警。 */
-export const STREAMING_CODE = 'svmsg:streaming';
+export const STREAMING_CODE = 'nxmsg:streaming';
 
 const messages: Record<Locale, Record<string, string>> = {
   zh: {
@@ -35,7 +36,7 @@ const messages: Record<Locale, Record<string, string>> = {
     'device.disconnect': '断开',
     'device.waiting': '等待确认…',
     'empty.scanning': '正在扫描局域网接收端…',
-    'empty.hint': '请确认手机端 SyncTouch 已打开并连接到同一 Wi-Fi',
+    'empty.hint': '请确认手机端 Nexus 已打开并连接到同一 Wi-Fi',
     'sync.doneTitle': '多设备同步完成',
     'sync.doneHint': '各设备已对齐统一时间基准，回到正常播放',
     'sync.busyTitle': '正在同步校准多台设备',
@@ -135,7 +136,7 @@ const messages: Record<Locale, Record<string, string>> = {
     'device.disconnect': 'Disconnect',
     'device.waiting': 'Waiting…',
     'empty.scanning': 'Scanning the LAN for receivers…',
-    'empty.hint': 'Make sure SyncTouch is open on the phone and both are on the same Wi-Fi',
+    'empty.hint': 'Make sure Nexus is open on the phone and both are on the same Wi-Fi',
     'sync.doneTitle': 'Multi-device sync complete',
     'sync.doneHint': 'All devices are aligned to a shared timebase, back to normal playback',
     'sync.busyTitle': 'Calibrating multi-device sync',
@@ -235,10 +236,11 @@ export function t(key: string, params?: Record<string, ParamValue>): string {
   return text;
 }
 
-/** 解析 Go 后端的 svmsg:<code>[:<detail>] 消息码并按当前语言翻译；detail 可嵌套另一个码。 */
+/** 解析 Go 后端的 nxmsg:<code>[:<detail>] 消息码并按当前语言翻译；detail 可嵌套另一个码。 */
 export function translateBackend(raw: string): string {
-  if (!raw.startsWith(svmsgPrefix)) return raw;
-  const body = raw.slice(svmsgPrefix.length);
+  const prefix = raw.startsWith(nxmsgPrefix) ? nxmsgPrefix : raw.startsWith(svmsgPrefix) ? svmsgPrefix : null;
+  if (!prefix) return raw;
+  const body = raw.slice(prefix.length);
   const colon = body.indexOf(':');
   const code = colon < 0 ? body : body.slice(0, colon);
   const detail = colon < 0 ? '' : body.slice(colon + 1);

@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.util
+﻿package com.haoze.nexus.util
 
 import android.content.Context
 import android.view.HapticFeedbackConstants

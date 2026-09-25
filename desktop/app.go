@@ -15,19 +15,19 @@ import (
 	"time"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
-	"steamvoice-desktop/internal/capture"
-	"steamvoice-desktop/internal/codec"
-	"steamvoice-desktop/internal/config"
-	"steamvoice-desktop/internal/discovery"
-	"steamvoice-desktop/internal/gateway"
-	"steamvoice-desktop/internal/ntp"
-	"steamvoice-desktop/internal/protocol"
-	"steamvoice-desktop/internal/stream"
+	"nexus-desktop/internal/capture"
+	"nexus-desktop/internal/codec"
+	"nexus-desktop/internal/config"
+	"nexus-desktop/internal/discovery"
+	"nexus-desktop/internal/gateway"
+	"nexus-desktop/internal/ntp"
+	"nexus-desktop/internal/protocol"
+	"nexus-desktop/internal/stream"
 )
 
-// 用户可见消息以前端可翻译的稳定码（svmsg:<code>[:<detail>]）传递，
+// 用户可见消息以前端可翻译的稳定码（nxmsg:<code>[:<detail>]）传递，
 // 前端按界面语言查表翻译；未识别的码或裸文本按原样展示。
-const svmsgPrefix = "svmsg:"
+const svmsgPrefix = "nxmsg:"
 
 func svMsg(code string) string { return svmsgPrefix + code }
 
@@ -218,7 +218,7 @@ func (a *App) Startup(ctx context.Context) {
 	} else {
 		a.listener = listener
 	}
-	if advertiser, err := discovery.Advertise("SteamVoice-"+a.pcName(), a.store.DeviceID, protocol.DesktopControlPort); err != nil {
+	if advertiser, err := discovery.Advertise("Nexus-"+a.pcName(), a.store.DeviceID, protocol.DesktopControlPort); err != nil {
 		log.Printf("mDNS advertise failed: %v", err)
 	} else {
 		a.advertiser = advertiser

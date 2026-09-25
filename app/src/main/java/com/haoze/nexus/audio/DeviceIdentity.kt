@@ -1,7 +1,7 @@
-package com.haoze.claudekeyboard.audio
+﻿package com.haoze.nexus.audio
 
 import android.content.Context
-import com.haoze.claudekeyboard.R
+import com.haoze.nexus.R
 
 object DeviceIdentity {
     fun friendlyName(context: Context): String {

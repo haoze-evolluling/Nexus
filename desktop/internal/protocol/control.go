@@ -16,7 +16,7 @@ type Settings struct {
 
 func EncodeSettings(s Settings) []byte {
 	b := make([]byte, SettingsControlSize)
-	copy(b, "SVCS")
+	copy(b, "NXCS")
 	b[4] = Version
 	b[5] = 1
 	binary.BigEndian.PutUint32(b[8:], s.BitrateKbps)
@@ -27,7 +27,7 @@ func EncodeSettings(s Settings) []byte {
 }
 
 func DecodeSettings(b []byte) (Settings, error) {
-	if len(b) != SettingsControlSize || string(b[:4]) != "SVCS" || b[4] != Version || b[5] != 1 {
+	if len(b) != SettingsControlSize || (string(b[:4]) != "NXCS" && string(b[:4]) != "SVCS") || b[4] != Version || b[5] != 1 {
 		return Settings{}, errors.New("invalid settings control")
 	}
 	id := string(b[24:40])
@@ -60,7 +60,7 @@ type ReceiverFeedback struct {
 
 func EncodeFeedback(f ReceiverFeedback) []byte {
 	b := make([]byte, FeedbackSize)
-	copy(b, "SVCT")
+	copy(b, "NXCT")
 	b[4] = Version
 	b[5] = 1
 	binary.BigEndian.PutUint32(b[8:], f.Session)
@@ -75,7 +75,7 @@ func EncodeFeedback(f ReceiverFeedback) []byte {
 	return b
 }
 func DecodeFeedback(b []byte) (ReceiverFeedback, error) {
-	if len(b) != FeedbackSize || string(b[:4]) != "SVCT" || b[4] != Version || b[5] != 1 {
+	if len(b) != FeedbackSize || (string(b[:4]) != "NXCT" && string(b[:4]) != "SVCT") || b[4] != Version || b[5] != 1 {
 		return ReceiverFeedback{}, errors.New("invalid feedback")
 	}
 	f := ReceiverFeedback{Session: binary.BigEndian.Uint32(b[8:]), HighestSeq: binary.BigEndian.Uint32(b[12:]), Received: binary.BigEndian.Uint32(b[16:]), Lost: binary.BigEndian.Uint32(b[20:]), Queue: binary.BigEndian.Uint16(b[24:]), Bitrate: binary.BigEndian.Uint32(b[26:])}

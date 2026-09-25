@@ -1,17 +1,17 @@
-package com.haoze.claudekeyboard.audio
+﻿package com.haoze.nexus.audio
 
 import java.util.TreeMap
 
 class PacketJitterBuffer(private val targetPackets: Int = 4) {
-    sealed class Item { data class Packet(val value: SteamVoicePacket): Item(); data object Gap: Item() }
-    private val packets = TreeMap<Long, SteamVoicePacket>()
+    sealed class Item { data class Packet(val value: NexusVoicePacket): Item(); data object Gap: Item() }
+    private val packets = TreeMap<Long, NexusVoicePacket>()
     private var session = -1L
     private var nextSequence = -1L
-    fun offer(packet: SteamVoicePacket) {
+    fun offer(packet: NexusVoicePacket) {
         if (packet.session != session) { packets.clear(); session = packet.session; nextSequence = packet.sequence }
         if (packet.sequence >= nextSequence) packets.putIfAbsent(packet.sequence, packet)
     }
-    fun take(): SteamVoicePacket? {
+    fun take(): NexusVoicePacket? {
         if (nextSequence < 0 || packets.size < targetPackets) return null
         val packet = packets.remove(nextSequence)
         if (packet == null) {

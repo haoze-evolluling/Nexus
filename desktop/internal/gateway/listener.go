@@ -4,7 +4,7 @@ import (
 	"net"
 	"sync"
 
-	"steamvoice-desktop/internal/protocol"
+	"nexus-desktop/internal/protocol"
 )
 
 // ControlPort is the fixed UDP port the desktop listens on for connection

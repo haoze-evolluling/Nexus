@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"steamvoice-desktop/internal/stream"
+	"nexus-desktop/internal/stream"
 )
 
 func newTestSession(t *testing.T, id string, name string) *deviceSession {

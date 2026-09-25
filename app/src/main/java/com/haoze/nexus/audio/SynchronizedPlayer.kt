@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.audio
+﻿package com.haoze.nexus.audio
 
 import android.media.AudioTrack
 import android.util.Log
@@ -43,7 +43,7 @@ class SynchronizedPlayer(
 
     fun start() {
         if (worker != null) return
-        worker = thread(name = "steamvoice-player") { runLoop() }
+        worker = thread(name = "nexus-player") { runLoop() }
     }
 
     /** 安装时钟映射（发送端流时钟 → 本机时钟）；时钟未收敛时返回 null。 */
@@ -162,7 +162,7 @@ class SynchronizedPlayer(
     }
 
     private companion object {
-        const val TAG = "SteamVoicePlayer"
+        const val TAG = "NexusPlayer"
         const val QUEUE_CAPACITY = 256
         const val NOMINAL_RATE = 48000
         const val RATE_STEP_HZ = 24

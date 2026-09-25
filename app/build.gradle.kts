@@ -7,7 +7,10 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
-val keystorePropertiesFile = rootProject.file("SyncTouch-keystore/keystore.properties")
+val keystorePropertiesFile = listOf(
+    rootProject.file("Nexus-keystore/keystore.properties"),
+    rootProject.file("SyncTouch-keystore/keystore.properties")
+).firstOrNull { it.exists() } ?: rootProject.file("Nexus-keystore/keystore.properties")
 
 val keystoreProperties = Properties().apply {
     if (keystorePropertiesFile.exists()) {
@@ -25,13 +28,13 @@ val releaseKeystoreFile: File? = releaseStoreFilePath?.let { rootProject.file(it
 val signDebugWithRelease = project.findProperty("signDebugWithRelease") in listOf("true", "1", "")
 
 android {
-    namespace = "com.haoze.claudekeyboard"
+    namespace = "com.haoze.nexus"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.haoze.claudekeyboard"
+        applicationId = "com.haoze.nexus"
         minSdk = 28
         targetSdk = 37
         versionCode = 1
@@ -100,7 +103,7 @@ listOf("debug", "release").forEach { buildType ->
         dependsOn("assemble$capitalizedBuildType")
         from(apkOutputDirectory)
         include("app-$buildType.apk")
-        rename("app-$buildType.apk", "SyncTouch-$buildType-v$apkVersionName.apk")
+        rename("app-$buildType.apk", "Nexus-$buildType-v$apkVersionName.apk")
         into(versionedApkOutputDirectory)
     }
 

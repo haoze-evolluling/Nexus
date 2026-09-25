@@ -23,7 +23,7 @@
     <uses-feature android:name="android.hardware.sensor.gyroscope" android:required="false" />
 
     <application
-        android:name=".SyncTouchApplication"
+        android:name=".NexusApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -31,7 +31,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Claudekeyboard">
+        android:theme="@style/Theme.Nexus">
 
         <!-- Main activity: launcher entry, keyboard UI -->
         <activity
@@ -40,7 +40,7 @@
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize|uiMode"
             android:windowLayoutInDisplayCutoutMode="shortEdges"
-            android:theme="@style/Theme.Claudekeyboard.Splash">
+            android:theme="@style/Theme.Nexus.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

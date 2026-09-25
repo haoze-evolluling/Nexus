@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.ui.touchpad
+﻿package com.haoze.nexus.ui.touchpad
 
 import android.content.Context
 import android.os.SystemClock
@@ -46,15 +46,15 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.haoze.claudekeyboard.R
-import com.haoze.claudekeyboard.bluetooth.MouseReport
-import com.haoze.claudekeyboard.bluetooth.MouseSender
-import com.haoze.claudekeyboard.ui.component.animation.rememberScreenEntranceTransition
-import com.haoze.claudekeyboard.ui.component.animation.screenEntranceBottomBar
-import com.haoze.claudekeyboard.ui.component.animation.screenEntranceCenter
-import com.haoze.claudekeyboard.ui.component.animation.screenEntranceMain
-import com.haoze.claudekeyboard.util.performHapticLongPress
-import com.haoze.claudekeyboard.util.performKeyClick
+import com.haoze.nexus.R
+import com.haoze.nexus.bluetooth.MouseReport
+import com.haoze.nexus.bluetooth.MouseSender
+import com.haoze.nexus.ui.component.animation.rememberScreenEntranceTransition
+import com.haoze.nexus.ui.component.animation.screenEntranceBottomBar
+import com.haoze.nexus.ui.component.animation.screenEntranceCenter
+import com.haoze.nexus.ui.component.animation.screenEntranceMain
+import com.haoze.nexus.util.performHapticLongPress
+import com.haoze.nexus.util.performKeyClick
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 

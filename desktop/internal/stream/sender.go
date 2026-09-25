@@ -5,7 +5,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"net"
-	"steamvoice-desktop/internal/protocol"
+	"nexus-desktop/internal/protocol"
 	"sync"
 	"time"
 )

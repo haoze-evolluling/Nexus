@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.audio
+﻿package com.haoze.nexus.audio
 
 import android.content.Context
 import androidx.datastore.preferences.core.Preferences
@@ -13,7 +13,7 @@ private val VALID_BITRATES = setOf(64, 96, 128, 192)
 
 data class AudioSettings(val initialBitrateKbps: Int = 128, val frameMs: Int = 10, val updatedAtMs: Long = 0L, val deviceId: String = "")
 
-private val Context.settingsDataStore by preferencesDataStore(name = "steamvoice_settings")
+private val Context.settingsDataStore by preferencesDataStore(name = "nexus_settings")
 
 class SettingsRepository(private val context: Context) {
     private object Keys {

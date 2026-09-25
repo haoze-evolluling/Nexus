@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.ui.tvremote
+﻿package com.haoze.nexus.ui.tvremote
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -34,8 +34,8 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.haoze.claudekeyboard.R
-import com.haoze.claudekeyboard.util.performKeyClick
+import com.haoze.nexus.R
+import com.haoze.nexus.util.performKeyClick
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive

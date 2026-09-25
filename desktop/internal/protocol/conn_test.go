@@ -60,12 +60,12 @@ func TestEncodeConnTruncatesLongName(t *testing.T) {
 func TestDecodeConnRejectsForeignDatagrams(t *testing.T) {
 	cases := [][]byte{
 		nil,
-		[]byte("SVCT"),
-		append([]byte("SVCR\x03\x01\x00\x00"), []byte("id")...), // wrong version
-		[]byte("SVCR\x03\x09\x00\x00id\x00name"),                // unknown kind
-		[]byte("SVCR\x03\x01\x00\x00\x00name"),                  // empty device id
-		[]byte("SVCR\x03\x02\x00\x00id"),                        // response without decision
-		[]byte("SVCR\x03\x02\x00\x00id\x00\x07"),                // unknown decision
+		[]byte("NXCT"),
+		append([]byte("NXCR\x03\x01\x00\x00"), []byte("id")...), // wrong version
+		[]byte("NXCR\x03\x09\x00\x00id\x00name"),                // unknown kind
+		[]byte("NXCR\x03\x01\x00\x00\x00name"),                  // empty device id
+		[]byte("NXCR\x03\x02\x00\x00id"),                        // response without decision
+		[]byte("NXCR\x03\x02\x00\x00id\x00\x07"),                // unknown decision
 	}
 	for _, b := range cases {
 		if _, err := DecodeConn(b); err == nil {
@@ -89,9 +89,9 @@ func TestTimeSyncRoundTrip(t *testing.T) {
 
 func TestDecodeTimeSyncRejectsForeign(t *testing.T) {
 	for _, bad := range [][]byte{
-		[]byte("SVTS"),
-		append([]byte("SVTS\x03\x01\x00\x00"), make([]byte, 34)...),
-		append([]byte("SVTS\x04\x09\x00\x00"), make([]byte, 32)...),
+		[]byte("NXTS"),
+		append([]byte("NXTS\x03\x01\x00\x00"), make([]byte, 34)...),
+		append([]byte("NXTS\x04\x09\x00\x00"), make([]byte, 32)...),
 	} {
 		if _, err := DecodeTimeSync(bad); err == nil {
 			t.Fatalf("accepted %q", bad[:6])

@@ -1,4 +1,4 @@
-module steamvoice-desktop
+module nexus-desktop
 
 go 1.26.0
 

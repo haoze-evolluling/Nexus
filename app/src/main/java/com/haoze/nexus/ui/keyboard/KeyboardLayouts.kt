@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.ui.keyboard
+﻿package com.haoze.nexus.ui.keyboard
 
 import androidx.compose.ui.graphics.Color
 

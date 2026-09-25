@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.bluetooth
+﻿package com.haoze.nexus.bluetooth
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -22,8 +22,8 @@ import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.haoze.claudekeyboard.MainActivity
-import com.haoze.claudekeyboard.R
+import com.haoze.nexus.MainActivity
+import com.haoze.nexus.R
 import java.util.concurrent.Executors
 
 /**

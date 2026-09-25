@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SyncTouch</string>
+    <string name="app_name">Nexus</string>
     <string name="home_audio_stream_title">Wireless Audio</string>
     <string name="home_audio_stream_desc">Low-latency PC audio receiver</string>
 
@@ -22,7 +22,7 @@
         <item quantity="other">%1$d PCs</item>
     </plurals>
     <string name="pc_denied">The PC rejected the connection request</string>
-    <string name="pc_connect_failed">Could not connect to %1$s. Make sure SteamVoice is running on the PC</string>
+    <string name="pc_connect_failed">Could not connect to %1$s. Make sure Nexus is running on the PC</string>
     <string name="btn_connect">Connect</string>
     <string name="btn_disconnect">Disconnect</string>
     <string name="btn_remove">Remove</string>
@@ -31,7 +31,7 @@
     <string name="pc_state_connecting">Connecting…</string>
     <string name="pc_state_connected">Connected</string>
     <string name="searching_title">Searching for nearby PCs</string>
-    <string name="searching_hint">Make sure SteamVoice is running on the PC, and that the phone and the PC are on the same Wi-Fi network.</string>
+    <string name="searching_hint">Make sure Nexus is running on the PC, and that the phone and the PC are on the same Wi-Fi network.</string>
     <string name="android_device">Android device</string>
     <string name="generic_pc">PC</string>
 
@@ -62,7 +62,7 @@
     <string name="calib_phase_done">In sync · Returning to normal playback</string>
 
     <!-- Notifications -->
-    <string name="receiver_channel">SteamVoice receiver service</string>
+    <string name="receiver_channel">Nexus receiver service</string>
     <string name="receiver_notification">Receiving PC audio</string>
     <string name="receiver_notification_active">Receiving PC audio from %1$s</string>
     <string name="auth_channel">Connection requests</string>

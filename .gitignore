@@ -24,6 +24,7 @@ signing.properties
 *.keystore
 *.p12
 SyncTouch-keystore/
+Nexus-keystore/
 secrets/
 
 # Android Studio and IntelliJ IDEA

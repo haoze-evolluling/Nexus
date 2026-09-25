@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.audio
+﻿package com.haoze.nexus.audio
 
 /**
  * 估算本机单调时钟与发送端流时钟的偏差（NTP 风格）。

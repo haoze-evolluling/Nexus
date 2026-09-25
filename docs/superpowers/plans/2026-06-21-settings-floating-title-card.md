@@ -137,7 +137,7 @@ git commit -m "feat: add floating title card with back button to settings"
 ### Task 3: Update MainActivity.kt — remove TitleHeader, add scroll listener, add blur
 
 **Files:**
-- Modify: `app/src/main/java/com/haoze/claudekeyboard/MainActivity.kt:409-494`
+- Modify: `app/src/main/java/com/haoze/nexus/MainActivity.kt:409-494`
 
 **Interfaces:**
 - Consumes: `R.id.card_settings_title`, `R.id.btn_back_settings`, `R.id.tv_settings_title`, `R.id.rv_settings` (Task 2)
@@ -276,6 +276,6 @@ Expected: BUILD SUCCESSFUL
 - [ ] **Step 4: Commit**
 
 ```bash
-git add app/src/main/java/com/haoze/claudekeyboard/MainActivity.kt
+git add app/src/main/java/com/haoze/nexus/MainActivity.kt
 git commit -m "feat: add floating title card with blur, scroll shadow, remove TitleHeader"
 ```

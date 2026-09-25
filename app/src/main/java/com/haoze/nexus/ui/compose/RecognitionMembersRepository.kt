@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.ui.compose
+﻿package com.haoze.nexus.ui.compose
 
 import android.content.Context
 import android.util.AtomicFile
@@ -26,7 +26,7 @@ data class RecognitionMembersConfiguration(
 
 object RecognitionMembersRepository {
     private const val CONFIGURATION_URL =
-        "https://raw.githubusercontent.com/haoze-evolluling/SyncTouch/main/recognition_members.json"
+        "https://raw.githubusercontent.com/haoze-evolluling/Nexus/main/recognition_members.json"
     private const val CACHE_FILE_NAME = "recognition_members.json"
     private const val PREFERENCES_NAME = "recognition_members"
     private const val ETAG_KEY = "etag"
@@ -90,8 +90,8 @@ object RecognitionMembersRepository {
         val root = JSONObject(json)
         require(root.has("version") && !root.isNull("version")) { "名单配置缺少版本" }
         return RecognitionMembersConfiguration(
-            sponsors = parseMembers(root.getJSONArray("sponsors"), "感谢您对 SyncTouch 项目的赞助支持"),
-            coBuilders = parseMembers(root.getJSONArray("coBuilders"), "感谢为 SyncTouch 提出建议与帮助测试")
+            sponsors = parseMembers(root.getJSONArray("sponsors"), "感谢您对 Nexus 项目的赞助支持"),
+            coBuilders = parseMembers(root.getJSONArray("coBuilders"), "感谢为 Nexus 提出建议与帮助测试")
         ).also { configuration ->
             validateUniqueMembers(configuration.sponsors)
             validateUniqueMembers(configuration.coBuilders)

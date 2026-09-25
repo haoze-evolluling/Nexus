@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard
+﻿package com.haoze.nexus
 
 import android.content.Context
 import android.content.Intent
@@ -12,32 +12,32 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.haoze.claudekeyboard.bluetooth.BluetoothViewModel
-import com.haoze.claudekeyboard.bluetooth.HidProfile
-import com.haoze.claudekeyboard.bluetooth.KeyboardSender
-import com.haoze.claudekeyboard.macro.Macro
-import com.haoze.claudekeyboard.macro.MacroRepository
-import com.haoze.claudekeyboard.ui.Routes
-import com.haoze.claudekeyboard.ui.compose.AboutSettingsScreen
-import com.haoze.claudekeyboard.ui.compose.AgentScreen
-import com.haoze.claudekeyboard.ui.compose.AppPage
-import com.haoze.claudekeyboard.ui.compose.CoreCommand
-import com.haoze.claudekeyboard.ui.compose.ConnectionSettingsScreen
-import com.haoze.claudekeyboard.ui.compose.DataSettingsScreen
-import com.haoze.claudekeyboard.ui.compose.DayNightModeScreen
-import com.haoze.claudekeyboard.ui.compose.FeedbackSettingsScreen
-import com.haoze.claudekeyboard.ui.compose.InputSettingsScreen
-import com.haoze.claudekeyboard.ui.compose.MacroEditorAlertDialog
-import com.haoze.claudekeyboard.ui.compose.AppearanceSettingsScreen
-import com.haoze.claudekeyboard.ui.compose.SettingsScreen
-import com.haoze.claudekeyboard.ui.compose.SponsorListScreen
-import com.haoze.claudekeyboard.ui.compose.SponsorSettingsScreen
-import com.haoze.claudekeyboard.ui.compose.SyncTouchConfirmationDialog
-import com.haoze.claudekeyboard.ui.compose.SyncTouchTheme
-import com.haoze.claudekeyboard.ui.compose.ThemeColorSettingsScreen
-import com.haoze.claudekeyboard.ui.compose.TvRemoteAction
-import com.haoze.claudekeyboard.ui.compose.TvRemoteScreen
-import com.haoze.claudekeyboard.ui.compose.getThemeColorStyle
+import com.haoze.nexus.bluetooth.BluetoothViewModel
+import com.haoze.nexus.bluetooth.HidProfile
+import com.haoze.nexus.bluetooth.KeyboardSender
+import com.haoze.nexus.macro.Macro
+import com.haoze.nexus.macro.MacroRepository
+import com.haoze.nexus.ui.Routes
+import com.haoze.nexus.ui.compose.AboutSettingsScreen
+import com.haoze.nexus.ui.compose.AgentScreen
+import com.haoze.nexus.ui.compose.AppPage
+import com.haoze.nexus.ui.compose.CoreCommand
+import com.haoze.nexus.ui.compose.ConnectionSettingsScreen
+import com.haoze.nexus.ui.compose.DataSettingsScreen
+import com.haoze.nexus.ui.compose.DayNightModeScreen
+import com.haoze.nexus.ui.compose.FeedbackSettingsScreen
+import com.haoze.nexus.ui.compose.InputSettingsScreen
+import com.haoze.nexus.ui.compose.MacroEditorAlertDialog
+import com.haoze.nexus.ui.compose.AppearanceSettingsScreen
+import com.haoze.nexus.ui.compose.SettingsScreen
+import com.haoze.nexus.ui.compose.SponsorListScreen
+import com.haoze.nexus.ui.compose.SponsorSettingsScreen
+import com.haoze.nexus.ui.compose.NexusConfirmationDialog
+import com.haoze.nexus.ui.compose.NexusTheme
+import com.haoze.nexus.ui.compose.ThemeColorSettingsScreen
+import com.haoze.nexus.ui.compose.TvRemoteAction
+import com.haoze.nexus.ui.compose.TvRemoteScreen
+import com.haoze.nexus.ui.compose.getThemeColorStyle
 
 abstract class ComposePageActivity : ComponentActivity() {
     protected val bluetoothViewModel: BluetoothViewModel by viewModels()
@@ -61,7 +61,7 @@ class TvRemoteActivity : ComposePageActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setComposeContent {
-            SyncTouchTheme(colorStyle = getThemeColorStyle(this@TvRemoteActivity)) {
+            NexusTheme(colorStyle = getThemeColorStyle(this@TvRemoteActivity)) {
                 TvRemoteScreen(isConnected, ::finish, ::sendAction)
             }
         }
@@ -103,7 +103,7 @@ class AgentActivity : ComposePageActivity() {
         macroRepository = MacroRepository(this)
         loadMacros()
         setComposeContent {
-            SyncTouchTheme(colorStyle = getThemeColorStyle(this@AgentActivity)) {
+            NexusTheme(colorStyle = getThemeColorStyle(this@AgentActivity)) {
                 AgentScreen(
                     isConnected, connectedDeviceName, macros, ::finish, ::sendCoreCommand, ::sendMacro,
                     onMacroLongClick = { macro -> editingMacro = macro; showMacroEditor = true },
@@ -124,7 +124,7 @@ class AgentActivity : ComposePageActivity() {
                     )
                 }
                 pendingDeleteMacroId?.let { id ->
-                    SyncTouchConfirmationDialog(
+                    NexusConfirmationDialog(
                         getString(R.string.dialog_delete_macro),
                         getString(R.string.dialog_delete_macro_message),
                         getString(R.string.dialog_delete),
@@ -179,7 +179,7 @@ class SettingsActivity : ComposePageActivity() {
         get() = intent.getStringExtra(EXTRA_ROUTE) ?: Routes.SETTINGS
 
     private lateinit var macroRepository: MacroRepository
-    private var colorStyleState by mutableStateOf(com.haoze.claudekeyboard.ui.compose.ThemeColorStyle.SYSTEM)
+    private var colorStyleState by mutableStateOf(com.haoze.nexus.ui.compose.ThemeColorStyle.SYSTEM)
     private var inputProfileState by mutableStateOf(HidProfile.DEFAULT)
     private var childLaunchInProgress = false
 
@@ -197,7 +197,7 @@ class SettingsActivity : ComposePageActivity() {
         colorStyleState = getThemeColorStyle(this)
         bluetoothViewModel.inputProfile.observe(this) { inputProfileState = it }
         setComposeContent {
-            SyncTouchTheme(colorStyle = colorStyleState) {
+            NexusTheme(colorStyle = colorStyleState) {
                 SettingsRouteContent(
                     route = route,
                     onBack = ::finish,
@@ -227,7 +227,7 @@ class SettingsActivity : ComposePageActivity() {
         onNavigate: (String) -> Unit,
         onBooleanSettingChanged: (String, Boolean) -> Unit,
         onResetMacros: () -> Unit,
-        onThemeColorStyleChanged: (com.haoze.claudekeyboard.ui.compose.ThemeColorStyle) -> Unit
+        onThemeColorStyleChanged: (com.haoze.nexus.ui.compose.ThemeColorStyle) -> Unit
     ) {
         when (route) {
             Routes.SETTINGS -> SettingsScreen(

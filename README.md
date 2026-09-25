@@ -1,6 +1,6 @@
-# SyncTouch
+# Nexus
 
-SyncTouch 是一款集**低延迟蓝牙外设模拟**与**局域网高保真无线音频串流**于一体的全能跨端控制套件。
+Nexus 是一款集**低延迟蓝牙外设模拟**与**局域网高保真无线音频串流**于一体的全能跨端控制套件。
 
 - **移动端（Android）**：提供基于标准蓝牙 HID 的虚拟触控板、机械按键音效键盘、双摇杆游戏手柄、电视遥控器，并内置超低延迟 Opus 音频串流接收引擎与微秒级多设备时钟同播对齐。
 - **桌面端（Windows）**：基于 Wails v2 + Vue 3 构建的轻量级发送端，通过 WASAPI Loopback 实时捕获系统音频并经 Opus 高保真压缩，毫秒级推流至一台或多台 Android 设备。
@@ -9,10 +9,10 @@ SyncTouch 是一款集**低延迟蓝牙外设模拟**与**局域网高保真无�
 
 ## ✨ 核心特性
 
-### 1. 局域网高保真无线音频串流（原 SteamVoice 整合）
+### 1. 局域网高保真无线音频串流
 - **超低延迟传输**：基于 48 kHz 双声道 Opus 实时编解码，支持 10 ms / 20 ms 极低帧长及 64 ~ 192 kbps 动态码率。
 - **高精度时钟同步与平滑播放**：NTP 风格纳秒级往返时钟对齐结合 Jitter Buffer 与自适应微调重采样，彻底消除跳音与多设备同播回音。
-- **分体式多声道与同播校准**：单台电脑可向多台 Android 设备分发独立声道（立体声 / 左 / 右），支持设备间直接发起同播校准（SVAC）。
+- **分体式多声道与同播校准**：单台电脑可向多台 Android 设备分发独立声道（立体声 / 左 / 右），支持设备间直接发起同播校准（NXAC）。
 - **双向 mDNS 发现与授权**：两端自动发现并支持双向发起连接，提供设备指纹授权与免密重连。
 
 ### 2. 全功能蓝牙 HID 外设模拟
@@ -29,7 +29,7 @@ SyncTouch 是一款集**低延迟蓝牙外设模拟**与**局域网高保真无�
 ## 📦 项目架构
 
 ```text
-SyncTouch/
+Nexus/
 ├── app/                  # Android 客户端源码（Kotlin、Jetpack Compose、NDK/CMake）
 │   ├── src/main/cpp/     # Opus 解码器与 JNI 桥接（C/C++）
 │   ├── src/main/java/    # 业务逻辑（bluetooth 外设模拟、audio 串流接收引擎、ui 交互）
@@ -75,5 +75,5 @@ SyncTouch/
 - **编译运行**：
   ```powershell
   cd desktop
-  wails dev -tags "steamvoice_opus nolibopusfile"
+  wails dev -tags "nexus_opus nolibopusfile"
   ```

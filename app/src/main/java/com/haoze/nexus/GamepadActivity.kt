@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard
+﻿package com.haoze.nexus
 
 import android.os.Build
 import android.os.Bundle
@@ -9,9 +9,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.haoze.claudekeyboard.ui.compose.SyncTouchTheme
-import com.haoze.claudekeyboard.ui.compose.getThemeColorStyle
-import com.haoze.claudekeyboard.ui.gamepad.GamepadScreen
+import com.haoze.nexus.ui.compose.NexusTheme
+import com.haoze.nexus.ui.compose.getThemeColorStyle
+import com.haoze.nexus.ui.gamepad.GamepadScreen
 
 /**
  * Bluke 手柄页宿主：横屏全出血（与键盘/触控板一致），
@@ -30,7 +30,7 @@ class GamepadActivity : InputActivity() {
         bluetoothViewModel.connectedDeviceName.observe(this) { connectedDeviceNameState = it }
 
         setContent {
-            SyncTouchTheme(colorStyle = getThemeColorStyle(this)) {
+            NexusTheme(colorStyle = getThemeColorStyle(this)) {
                 GamepadScreen(
                     isConnected = isConnectedState,
                     deviceName = connectedDeviceNameState,

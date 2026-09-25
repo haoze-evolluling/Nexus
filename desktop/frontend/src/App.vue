@@ -15,8 +15,8 @@ type Calibration = { phase: number; offsetMs: number; rttMs: number; updatedAt: 
 const phaseLabels = computed(() => [t('phase.detect'), t('phase.calculate'), t('phase.sync'), t('phase.done')]);
 const phaseHints = computed(() => [t('phaseHint.detect'), t('phaseHint.calculate'), t('phaseHint.sync'), t('phaseHint.done')]);
 const languageOptions: LanguagePref[] = ['system', 'zh', 'en'];
-const settingsKey = 'steamvoice.desktop.settings.v2';
-const deviceIdKey = 'steamvoice.desktop.device_id';
+const settingsKey = 'nexus.desktop.settings.v2';
+const deviceIdKey = 'nexus.desktop.device_id';
 const deviceId = localStorage.getItem(deviceIdKey) ?? crypto.randomUUID();
 localStorage.setItem(deviceIdKey, deviceId);
 const defaults: Settings = { bitrate: 128000, frameMs: 10, theme: 'system', updatedAtMs: 0, deviceId };
@@ -24,7 +24,7 @@ const settings = ref<Settings>({ ...defaults });
 const themeOptions: Theme[] = ['light', 'dark', 'system'];
 const page = ref<'devices' | 'settings'>('devices');
 const devices = ref<Device[]>([]);
-// 状态条文案统一在展示时翻译：key 为前端文案键，backend 为 Go 的 svmsg 码，
+// 状态条文案统一在展示时翻译：key 为前端文案键，backend 为 Go 的 nxmsg 码，
 // 语言切换后无需等待下一条消息即自动切换显示语言。
 type StatusInfo = { kind: 'key' | 'backend'; value: string; params?: Record<string, ParamValue> } | null;
 const statusInfo = ref<StatusInfo>(null);
@@ -37,7 +37,7 @@ function setStatus(key: string, params?: Record<string, ParamValue>) { statusInf
 function setStatusBackend(raw: string) { statusInfo.value = { kind: 'backend', value: raw }; }
 function setErrorStatus(prefixKey: string, error: unknown) {
   const message = error instanceof Error ? error.message : String(error);
-  if (message.startsWith('svmsg:')) setStatusBackend(message);
+  if (message.startsWith('nxmsg:') || message.startsWith('svmsg:')) setStatusBackend(message);
   else setStatus(prefixKey, { detail: message });
 }
 const connected = ref<Record<string, DeviceStatus>>({});
@@ -214,7 +214,7 @@ onUnmounted(() => { window.clearInterval(tickTimer); });
 <template>
   <main>
     <header>
-      <div><p class="eyebrow">{{ t('header.eyebrow') }}</p><h1>SyncTouch Audio</h1></div>
+      <div><p class="eyebrow">{{ t('header.eyebrow') }}</p><h1>Nexus</h1></div>
       <div class="header-actions"><span :class="['status', connectedCount ? 'live' : '']">{{ headerStatus }}</span><button class="secondary" @click="page = page === 'settings' ? 'devices' : 'settings'">{{ page === 'settings' ? t('header.back') : t('header.settings') }}</button></div>
     </header>
 

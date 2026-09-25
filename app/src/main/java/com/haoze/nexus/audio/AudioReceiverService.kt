@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.audio
+package com.haoze.nexus.audio
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -23,16 +23,16 @@ import java.net.InetAddress
 import kotlin.concurrent.thread
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import com.haoze.claudekeyboard.R
-import com.haoze.claudekeyboard.ui.audio.AudioReceiverActivity
+import com.haoze.nexus.R
+import com.haoze.nexus.ui.audio.AudioReceiverActivity
 
 class AudioReceiverService : Service() {
     private companion object {
-        const val TAG = "SteamVoiceReceiver"; const val MAX_UDP_PACKET = 65535
+        const val TAG = "NexusReceiver"; const val MAX_UDP_PACKET = 65535
         const val AUTH_NOTIFICATION_ID = 9
         const val PROMPT_EXPIRY_MS = 35_000L
         const val HEARTBEAT_TIMEOUT_NS = 3_500_000_000L
-        const val ACTION_RESPOND = "com.haoze.claudekeyboard.audio.action.RESPOND"
+        const val ACTION_RESPOND = "com.haoze.nexus.audio.action.RESPOND"
         const val EXTRA_REQUEST_ID = "request_id"; const val EXTRA_ALLOW = "allow"; const val EXTRA_REMEMBER = "remember"
         fun timeSyncIntervalNs(hasEstimate: Boolean): Long = if (hasEstimate) 2_000_000_000L else 250_000_000L
     }
@@ -70,7 +70,7 @@ class AudioReceiverService : Service() {
                 if (requestId.isNotEmpty()) ConnectionBus.decisions.add(Triple(requestId, allow, remember))
             }
         }
-        Log.i(TAG, "receiver service starting port=${SteamVoiceProtocol.port}")
+        Log.i(TAG, "receiver service starting port=${NexusProtocol.port}")
         stopRequested = false
         ensureMediaSession()
         // Publish the media session-backed notification before doing network
@@ -78,7 +78,7 @@ class AudioReceiverService : Service() {
         // service from the moment it is started.
         startForeground(8, notification(null))
         registerService()
-        if (worker?.isAlive != true) worker = thread(name = "steamvoice-udp") { receiveLoop() }
+        if (worker?.isAlive != true) worker = thread(name = "nexus-udp") { receiveLoop() }
         // Keep the receiver discoverable after the process is reclaimed while the
         // screen is locked; trusted peers can then reconnect without reopening UI.
         return START_STICKY
@@ -112,7 +112,7 @@ class AudioReceiverService : Service() {
 
     private fun notification(pcName: String?): Notification {
         val loc = LocaleManager.wrap(this)
-        return NotificationCompat.Builder(this, "steamvoice-receiver")
+        return NotificationCompat.Builder(this, "nexus-receiver")
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(loc.getString(R.string.app_name))
             .setContentText(
@@ -126,7 +126,7 @@ class AudioReceiverService : Service() {
             .build()
             .also {
                 val manager = getSystemService(NotificationManager::class.java)
-                val channel = NotificationChannel("steamvoice-receiver", loc.getString(R.string.receiver_channel), NotificationManager.IMPORTANCE_LOW)
+                val channel = NotificationChannel("nexus-receiver", loc.getString(R.string.receiver_channel), NotificationManager.IMPORTANCE_LOW)
                 channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 manager.createNotificationChannel(channel)
             }
@@ -149,7 +149,7 @@ class AudioReceiverService : Service() {
         // onStartCommand 在每次前台服务被拉起时都会触发（例如发起连接前的
         // ensureReceiverRunning）；重复注册同名服务会与自身记录冲突导致广播异常。
         if (registration != null) return
-        val settings = runBlocking { SettingsRepository(this@AudioReceiverService).settings.first() }; nsd=getSystemService(Context.NSD_SERVICE) as NsdManager; val friendly=DeviceIdentity.friendlyName(LocaleManager.wrap(this)); val info=NsdServiceInfo().apply { serviceName="SteamVoice-$friendly"; serviceType="_steamvoice._udp."; port=SteamVoiceProtocol.port; setAttribute("role", "speaker"); setAttribute("device_id", settings.deviceId); setAttribute("codec", "opus"); setAttribute("sample_rate", SteamVoiceProtocol.sampleRate.toString()); setAttribute("channels", SteamVoiceProtocol.channels.toString()); setAttribute("bitrate", (settings.initialBitrateKbps * 1000).toString()); setAttribute("frame_ms", SteamVoiceProtocol.supportedFrameMilliseconds.joinToString(",")); setAttribute("current_frame_ms", settings.frameMs.toString()); setAttribute("settings_updated_at", settings.updatedAtMs.toString()); setAttribute("settings_device_id", settings.deviceId) }; registration=object:NsdManager.RegistrationListener { override fun onServiceRegistered(i:NsdServiceInfo){ Log.i(TAG,"advertising ${i.serviceName}") }; override fun onRegistrationFailed(i:NsdServiceInfo,e:Int){ Log.e(TAG,"NSD registration failed: $e"); registration = null }; override fun onServiceUnregistered(i:NsdServiceInfo){ registration = null }; override fun onUnregistrationFailed(i:NsdServiceInfo,e:Int){ Log.e(TAG,"NSD unregistration failed: $e") } }; nsd?.registerService(info,NsdManager.PROTOCOL_DNS_SD,registration) }
+        val settings = runBlocking { SettingsRepository(this@AudioReceiverService).settings.first() }; nsd=getSystemService(Context.NSD_SERVICE) as NsdManager; val friendly=DeviceIdentity.friendlyName(LocaleManager.wrap(this)); val info=NsdServiceInfo().apply { serviceName="Nexus-$friendly"; serviceType="_nexus._udp."; port=NexusProtocol.port; setAttribute("role", "speaker"); setAttribute("device_id", settings.deviceId); setAttribute("codec", "opus"); setAttribute("sample_rate", NexusProtocol.sampleRate.toString()); setAttribute("channels", NexusProtocol.channels.toString()); setAttribute("bitrate", (settings.initialBitrateKbps * 1000).toString()); setAttribute("frame_ms", NexusProtocol.supportedFrameMilliseconds.joinToString(",")); setAttribute("current_frame_ms", settings.frameMs.toString()); setAttribute("settings_updated_at", settings.updatedAtMs.toString()); setAttribute("settings_device_id", settings.deviceId) }; registration=object:NsdManager.RegistrationListener { override fun onServiceRegistered(i:NsdServiceInfo){ Log.i(TAG,"advertising ${i.serviceName}") }; override fun onRegistrationFailed(i:NsdServiceInfo,e:Int){ Log.e(TAG,"NSD registration failed: $e"); registration = null }; override fun onServiceUnregistered(i:NsdServiceInfo){ registration = null }; override fun onUnregistrationFailed(i:NsdServiceInfo,e:Int){ Log.e(TAG,"NSD unregistration failed: $e") } }; nsd?.registerService(info,NsdManager.PROTOCOL_DNS_SD,registration) }
 
     private fun receiveLoop() {
         val repository = SettingsRepository(this@AudioReceiverService)
@@ -157,7 +157,7 @@ class AudioReceiverService : Service() {
         var settings = runBlocking { repository.settings.first() }
         val track = newTrack()
         val buffer = PacketJitterBuffer(targetPackets = 2)
-        socket = DatagramSocket(SteamVoiceProtocol.port)
+        socket = DatagramSocket(NexusProtocol.port)
         val bytes = ByteArray(MAX_UDP_PACKET)
         var received = 0L
         var decoded = 0L
@@ -396,7 +396,7 @@ class AudioReceiverService : Service() {
                 // actual source address on its first audio packet.
                 val authorized = fromActivePc(datagram.address, datagram.port)
                 if (!authorized) { unauthorizedDrops++; if (unauthorizedDrops % 100 == 1L) Log.w(TAG, "dropping audio from unauthorized ${datagram.address} (total=$unauthorizedDrops)"); continue }
-                val packet = SteamVoiceProtocol.decode(datagram.data, datagram.length)
+                val packet = NexusProtocol.decode(datagram.data, datagram.length)
                 if (packet == null) { Log.w(TAG, "invalid UDP packet length=${datagram.length}"); continue }
                 // The control request originates from the receiver's fixed
                 // port (40125), while the desktop streams from the sender's
@@ -572,7 +572,7 @@ class AudioReceiverService : Service() {
                 publish(peerDeviceId, PeerCalibrationState(PeerCalibrationPhase.MEASURING))
                 lastPeerAddress = datagram.address; lastPeerPort = datagram.port
                 val peer = AndroidDevice(control.deviceId, control.deviceId.take(8), datagram.address.hostAddress ?: return, datagram.port)
-                thread(name = "steamvoice-peer-calibration") {
+                thread(name = "nexus-peer-calibration") {
                     val result = runCatching { AndroidClockSync.query(peer) }.getOrNull()
                     val currentPc = activePc
                     if (result == null || currentPc == null || currentPc.deviceId != control.pcId || peerOperation != control.operation) {
@@ -606,7 +606,7 @@ class AudioReceiverService : Service() {
         runCatching {
             val bye = ConnControl(ConnControl.KIND_BYE, selfIdBlocking(), nonce = pc.nonce).encode()
             repeat(3) {
-                socket?.send(DatagramPacket(bye, bye.size, pc.address, SteamVoiceProtocol.desktopControlPort))
+                socket?.send(DatagramPacket(bye, bye.size, pc.address, NexusProtocol.desktopControlPort))
             }
         }
     }
@@ -632,7 +632,7 @@ class AudioReceiverService : Service() {
     private fun postAuthNotification(prompt: PcAuthPrompt) {
         val manager = getSystemService(NotificationManager::class.java)
         val loc = LocaleManager.wrap(this)
-        val authChannel = NotificationChannel("steamvoice-auth", loc.getString(R.string.auth_channel), NotificationManager.IMPORTANCE_HIGH)
+        val authChannel = NotificationChannel("nexus-auth", loc.getString(R.string.auth_channel), NotificationManager.IMPORTANCE_HIGH)
         authChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         manager.createNotificationChannel(authChannel)
         val openApp = PendingIntent.getActivity(
@@ -641,7 +641,7 @@ class AudioReceiverService : Service() {
             Intent(this, AudioReceiverActivity::class.java),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
-        val notification = NotificationCompat.Builder(this, "steamvoice-auth")
+        val notification = NotificationCompat.Builder(this, "nexus-auth")
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle(loc.getString(R.string.auth_title))
             .setContentText(loc.getString(R.string.auth_notification_text, prompt.name))

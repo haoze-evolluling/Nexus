@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.ui.compose
+﻿package com.haoze.nexus.ui.compose
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseOut
@@ -66,14 +66,14 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastCoerceIn
 import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.fastRoundToInt
-import com.haoze.claudekeyboard.R
-import com.haoze.claudekeyboard.ui.component.liquid.DampedDragAnimation
-import com.haoze.claudekeyboard.ui.component.liquid.InnerShadow
-import com.haoze.claudekeyboard.ui.component.liquid.InteractiveHighlight
-import com.haoze.claudekeyboard.ui.component.liquid.IosIndicatorSpecular
-import com.haoze.claudekeyboard.ui.component.liquid.drawSpecularHighlight
-import com.haoze.claudekeyboard.ui.component.liquid.innerShadow
-import com.haoze.claudekeyboard.ui.component.liquid.rememberGravityRotatedHighlight
+import com.haoze.nexus.R
+import com.haoze.nexus.ui.component.liquid.DampedDragAnimation
+import com.haoze.nexus.ui.component.liquid.InnerShadow
+import com.haoze.nexus.ui.component.liquid.InteractiveHighlight
+import com.haoze.nexus.ui.component.liquid.IosIndicatorSpecular
+import com.haoze.nexus.ui.component.liquid.drawSpecularHighlight
+import com.haoze.nexus.ui.component.liquid.innerShadow
+import com.haoze.nexus.ui.component.liquid.rememberGravityRotatedHighlight
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop

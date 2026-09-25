@@ -1,7 +1,7 @@
 {
   "$schema": "https://wails.io/schemas/config.v2.json",
-  "name": "SyncTouch-Audio",
-  "outputfilename": "SyncTouch-Audio",
+  "name": "Nexus",
+  "outputfilename": "Nexus",
   "info": {
     "productVersion": "2.0.0"
   },

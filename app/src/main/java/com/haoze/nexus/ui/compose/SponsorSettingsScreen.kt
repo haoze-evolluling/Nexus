@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.ui.compose
+﻿package com.haoze.nexus.ui.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +19,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.haoze.claudekeyboard.R
+import com.haoze.nexus.R
 
 @Composable
 fun SponsorSettingsScreen(onBack: () -> Unit) {
@@ -35,7 +35,7 @@ fun SponsorSettingsScreen(onBack: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text("请作者喝杯蜜雪 🧋", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold)
-                Text("如果 SyncTouch 帮助到了你，欢迎请作者喝杯蜜雪。", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("如果 Nexus 帮助到了你，欢迎请作者喝杯蜜雪。", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     PaymentQrCode(R.drawable.alipay_code, "支付宝付款码", Modifier.weight(1f))
                     PaymentQrCode(R.drawable.wechatpay_code, "微信付款码", Modifier.weight(1f))

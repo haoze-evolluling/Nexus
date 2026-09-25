@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.ui.audio
+﻿package com.haoze.nexus.ui.audio
 
 import android.Manifest
 import android.content.Context
@@ -83,27 +83,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.haoze.claudekeyboard.R
-import com.haoze.claudekeyboard.audio.ActivePc
-import com.haoze.claudekeyboard.audio.AndroidDevice
-import com.haoze.claudekeyboard.audio.AudioReceiverService
-import com.haoze.claudekeyboard.audio.AudioSettings
-import com.haoze.claudekeyboard.audio.CalibrationPhase
-import com.haoze.claudekeyboard.audio.CalibrationState
-import com.haoze.claudekeyboard.audio.ConnectionBus
-import com.haoze.claudekeyboard.audio.DeviceIdentity
-import com.haoze.claudekeyboard.audio.LocaleManager
-import com.haoze.claudekeyboard.audio.PcAuthPrompt
-import com.haoze.claudekeyboard.audio.PcConnectionState
-import com.haoze.claudekeyboard.audio.PcConnector
-import com.haoze.claudekeyboard.audio.PcDevice
-import com.haoze.claudekeyboard.audio.PcDiscovery
-import com.haoze.claudekeyboard.audio.PcTrustRepository
-import com.haoze.claudekeyboard.audio.PeerCalibrationPhase
-import com.haoze.claudekeyboard.audio.PeerCalibrationState
-import com.haoze.claudekeyboard.audio.SettingsRepository
-import com.haoze.claudekeyboard.ui.compose.SyncTouchTheme
-import com.haoze.claudekeyboard.ui.compose.getThemeColorStyle
+import com.haoze.nexus.R
+import com.haoze.nexus.audio.ActivePc
+import com.haoze.nexus.audio.AndroidDevice
+import com.haoze.nexus.audio.AudioReceiverService
+import com.haoze.nexus.audio.AudioSettings
+import com.haoze.nexus.audio.CalibrationPhase
+import com.haoze.nexus.audio.CalibrationState
+import com.haoze.nexus.audio.ConnectionBus
+import com.haoze.nexus.audio.DeviceIdentity
+import com.haoze.nexus.audio.LocaleManager
+import com.haoze.nexus.audio.PcAuthPrompt
+import com.haoze.nexus.audio.PcConnectionState
+import com.haoze.nexus.audio.PcConnector
+import com.haoze.nexus.audio.PcDevice
+import com.haoze.nexus.audio.PcDiscovery
+import com.haoze.nexus.audio.PcTrustRepository
+import com.haoze.nexus.audio.PeerCalibrationPhase
+import com.haoze.nexus.audio.PeerCalibrationState
+import com.haoze.nexus.audio.SettingsRepository
+import com.haoze.nexus.ui.compose.NexusTheme
+import com.haoze.nexus.ui.compose.getThemeColorStyle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -130,7 +130,7 @@ class AudioReceiverActivity : ComponentActivity() {
         enableEdgeToEdge()
         lifecycleScope.launch(Dispatchers.IO) { selfId = repository.settings.first().deviceId }
         setContent {
-            SyncTouchTheme(colorStyle = getThemeColorStyle(this)) {
+            NexusTheme(colorStyle = getThemeColorStyle(this)) {
                 AudioReceiverScreen(
                     discovery = discovery,
                     connector = connector,

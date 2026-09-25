@@ -22,7 +22,7 @@ const (
 )
 
 const (
-	connMagic              = "SVCR"
+	connMagic              = "NXCR"
 	connHeaderSize         = 8
 	connNonceSize          = 8
 	MaxDeviceIDLen         = 64
@@ -94,7 +94,7 @@ func EncodeConn(c ConnControl) ([]byte, error) {
 }
 
 func DecodeConn(b []byte) (ConnControl, error) {
-	if len(b) < connHeaderSize || string(b[:4]) != connMagic || b[4] != Version {
+	if len(b) < connHeaderSize || (string(b[:4]) != connMagic && string(b[:4]) != "SVCR") || b[4] != Version {
 		return ConnControl{}, errors.New("invalid connection control")
 	}
 	c := ConnControl{Kind: b[5]}

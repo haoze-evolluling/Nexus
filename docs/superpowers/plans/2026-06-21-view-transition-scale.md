@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add scale+fade animation to view transitions in SyncTouch, skipping animation when orientation changes.
+**Goal:** Add scale+fade animation to view transitions in Nexus, skipping animation when orientation changes.
 
 **Architecture:** Modify the existing `showOnly()` method in `MainActivity.kt` to accept an `animate` parameter. When animated, use `ViewPropertyAnimator` to scale+fade the outgoing and incoming views. `navigateToPage()` and `navigateToHome()` detect orientation changes and pass `animate = false` when the target orientation differs from the current one.
 
@@ -21,7 +21,7 @@
 ### Task 1: Add scale animation to `showOnly()` and wire orientation-aware skip
 
 **Files:**
-- Modify: `app/src/main/java/com/haoze/claudekeyboard/MainActivity.kt`
+- Modify: `app/src/main/java/com/haoze/nexus/MainActivity.kt`
 
 **Interfaces:**
 - Produces: `private fun showOnly(target: View, animate: Boolean = true)` — new `animate` parameter
@@ -178,6 +178,6 @@ Expected: BUILD SUCCESSFUL
 - [ ] **Step 6: Commit**
 
 ```bash
-git add app/src/main/java/com/haoze/claudekeyboard/MainActivity.kt
+git add app/src/main/java/com/haoze/nexus/MainActivity.kt
 git commit -m "feat: add scale animation to view transitions"
 ```

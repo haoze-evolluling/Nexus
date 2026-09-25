@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.audio
+package com.haoze.nexus.audio
 
 import java.net.DatagramPacket
 import java.net.DatagramSocket
@@ -6,7 +6,7 @@ import java.net.InetAddress
 
 data class AndroidClockSyncResult(val offsetMs: Long, val rttMs: Long)
 
-/** Performs a short NTP-style probe against another SteamVoice Android receiver. */
+/** Performs a short NTP-style probe against another Nexus Android receiver. */
 object AndroidClockSync {
     private const val PROBES = 4
     private const val TIMEOUT_MS = 900

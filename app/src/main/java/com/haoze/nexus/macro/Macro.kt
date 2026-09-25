@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.macro
+﻿package com.haoze.nexus.macro
 
 import java.util.UUID
 

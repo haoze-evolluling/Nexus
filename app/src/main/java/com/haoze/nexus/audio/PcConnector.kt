@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.audio
+﻿package com.haoze.nexus.audio
 
 import android.util.Log
 import java.net.DatagramPacket
@@ -83,7 +83,7 @@ class PcConnector {
     }
 
     private companion object {
-        const val TAG = "SteamVoicePcConnector"
+        const val TAG = "NexusPcConnector"
         const val RETRANSMIT_INTERVAL_MS = 1500
         const val BYE_ATTEMPTS = 3
     }

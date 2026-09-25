@@ -6,7 +6,7 @@ import (
 
 // ServiceType is the mDNS service both platforms advertise; the TXT role
 // attribute distinguishes senders (PCs) from speakers (Android receivers).
-const ServiceType = "_steamvoice._udp"
+const ServiceType = "_nexus._udp"
 
 // Advertiser publishes this desktop on the LAN so Android receivers can
 // discover it and initiate connections.

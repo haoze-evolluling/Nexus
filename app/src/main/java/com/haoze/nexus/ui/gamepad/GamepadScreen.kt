@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.ui.gamepad
+﻿package com.haoze.nexus.ui.gamepad
 
 import android.content.Context
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -40,12 +40,12 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.edit
-import com.haoze.claudekeyboard.R
-import com.haoze.claudekeyboard.ui.component.animation.rememberScreenEntranceTransition
-import com.haoze.claudekeyboard.ui.component.animation.screenEntranceCenter
-import com.haoze.claudekeyboard.ui.component.animation.screenEntranceLeftWing
-import com.haoze.claudekeyboard.ui.component.animation.screenEntranceRightWing
-import com.haoze.claudekeyboard.ui.component.animation.screenEntranceTopBar
+import com.haoze.nexus.R
+import com.haoze.nexus.ui.component.animation.rememberScreenEntranceTransition
+import com.haoze.nexus.ui.component.animation.screenEntranceCenter
+import com.haoze.nexus.ui.component.animation.screenEntranceLeftWing
+import com.haoze.nexus.ui.component.animation.screenEntranceRightWing
+import com.haoze.nexus.ui.component.animation.screenEntranceTopBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs

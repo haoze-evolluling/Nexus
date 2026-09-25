@@ -2,7 +2,7 @@ package stream
 
 import (
 	"net"
-	"steamvoice-desktop/internal/protocol"
+	"nexus-desktop/internal/protocol"
 	"testing"
 	"time"
 )
@@ -22,10 +22,10 @@ func TestRequestConnectionAcceptsRawResponse(t *testing.T) {
 			if err != nil {
 				return
 			}
-			if n >= 8 && string(buf[:4]) == "SVCR" && buf[5] == 1 {
+			if n >= 8 && (string(buf[:4]) == "NXCR" || string(buf[:4]) == "SVCR") && buf[5] == 1 {
 				id := []byte("receiver-echo")
 				out := make([]byte, 8+len(id)+2)
-				copy(out, "SVCR")
+				copy(out, "NXCR")
 				out[4] = protocol.Version
 				out[5] = 2
 				copy(out[8:], id)

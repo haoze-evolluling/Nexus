@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.ui.component.liquid
+﻿package com.haoze.nexus.ui.component.liquid
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable

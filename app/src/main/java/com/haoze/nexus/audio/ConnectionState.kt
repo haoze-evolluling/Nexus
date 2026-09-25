@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.audio
+﻿package com.haoze.nexus.audio
 
 /** Transport state machine shared by connector, receiver service and UI. */
 enum class ConnectionState { IDLE, CONNECTING, AWAITING_AUTHORIZATION, CONNECTED, DISCONNECTING, RECONNECTING, FAILED }

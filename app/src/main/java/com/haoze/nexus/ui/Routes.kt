@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.ui
+﻿package com.haoze.nexus.ui
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bluetooth

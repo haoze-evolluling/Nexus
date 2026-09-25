@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.ui.component.animation
+﻿package com.haoze.nexus.ui.component.animation
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState

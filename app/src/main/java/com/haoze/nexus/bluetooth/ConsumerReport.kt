@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.bluetooth
+﻿package com.haoze.nexus.bluetooth
 
 /**
  * Inline class wrapping a 3-byte HID Consumer Control report.

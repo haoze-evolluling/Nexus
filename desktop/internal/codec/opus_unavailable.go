@@ -1,4 +1,4 @@
-//go:build !steamvoice_opus || !cgo
+//go:build (!nexus_opus && !steamvoice_opus) || !cgo
 
 package codec
 
@@ -16,7 +16,7 @@ const (
 type OpusEncoder struct{}
 
 func NewOpusEncoder(int, int) (*OpusEncoder, error) {
-	return nil, errors.New("Opus encoder unavailable: build with -tags steamvoice_opus and install libopus")
+	return nil, errors.New("Opus encoder unavailable: build with -tags nexus_opus and install libopus")
 }
 func (e *OpusEncoder) SetBitrate(int) error { return errors.New("Opus encoder unavailable") }
 func (e *OpusEncoder) EncodePCM([]byte) ([]byte, error) {

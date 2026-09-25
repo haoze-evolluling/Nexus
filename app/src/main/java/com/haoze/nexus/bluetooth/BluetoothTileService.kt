@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.bluetooth
+﻿package com.haoze.nexus.bluetooth
 
 import android.app.PendingIntent
 import android.content.ComponentName
@@ -10,7 +10,7 @@ import android.os.IBinder
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.core.content.ContextCompat
-import com.haoze.claudekeyboard.R
+import com.haoze.nexus.R
 
 /**
  * Quick Settings tile for one-tap Bluetooth connect/disconnect.
@@ -68,7 +68,7 @@ class BluetoothTileService : TileService() {
                     updateTileState(true)
                 }
                 val intent = Intent(Intent.ACTION_MAIN)
-                    .setClassName(packageName, "com.haoze.claudekeyboard.MainActivity")
+                    .setClassName(packageName, "com.haoze.nexus.MainActivity")
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     val pendingIntent = PendingIntent.getActivity(

@@ -1,7 +1,7 @@
-package com.haoze.claudekeyboard.audio
+﻿package com.haoze.nexus.audio
 
 object OpusNative {
-    init { System.loadLibrary("steamvoice_native") }
+    init { System.loadLibrary("nexus_native") }
     external fun createEncoder(sampleRate: Int, channels: Int, bitrate: Int): Long
     external fun encode(handle: Long, pcm16le: ByteArray, frameSamples: Int): ByteArray?
     external fun setEncoderBitrate(handle: Long, bitrate: Int): Boolean

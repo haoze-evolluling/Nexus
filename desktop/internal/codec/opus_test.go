@@ -1,4 +1,4 @@
-//go:build steamvoice_opus && cgo
+//go:build (nexus_opus || steamvoice_opus) && cgo
 
 package codec
 

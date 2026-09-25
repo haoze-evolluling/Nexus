@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.audio
+﻿package com.haoze.nexus.audio
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit
@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-private val Context.pcTrustDataStore by preferencesDataStore(name = "steamvoice_pc_trust")
+private val Context.pcTrustDataStore by preferencesDataStore(name = "nexus_pc_trust")
 
 /**
  * 记住用户选择“以后自动同意”的电脑，按稳定设备标识存储（条目格式 "id\u0000名称"）。

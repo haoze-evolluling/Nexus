@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.ui.compose
+package com.haoze.nexus.ui.compose
 
 import android.content.Intent
 import android.net.Uri
@@ -48,10 +48,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.haoze.claudekeyboard.R
+import com.haoze.nexus.R
 import kotlin.math.sqrt
 
-private const val PROJECT_REPOSITORY_URL = "https://github.com/haoze-evolluling/SyncTouch"
+private const val PROJECT_REPOSITORY_URL = "https://github.com/haoze-evolluling/Nexus"
 
 private data class AboutCapability(val title: String, val description: String)
 
@@ -65,7 +65,7 @@ private val aboutCapabilities = listOf(
 )
 
 private val aboutBoundaries = listOf(
-    "本机蓝牙直连" to "SyncTouch 通过 Android 蓝牙 HID 与已配对设备直接通信，不经过远程服务器。",
+    "本机蓝牙直连" to "Nexus 通过 Android 蓝牙 HID 与已配对设备直接通信，不经过远程服务器。",
     "设备兼容性" to "接收设备需要支持相应的蓝牙 HID 键盘、鼠标或遥控输入能力；实际表现取决于设备系统和蓝牙环境。",
     "本地数据存储" to "已连接设备信息、应用偏好和自定义快捷命令保存在本机，用于恢复你的使用习惯。"
 )
@@ -112,7 +112,7 @@ fun AboutSettingsScreen(onBack: () -> Unit, versionName: String, isConnected: Bo
             item { ProjectCard(openRepository) }
             item {
                 Text(
-                    text = "SYNCTOUCH / CONTROL AT YOUR FINGERTIPS",
+                    text = "NEXUS / CONTROL AT YOUR FINGERTIPS",
                     modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelMedium,
@@ -148,7 +148,7 @@ private fun AboutHero(versionName: String) {
 private fun HeroCopy(versionName: String, modifier: Modifier = Modifier) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("// BLUETOOTH HID CONTROL", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-        Text("SyncTouch 蓝牙输入控制", color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+        Text("Nexus 蓝牙输入控制", color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
         Text("将手机变为蓝牙键盘、触控板和遥控器，让常用输入与设备控制触手可及。", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyLarge)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             AboutBadge("版本 ${versionName.ifBlank { "--" }}")
@@ -272,7 +272,7 @@ private fun ProjectCard(onOpenRepository: () -> Unit) {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text("MAINTAINED BY", color = MaterialTheme.colorScheme.primary, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                 Text("haoze-evolluling", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                Text("SyncTouch 开源项目", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+                Text("Nexus 开源项目", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
             }
             Surface(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable(onClick = onOpenRepository), shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.primary.copy(alpha = 0.10f), border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.38f))) {
                 Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {

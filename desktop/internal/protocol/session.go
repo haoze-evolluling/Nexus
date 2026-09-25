@@ -112,7 +112,7 @@ const (
 
 func EncodeHeartbeat(h Heartbeat) []byte {
 	b := make([]byte, heartbeatSize)
-	copy(b, "SVHB")
+	copy(b, "NXHB")
 	b[4] = Version
 	b[5] = h.Kind
 	binary.BigEndian.PutUint32(b[8:], h.Session)
@@ -121,7 +121,7 @@ func EncodeHeartbeat(h Heartbeat) []byte {
 	return b
 }
 func DecodeHeartbeat(b []byte) (Heartbeat, error) {
-	if len(b) != heartbeatSize || string(b[:4]) != "SVHB" || b[4] != Version || (b[5] != HeartbeatPing && b[5] != HeartbeatPong) {
+	if len(b) != heartbeatSize || (string(b[:4]) != "NXHB" && string(b[:4]) != "SVHB") || b[4] != Version || (b[5] != HeartbeatPing && b[5] != HeartbeatPong) {
 		return Heartbeat{}, errors.New("invalid heartbeat")
 	}
 	return Heartbeat{Kind: b[5], Session: binary.BigEndian.Uint32(b[8:]), Sequence: binary.BigEndian.Uint32(b[12:]), TimestampNs: binary.BigEndian.Uint64(b[16:])}, nil

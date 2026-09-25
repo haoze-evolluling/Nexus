@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions
 
-rem Build the SteamVoice Windows installer from this script's directory.
+rem Build the Nexus Windows installer from this script's directory.
 pushd "%~dp0"
 
 set "PAUSE_AT_END=1"
@@ -50,8 +50,8 @@ if errorlevel 1 (
 
 set "CGO_ENABLED=1"
 set "CGO_LDFLAGS=-Wl,-Bstatic -lopus -Wl,-Bdynamic %CGO_LDFLAGS%"
-echo Building SteamVoice Windows installer...
-wails build -clean -nsis -installscope machine -tags "steamvoice_opus nolibopusfile"
+echo Building Nexus Windows installer...
+wails build -clean -nsis -installscope machine -tags "nexus_opus nolibopusfile"
 if errorlevel 1 (
     echo [ERROR] Desktop installer build failed.
     goto :done

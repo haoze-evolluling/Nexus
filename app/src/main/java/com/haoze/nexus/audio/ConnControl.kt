@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.audio
+package com.haoze.nexus.audio
 
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -22,7 +22,7 @@ data class ConnControl(val kind: Int, val deviceId: String, val name: String = "
         }
         return ByteBuffer.allocate(HEADER_SIZE + body.size).order(ByteOrder.BIG_ENDIAN).apply {
             put(MAGIC.toByteArray(Charsets.UTF_8))
-            put(SteamVoiceProtocol.version.toByte())
+            put(NexusProtocol.version.toByte())
             put(kind.toByte())
             putShort(0)
             put(body)
@@ -36,14 +36,15 @@ data class ConnControl(val kind: Int, val deviceId: String, val name: String = "
         const val MAX_DEVICE_ID_LEN = 64
         const val MAX_NAME_LEN = 64
         private const val HEADER_SIZE = 8
-        private const val MAGIC = "SVCR"
+        private const val MAGIC = "NXCR"
         private const val ALLOW: Byte = 1
         private const val DENY: Byte = 2
 
         fun decode(data: ByteArray, length: Int): ConnControl? {
             if (length < HEADER_SIZE) return null
-            if (String(data, 0, 4, Charsets.UTF_8) != MAGIC) return null
-            if (data[4].toInt() != SteamVoiceProtocol.version) return null
+            val magic = String(data, 0, 4, Charsets.UTF_8)
+            if (magic != MAGIC && magic != "SVCR") return null
+            if (data[4].toInt() != NexusProtocol.version) return null
             val kind = data[5].toInt() and 0xff
             if (length < HEADER_SIZE + 8) return null
             val nonce = ByteBuffer.wrap(data, HEADER_SIZE, 8).order(ByteOrder.BIG_ENDIAN).long

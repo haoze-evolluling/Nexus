@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.ui.compose
+﻿package com.haoze.nexus.ui.compose
 
 import android.app.Activity
 import android.content.Context
@@ -77,7 +77,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun SyncTouchTheme(
+fun NexusTheme(
     colorStyle: ThemeColorStyle = ThemeColorStyle.SYSTEM,
     content: @Composable () -> Unit
 ) {

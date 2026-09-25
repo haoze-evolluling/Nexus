@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard
+﻿package com.haoze.nexus
 
 import android.Manifest
 import android.bluetooth.BluetoothDevice
@@ -20,13 +20,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.haoze.claudekeyboard.bluetooth.BluetoothViewModel
-import com.haoze.claudekeyboard.ui.Routes
-import com.haoze.claudekeyboard.ui.compose.AppPage
-import com.haoze.claudekeyboard.ui.compose.SyncTouchApp
-import com.haoze.claudekeyboard.ui.compose.SyncTouchTheme
-import com.haoze.claudekeyboard.ui.compose.ThemeController
-import com.haoze.claudekeyboard.ui.compose.getThemeColorStyle
+import com.haoze.nexus.bluetooth.BluetoothViewModel
+import com.haoze.nexus.ui.Routes
+import com.haoze.nexus.ui.compose.AppPage
+import com.haoze.nexus.ui.compose.NexusApp
+import com.haoze.nexus.ui.compose.NexusTheme
+import com.haoze.nexus.ui.compose.ThemeController
+import com.haoze.nexus.ui.compose.getThemeColorStyle
 
 class MainActivity : ComponentActivity() {
 
@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
     private var pairedDevicesState by mutableStateOf<List<BluetoothDevice>>(emptyList())
     private var deviceListPermissionDenied by mutableStateOf(false)
     private var connectingDeviceAddress by mutableStateOf<String?>(null)
-    private var colorStyleState by mutableStateOf(com.haoze.claudekeyboard.ui.compose.ThemeColorStyle.SYSTEM)
+    private var colorStyleState by mutableStateOf(com.haoze.nexus.ui.compose.ThemeColorStyle.SYSTEM)
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -122,8 +122,8 @@ class MainActivity : ComponentActivity() {
 
     private fun setupComposeContent() {
         setContent {
-            SyncTouchTheme(colorStyle = colorStyleState) {
-                SyncTouchApp(
+            NexusTheme(colorStyle = colorStyleState) {
+                NexusApp(
                     isConnected = isConnectedState,
                     connectedDeviceName = connectedDeviceNameState,
                     onNavigate = ::openPage,

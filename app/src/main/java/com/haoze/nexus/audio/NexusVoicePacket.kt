@@ -1,9 +1,9 @@
-package com.haoze.claudekeyboard.audio
+package com.haoze.nexus.audio
 
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-data class SteamVoicePacket(
+data class NexusVoicePacket(
     val codec: Int,
     val sampleRate: Int,
     val channels: Int,
@@ -38,7 +38,7 @@ data class ReceiverFeedback(
 ) {
     fun encode(): ByteArray {
         val b = ByteBuffer.allocate(SIZE).order(ByteOrder.BIG_ENDIAN)
-        b.put("SVCT".toByteArray()).put(SteamVoiceProtocol.version.toByte()).put(1.toByte()).putShort(0)
+        b.put("NXCT".toByteArray()).put(NexusProtocol.version.toByte()).put(1.toByte()).putShort(0)
         b.putInt(session.toInt()).putInt(highestSeq.toInt()).putInt(received.toInt()).putInt(lost.toInt()).putShort(queue.toShort()).putInt(bitrate)
         b.put(syncState.toByte()).putShort(offsetMs.toShort()).putShort(rttMs.toShort())
         return b.array()
@@ -52,7 +52,7 @@ data class ReceiverFeedback(
 data class SettingsControl(val bitrateKbps: Int, val frameMs: Int, val updatedAtMs: Long, val deviceId: String) {
     fun encode(): ByteArray {
         val b = ByteBuffer.allocate(40).order(ByteOrder.BIG_ENDIAN)
-        b.put("SVCS".toByteArray()).put(SteamVoiceProtocol.version.toByte()).put(1.toByte()).putShort(0)
+        b.put("NXCS".toByteArray()).put(NexusProtocol.version.toByte()).put(1.toByte()).putShort(0)
         b.putInt(bitrateKbps * 1000).putShort(frameMs.toShort()).putShort(0).putLong(updatedAtMs)
         val id = deviceId.toByteArray().copyOf(16)
         b.put(id)
@@ -60,7 +60,10 @@ data class SettingsControl(val bitrateKbps: Int, val frameMs: Int, val updatedAt
     }
     companion object {
         fun decode(data: ByteArray, length: Int): SettingsControl? {
-            if (length != 40 || data.copyOfRange(0, 4).decodeToString() != "SVCS" || data[4].toInt() != SteamVoiceProtocol.version || data[5].toInt() != 1) return null
+            if (length != 40) return null
+            val magic = data.copyOfRange(0, 4).decodeToString()
+            if (magic != "NXCS" && magic != "SVCS") return null
+            if (data[4].toInt() != NexusProtocol.version || data[5].toInt() != 1) return null
             val b = ByteBuffer.wrap(data, 0, length).order(ByteOrder.BIG_ENDIAN)
             b.position(8)
             val bitrate = b.int / 1000
@@ -74,11 +77,11 @@ data class SettingsControl(val bitrateKbps: Int, val frameMs: Int, val updatedAt
     }
 }
 
-/** NTP 风格的时钟同步报文（SVTS）。t4 由请求方本地记录，不经网络传输。 */
+/** NTP 风格的时钟同步报文（NXTS/SVTS）。t4 由请求方本地记录，不经网络传输。 */
 data class TimeSyncControl(val kind: Int, val t1: Long, val t2: Long, val t3: Long) {
     fun encode(): ByteArray {
         val b = ByteBuffer.allocate(SIZE).order(ByteOrder.BIG_ENDIAN)
-        b.put(MAGIC.toByteArray()).put(SteamVoiceProtocol.version.toByte()).put(kind.toByte()).putShort(0)
+        b.put(MAGIC.toByteArray()).put(NexusProtocol.version.toByte()).put(kind.toByte()).putShort(0)
         b.putLong(t1).putLong(t2).putLong(t3).putLong(0)
         return b.array()
     }
@@ -87,11 +90,13 @@ data class TimeSyncControl(val kind: Int, val t1: Long, val t2: Long, val t3: Lo
         const val KIND_REQUEST = 1
         const val KIND_RESPONSE = 2
         const val SIZE = 40
-        private const val MAGIC = "SVTS"
+        private const val MAGIC = "NXTS"
 
         fun decode(data: ByteArray, length: Int): TimeSyncControl? {
-            if (length != SIZE || data.copyOfRange(0, 4).decodeToString() != MAGIC) return null
-            if (data[4].toInt() != SteamVoiceProtocol.version) return null
+            if (length != SIZE) return null
+            val magic = data.copyOfRange(0, 4).decodeToString()
+            if (magic != MAGIC && magic != "SVTS") return null
+            if (data[4].toInt() != NexusProtocol.version) return null
             val kind = data[5].toInt() and 0xff
             if (kind != KIND_REQUEST && kind != KIND_RESPONSE) return null
             val b = ByteBuffer.wrap(data, 0, length).order(ByteOrder.BIG_ENDIAN)
@@ -116,7 +121,7 @@ data class PeerCalibrationControl(
         val pc = pcId.toByteArray(Charsets.UTF_8)
         require(device.size in 1..MAX_ID_BYTES && pc.size in 1..MAX_ID_BYTES)
         return ByteBuffer.allocate(HEADER_SIZE + device.size + pc.size).order(ByteOrder.BIG_ENDIAN).apply {
-            put(MAGIC.toByteArray()).put(SteamVoiceProtocol.version.toByte()).put(kind.toByte()).putShort(0)
+            put(MAGIC.toByteArray()).put(NexusProtocol.version.toByte()).put(kind.toByte()).putShort(0)
             putLong(operation).putLong(targetNs).putLong(offsetNs).putLong(rttMs)
             putShort(device.size.toShort()).putShort(pc.size.toShort()).put(device).put(pc)
         }.array()
@@ -125,12 +130,15 @@ data class PeerCalibrationControl(
     companion object {
         const val REQUEST = 1; const val ACCEPT = 2; const val REJECT = 3
         const val COMMIT = 4; const val COMPLETE = 5; const val CANCEL = 6
-        private const val MAGIC = "SVAC"
+        private const val MAGIC = "NXAC"
         private const val HEADER_SIZE = 44
         private const val MAX_ID_BYTES = 64
 
         fun decode(data: ByteArray, length: Int): PeerCalibrationControl? {
-            if (length < HEADER_SIZE || data.copyOfRange(0, 4).decodeToString() != MAGIC || data[4].toInt() != SteamVoiceProtocol.version) return null
+            if (length < HEADER_SIZE) return null
+            val magic = data.copyOfRange(0, 4).decodeToString()
+            if (magic != MAGIC && magic != "SVAC") return null
+            if (data[4].toInt() != NexusProtocol.version) return null
             val kind = data[5].toInt() and 0xff
             if (kind !in REQUEST..CANCEL) return null
             val b = ByteBuffer.wrap(data, 0, length).order(ByteOrder.BIG_ENDIAN)
@@ -143,7 +151,7 @@ data class PeerCalibrationControl(
     }
 }
 
-object SteamVoiceProtocol {
+object NexusProtocol {
     const val port = 40125
     const val version = 4
     const val codecOpus = 1
@@ -157,8 +165,11 @@ object SteamVoiceProtocol {
     const val heartbeatIntervalMs = 1_000L
     const val heartbeatTimeoutMs = 3_500L
     private const val headerSize = 40
-    fun decode(data: ByteArray, length: Int): SteamVoicePacket? {
-        if (length < headerSize || data.copyOfRange(0, 4).decodeToString() != "SV01" || data[4].toInt() != version || data[5].toInt() != codecOpus) return null
+    fun decode(data: ByteArray, length: Int): NexusVoicePacket? {
+        if (length < headerSize) return null
+        val magic = data.copyOfRange(0, 4).decodeToString()
+        if (magic != "NX01" && magic != "SV01") return null
+        if (data[4].toInt() != version || data[5].toInt() != codecOpus) return null
         val buffer = ByteBuffer.wrap(data, 0, length).order(ByteOrder.BIG_ENDIAN)
         val rate = buffer.getInt(6)
         val channelCount = data[10].toInt() and 0xff
@@ -170,19 +181,22 @@ object SteamVoiceProtocol {
         val session = buffer.getInt(16).toLong() and 0xffffffffL
         val sequence = buffer.getInt(20).toLong() and 0xffffffffL
         val timestamp = buffer.getLong(32)
-        return SteamVoicePacket(data[5].toInt(), rate, channelCount, bitrate, frameMs, session, sequence, data.copyOfRange(headerSize, length), data[28].toInt() and 0xff, timestamp)
+        return NexusVoicePacket(data[5].toInt(), rate, channelCount, bitrate, frameMs, session, sequence, data.copyOfRange(headerSize, length), data[28].toInt() and 0xff, timestamp)
     }
 }
 
 data class HeartbeatControl(val kind: Int, val session: Long, val sequence: Long, val timestampNs: Long) {
     fun encode(): ByteArray = ByteBuffer.allocate(SIZE).order(ByteOrder.BIG_ENDIAN).apply {
-        put("SVHB".toByteArray()).put(SteamVoiceProtocol.version.toByte()).put(kind.toByte()).putShort(0)
+        put("NXHB".toByteArray()).put(NexusProtocol.version.toByte()).put(kind.toByte()).putShort(0)
         putInt(session.toInt()).putInt(sequence.toInt()).putLong(timestampNs).putLong(0)
     }.array()
     companion object {
         const val KIND_PING = 1; const val KIND_PONG = 2; const val SIZE = 32
         fun decode(data: ByteArray, length: Int): HeartbeatControl? {
-            if (length != SIZE || data.copyOfRange(0, 4).decodeToString() != "SVHB" || data[4].toInt() != SteamVoiceProtocol.version) return null
+            if (length != SIZE) return null
+            val magic = data.copyOfRange(0, 4).decodeToString()
+            if (magic != "NXHB" && magic != "SVHB") return null
+            if (data[4].toInt() != NexusProtocol.version) return null
             val kind = data[5].toInt() and 0xff
             if (kind != KIND_PING && kind != KIND_PONG) return null
             val b = ByteBuffer.wrap(data, 0, length).order(ByteOrder.BIG_ENDIAN)
@@ -190,4 +204,3 @@ data class HeartbeatControl(val kind: Int, val session: Long, val sequence: Long
         }
     }
 }
-

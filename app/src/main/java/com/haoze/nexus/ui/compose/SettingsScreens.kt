@@ -1,4 +1,4 @@
-package com.haoze.claudekeyboard.ui.compose
+﻿package com.haoze.nexus.ui.compose
 
 import android.content.Context
 import android.content.Intent
@@ -56,9 +56,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.haoze.claudekeyboard.R
-import com.haoze.claudekeyboard.bluetooth.HidProfile
-import com.haoze.claudekeyboard.ui.Routes
+import com.haoze.nexus.R
+import com.haoze.nexus.bluetooth.HidProfile
+import com.haoze.nexus.ui.Routes
 
 /**
  * 设置页一级界面：
@@ -459,7 +459,7 @@ fun SettingsScreen(
 
                     SettingsActionItem(
                         title = stringResource(R.string.home_sponsor_list_title),
-                        subtitle = "感谢所有支持 SyncTouch 的朋友",
+                        subtitle = "感谢所有支持 Nexus 的朋友",
                         leadingIcon = Icons.Default.WorkspacePremium,
                         onClick = { onNavigateToRoute?.invoke(Routes.SPONSOR_LIST) },
                         trailing = {
@@ -480,7 +480,7 @@ fun SettingsScreen(
                         onClick = {
                             runCatching {
                                 context.startActivity(
-                                    Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/haoze-evolluling/SyncTouch"))
+                                    Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/haoze-evolluling/Nexus"))
                                 )
                             }
                         },
@@ -499,7 +499,7 @@ fun SettingsScreen(
             item {
                 Spacer(Modifier.height(12.dp))
                 Text(
-                    text = "SyncTouch ${if (versionName.isNotBlank()) "v$versionName" else ""} · Control at Your Fingertips",
+                    text = "Nexus ${if (versionName.isNotBlank()) "v$versionName" else ""} · Control at Your Fingertips",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                     textAlign = TextAlign.Center,

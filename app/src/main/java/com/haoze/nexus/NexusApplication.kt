@@ -1,11 +1,11 @@
-package com.haoze.claudekeyboard
+﻿package com.haoze.nexus
 
 import android.app.Application
 import android.content.Context
-import com.haoze.claudekeyboard.bluetooth.HidProfile
-import com.haoze.claudekeyboard.ui.compose.ThemeController
+import com.haoze.nexus.bluetooth.HidProfile
+import com.haoze.nexus.ui.compose.ThemeController
 
-class SyncTouchApplication : Application() {
+class NexusApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         migrateDeviceTypeDefaultIfNeeded()
