@@ -1,207 +1,289 @@
 <resources>
-    <string name="app_name">SyncTouch</string>
+  <string name="app_name">SyncTouch</string>
+  <!-- Button labels -->
+  <string name="btn_yes">确认</string>
+  <string name="btn_no">拒绝</string>
+  <string name="btn_ctrl_c">Ctrl+C</string>
+  <string name="btn_backspace">退格</string>
+  <string name="btn_enter">回车</string>
+  <string name="btn_yes_to_all">全部确认</string>
+  <string name="btn_add_macro">+ 添加自定义宏</string>
+  <string name="btn_disconnect">断开</string>
+  <!-- Status messages -->
+  <string name="status_unknown_device">未知设备</string>
+  <string name="status_connected_label">已连接</string>
+  <string name="status_not_connected">未连接设备</string>
+  <string name="device_name_status">%1$s · %2$s</string>
+  <!-- Notification -->
+  <string name="notification_channel_name">蓝牙 HID 服务</string>
+  <string name="notification_channel_description">显示蓝牙 HID 键盘连接状态</string>
+  <string name="notification_title">SyncTouch</string>
+  <string name="notification_waiting">等待配对…</string>
+  <string name="notification_connected">已连接: %s</string>
+  <string name="notification_disconnected">设备已断开</string>
+  <string name="notification_connection_channel_name">连接事件</string>
+  <!-- Dialog titles -->
+  <string name="dialog_add_macro">添加自定义宏</string>
+  <string name="dialog_edit_macro">编辑宏</string>
+  <string name="dialog_macro_label">名称</string>
+  <string name="dialog_macro_command">命令</string>
+  <string name="dialog_macro_description">备注（可选）</string>
+  <string name="dialog_save">保存</string>
+  <string name="dialog_cancel">取消</string>
+  <string name="dialog_delete">删除</string>
+  <string name="dialog_delete_macro">删除宏</string>
+  <string name="dialog_delete_macro_message">确定要删除这个宏吗？</string>
+  <!-- Toast messages -->
+  <string name="toast_bluetooth_not_supported">此设备不支持蓝牙 HID</string>
+  <string name="toast_permission_denied">蓝牙权限被拒绝</string>
+  <string name="toast_macro_added">宏已添加</string>
+  <string name="toast_macro_updated">宏已更新</string>
+  <string name="toast_macro_deleted">宏已删除</string>
+  <string name="toast_send_error">发送失败: %s</string>
+  <!-- Macro list -->
+  <string name="macro_list_title">快捷命令</string>
+  <string name="macro_long_press_hint">长按自定义宏可编辑或删除</string>
+  <!-- Settings -->
+  <string name="settings">设置</string>
+  <string name="back">返回</string>
+  <string name="settings_reset_macros">恢复默认快捷命令</string>
+  <string name="settings_section_connection">连接设置</string>
+  <string name="settings_section_appearance">外观设置</string>
+  <string name="settings_section_data">数据管理</string>
+  <string name="settings_section_input">输入（灵敏度设置）</string>
+  <string name="settings_section_feedback">反馈（触感反馈）</string>
+  <string name="settings_section_about">应用信息</string>
+  <string name="settings_section_sponsor">赞助</string>
+  <string name="settings_home_group">设置项目</string>
+  <string name="settings_group_appearance_data">外观与数据</string>
+  <string name="settings_group_input_feedback">输入与反馈</string>
+  <string name="settings_group_connection">连接设置</string>
+  <string name="settings_group_connection_behavior">自动连接与通知</string>
+  <string name="settings_group_pointer_scroll">指针与滚动</string>
+  <string name="settings_group_feedback">操作反馈</string>
+  <string name="settings_group_commands">快捷命令</string>
+  <string name="settings_group_theme">显示模式</string>
+  <string name="settings_group_theme_color">主题色</string>
+  <string name="settings_theme_color_system_summary">使用系统壁纸的动态取色</string>
+  <string name="settings_group_about">版本与许可</string>
+  <string name="settings_group_device_type">设备类型</string>
+  <string name="settings_device_type_gamepad">游戏手柄</string>
+  <string name="settings_device_type_gamepad_subtitle">注册为标准 HID 游戏控制器，游戏可直接进入手柄模式；键盘、鼠标功能仍可使用</string>
+  <string name="settings_device_type_keyboard_mouse">键鼠组合</string>
+  <string name="settings_device_type_keyboard_mouse_subtitle">注册为键盘 + 触控板组合设备，适合办公与文字输入场景</string>
+  <string name="settings_device_type_switch_note">切换设备类型会断开当前连接，主机重新连接后生效；若主机仍显示为旧设备类型，请在主机上删除配对信息后重新配对</string>
+  <string name="settings_device_type_switch_failed">设备类型暂不可切换，请稍后重试</string>
+  <string name="settings_auto_connect_launch">打开应用后连接上次设备</string>
+  <string name="settings_auto_connect_launch_subtitle">服务启动完成后，自动尝试连接最近使用的蓝牙设备</string>
+  <string name="settings_auto_reconnect">连接中断后自动重连</string>
+  <string name="settings_auto_reconnect_subtitle">非主动断开时，自动尝试恢复当前设备连接</string>
+  <string name="settings_keep_screen_on">连接时保持屏幕常亮</string>
+  <string name="settings_keep_screen_on_subtitle">已连接设备时防止手机自动锁屏</string>
+  <string name="settings_connection_notifications">连接通知</string>
+  <string name="settings_connection_notifications_subtitle">设备连接成功或断开时发送系统通知</string>
+  <string name="settings_touchpad_sensitivity">移动灵敏度</string>
+  <string name="settings_touchpad_sensitivity_subtitle">调高后，较小的手指移动也会产生更明显的光标移动</string>
+  <string name="settings_cursor_speed">光标速度</string>
+  <string name="settings_cursor_speed_subtitle">调高后，同样的滑动距离会让光标移动得更远</string>
+  <string name="settings_scroll_direction_natural">自然滚动</string>
+  <string name="settings_scroll_direction_natural_subtitle">反转双指滚动方向，接近触屏滚动习惯</string>
+  <string name="settings_haptic_feedback">触感反馈</string>
+  <string name="settings_haptic_feedback_subtitle">点击、滚动结束等操作时提供短振动反馈</string>
+  <string name="settings_connection_route_title">连接与设备</string>
+  <string name="settings_summary_connection">管理自动连接、断线重连、屏幕常亮和连接通知</string>
+  <string name="settings_summary_appearance">选择浅色、深色或跟随系统显示</string>
+  <string name="settings_summary_data">恢复内置快捷命令，并清除自定义命令</string>
+  <string name="settings_summary_input">调整移动灵敏度、光标速度和滚动方向</string>
+  <string name="settings_summary_feedback">控制操作时的触感反馈</string>
+  <string name="settings_summary_about">查看版本、应用名称和许可信息</string>
+  <string name="settings_summary_sponsor">支持 SyncTouch 的持续开发与维护</string>
+  <string name="settings_state_on">开启</string>
+  <string name="settings_state_off">关闭</string>
+  <string name="settings_github_repo">GitHub 仓库</string>
+  <string name="settings_github_url">https://github.com/haoze-evolluling/SyncTouch</string>
+  <string name="dialog_reset_macros_confirm">恢复后会删除自定义命令，并重新生成内置快捷命令。</string>
+  <string name="dialog_reset">重置</string>
+  <string name="settings_version">版本</string>
+  <string name="settings_app_name_label">应用名称</string>
+  <string name="settings_open_source">许可信息</string>
+  <string name="switch_send_enter">发送回车</string>
+  <string name="device_list_title">设备列表</string>
+  <string name="device_list_subtitle">选择已配对设备进行连接，或管理当前连接</string>
+  <string name="device_last_connected">上次连接</string>
+  <string name="device_connecting">连接中</string>
+  <string name="device_no_paired">没有已配对设备，请先在系统蓝牙设置中配对</string>
+  <string name="dialog_connect_timeout_title">连接超时</string>
+  <string name="dialog_connect_timeout_message">连接超时，请重试</string>
+  <string name="dialog_ok">确定</string>
+  <!-- Bottom Navigation Tabs -->
+  <string name="tab_claude">首页</string>
+  <string name="tab_keyboard">键盘</string>
+  <string name="tab_touchpad">触控板</string>
+  <string name="touchpad_sensitivity">灵敏度</string>
+  <string name="touchpad_not_connected_hint">当前未连接蓝牙设备，触控板暂不可用</string>
+  <!-- Home page -->
+  <string name="home_functions">功能</string>
+  <string name="home_system">系统</string>
+  <string name="home_hero_subtitle">手机即键盘，指尖控全场</string>
+  <string name="home_connection_status">连接状态</string>
+  <string name="home_connection_connected_hint">点击管理当前设备</string>
+  <string name="home_connection_disconnected_hint">点击选择已配对的蓝牙设备</string>
+  <string name="home_connection_action_connected">管理设备</string>
+  <string name="home_connection_action_disconnected">选择设备</string>
+  <string name="home_device_selector_label">当前设备</string>
+  <string name="home_select_device">选择已配对设备</string>
+  <string name="home_feature_hub">功能中心</string>
+  <string name="home_input_controls">输入控制</string>
+  <string name="home_shortcuts_and_system">快捷与系统</string>
+  <string name="home_agent_chip">Agent</string>
+  <string name="home_keyboard_title">键盘</string>
+  <string name="home_touchpad_title">触控板</string>
+  <string name="home_gamepad_title">游戏手柄</string>
+  <string name="home_touchpad_subtitle">蓝牙 HID 鼠标控制</string>
+  <string name="home_agent_title">Agent 快捷按钮</string>
+  <string name="home_agent_subtitle">快速发送常用命令</string>
+  <string name="home_settings_title">设置</string>
+  <string name="home_settings_subtitle">连接、触控板、主题与快捷命令</string>
+  <string name="home_about_support">应用与支持</string>
+  <string name="home_about_title">应用信息</string>
+  <string name="home_sponsor_title">赞助</string>
+  <string name="home_sponsor_list_title">赞助者名单</string>
+  <string name="nav_back">返回</string>
+  <string name="home_tvremote_title">电视遥控器</string>
+  <string name="home_tvremote_subtitle">蓝牙 HID 遥控操作</string>
+  <!-- TV Remote -->
+  <string name="tvremote_power">电源</string>
+  <string name="tvremote_back">返回</string>
+  <string name="tvremote_assistant">语音助手</string>
+  <string name="tvremote_home">主页</string>
+  <string name="tvremote_mute">静音</string>
+  <string name="tvremote_volume_up">音量+</string>
+  <string name="tvremote_volume_down">音量-</string>
+  <string name="tvremote_play_pause">播放/暂停</string>
+  <string name="tvremote_next">下一首</string>
+  <string name="tvremote_previous">上一首</string>
+  <string name="tvremote_stop">停止</string>
+  <string name="tvremote_led_label">指示灯</string>
+  <string name="tvremote_ok">OK</string>
+  <!-- Quick Settings Tile -->
+  <string name="tile_connected">已连接</string>
+  <string name="tile_disconnected">未连接</string>
+  <!-- Preset macro descriptions -->
+  <string name="preset_clear_desc">清除终端屏幕</string>
+  <string name="preset_compact_desc">压缩上下文以节省 token</string>
+  <string name="preset_model_desc">切换当前使用的模型</string>
+  <string name="preset_btw_desc">附带消息继续对话</string>
+  <!-- Theme mode -->
+  <string name="settings_theme_mode">应用主题</string>
+  <string name="settings_theme_system">跟随系统</string>
+  <string name="settings_theme_light">浅色</string>
+  <string name="settings_theme_dark">深色</string>
+  <!-- Settings Reorganized Sections -->
+  <string name="settings_section_appearance_title">外观与个性化</string>
+  <string name="settings_section_input_title">触控与指针</string>
+  <string name="settings_section_feedback_title">声音与触感反馈</string>
+  <string name="settings_section_connection_title">设备与连接</string>
+  <string name="settings_section_data_title">数据与管理</string>
+  <string name="settings_section_about_title">关于与支持</string>
+  <string name="settings_key_sound">键盘按键音效</string>
+  <string name="settings_key_sound_subtitle">打字时播放模拟机械键盘按键音效</string>
+  <string name="settings_gamepad_vibration">游戏手柄振动</string>
+  <string name="settings_gamepad_vibration_subtitle">操作虚拟手柄时提供振动反馈</string>
+  <string name="home_audio_stream_title">无线音频</string>
+  <string name="home_audio_stream_desc">超低延迟接收电脑音频串流</string>
+  <string name="dialog_confirm">确定</string>
 
-    <!-- Button labels -->
-    <string name="btn_yes">确认</string>
-    <string name="btn_no">拒绝</string>
-    <string name="btn_ctrl_c">Ctrl+C</string>
-    <string name="btn_backspace">退格</string>
-    <string name="btn_enter">回车</string>
-    <string name="btn_yes_to_all">全部确认</string>
-    <string name="btn_add_macro">+ 添加自定义宏</string>
-    <string name="btn_disconnect">断开</string>
+  <!-- SteamVoice Audio Stream Strings -->
+  <string name="receiver_active">正在接收 %1$s 的音频</string>
+  <string name="receiver_idle">接收服务运行中 · 等待电脑连接</string>
+  <string name="receiver_starting">正在启动接收服务…</string>
+  <string name="cd_settings">设置</string>
+  <string name="cd_back">返回</string>
+  <string name="nearby_pcs">附近的电脑</string>
+  <string name="nearby_android_devices">附近的安卓设备</string>
+  <string name="android_sync_ready">可进行时间校正</string>
+  <string name="android_sync_running">正在校正时钟…</string>
+  <string name="android_sync_failed">校正失败，请检查网络</string>
+  <string name="android_sync_result">播放已对齐 · 往返 %1$d ms</string>
+  <string name="android_sync_complete">两台设备已重新同步</string>
+  <string name="android_sync_action">校正时间</string>
+  <plurals name="device_count">
+    <item quantity="other">%1$d 台</item>
+  </plurals>
+  <string name="pc_denied">电脑端拒绝了连接请求</string>
+  <string name="pc_connect_failed">无法连接 %1$s，请确认电脑端正在运行</string>
+  <string name="btn_connect">连接</string>
+  <string name="btn_remove">移除</string>
+  <string name="pc_state_online">在线</string>
+  <string name="pc_state_connecting">连接中…</string>
+  <string name="pc_state_connected">已连接</string>
+  <string name="searching_title">正在搜索附近的电脑</string>
+  <string name="searching_hint">请确认电脑端 SteamVoice 正在运行，且手机和电脑连接到同一 Wi-Fi 网络。</string>
+  <string name="android_device">Android 设备</string>
+  <string name="generic_pc">电脑</string>
 
-    <!-- Status messages -->
-    <string name="status_unknown_device">未知设备</string>
-    <string name="status_connected_label">已连接</string>
-    <string name="status_not_connected">未连接设备</string>
-    <string name="device_name_status">%1$s · %2$s</string>
+  <!-- snackbar 消息 -->
+  <string name="msg_connection_interrupted">%1$s 连接已中断</string>
+  <string name="msg_disconnected">%1$s 已断开连接</string>
+  <string name="msg_connected">已连接 %1$s</string>
 
-    <!-- Notification -->
-    <string name="notification_channel_name">蓝牙 HID 服务</string>
-    <string name="notification_channel_description">显示蓝牙 HID 键盘连接状态</string>
-    <string name="notification_title">SyncTouch</string>
-    <string name="notification_waiting">等待配对…</string>
-    <string name="notification_connected">已连接: %s</string>
-    <string name="notification_disconnected">设备已断开</string>
-    <string name="notification_connection_channel_name">连接事件</string>
+  <!-- 授权 -->
+  <string name="auth_title">连接请求</string>
+  <string name="auth_message">%1$s 想要把电脑音频推送到本机播放。</string>
+  <string name="auth_remember">以后自动同意该设备</string>
+  <string name="auth_allow">允许</string>
+  <string name="auth_deny">拒绝</string>
+  <string name="auth_always_allow">总是允许</string>
 
-    <!-- Dialog titles -->
-    <string name="dialog_add_macro">添加自定义宏</string>
-    <string name="dialog_edit_macro">编辑宏</string>
-    <string name="dialog_macro_label">名称</string>
-    <string name="dialog_macro_command">命令</string>
-    <string name="dialog_macro_description">备注（可选）</string>
-    <string name="dialog_save">保存</string>
-    <string name="dialog_cancel">取消</string>
-    <string name="dialog_delete">删除</string>
-    <string name="dialog_delete_macro">删除宏</string>
-    <string name="dialog_delete_macro_message">确定要删除这个宏吗？</string>
+  <!-- 同步校准 -->
+  <string name="calibrating">同步校准中</string>
+  <string name="calib_synced">已同步</string>
+  <string name="calib_stats">时钟偏差 %1$d ms · 往返 %2$d ms</string>
+  <string name="calib_step_detect">检测</string>
+  <string name="calib_step_calculate">计算</string>
+  <string name="calib_step_sync">同步</string>
+  <string name="calib_step_done">完成</string>
+  <string name="calib_phase_detect">正在检测电脑的音频信号</string>
+  <string name="calib_phase_calculate">测量时钟偏差，与电脑时间基准对时</string>
+  <string name="calib_phase_sync">已对齐时钟，等待统一播放时刻</string>
+  <string name="calib_phase_done">已同步 · 回到正常播放</string>
 
-    <!-- Toast messages -->
-    <string name="toast_bluetooth_not_supported">此设备不支持蓝牙 HID</string>
-    <string name="toast_permission_denied">蓝牙权限被拒绝</string>
-    <string name="toast_macro_added">宏已添加</string>
-    <string name="toast_macro_updated">宏已更新</string>
-    <string name="toast_macro_deleted">宏已删除</string>
-    <string name="toast_send_error">发送失败: %s</string>
+  <!-- 通知 -->
+  <string name="receiver_channel">SteamVoice 接收服务</string>
+  <string name="receiver_notification">正在接收电脑音频</string>
+  <string name="receiver_notification_active">正在接收来自 %1$s 的电脑音频</string>
+  <string name="auth_channel">连接请求</string>
+  <string name="auth_notification_text">%1$s 想要把电脑音频推送到本机播放</string>
 
-    <!-- Macro list -->
-    <string name="macro_list_title">快捷命令</string>
-    <string name="macro_long_press_hint">长按自定义宏可编辑或删除</string>
+  <!-- 设置 -->
+  <string name="settings_title">设置</string>
+  <string name="settings_bitrate_title">初始发送码率</string>
+  <string name="settings_bitrate_desc">电脑端发起连接时使用的 Opus 码率，播放中保持不变</string>
+  <string name="bitrate_recommended">推荐 · 覆盖大多数家庭网络</string>
+  <string name="settings_frame_title">音频帧时长</string>
+  <string name="settings_frame_desc">帧长越小延迟越低，但对网络抖动更敏感</string>
+  <string name="frame_10_note">推荐 · 延迟更低</string>
+  <string name="frame_20_note">更稳定</string>
+  <string name="settings_trusted_title">已授权电脑</string>
+  <string name="settings_trusted_desc">以下电脑连接本机时无需再次确认</string>
+  <string name="settings_trusted_empty">暂无已授权电脑。电脑主动连接时，可以选择“以后自动同意该设备”。</string>
+  <string name="settings_format_title">接收格式</string>
+  <string name="settings_format_desc">本机作为接收端解码播放的音频格式</string>
+  <string name="label_codec">编码器</string>
+  <string name="label_sample_rate">采样率</string>
+  <string name="label_channels">声道</string>
+  <string name="channels_stereo">%1$d 声道立体声</string>
+  <string name="label_frame_lengths">支持帧长</string>
+  <string name="settings_about">关于</string>
+  <string name="about_sync">多设备同步</string>
+  <string name="about_sync_value">已启用 · 时钟对齐播放</string>
+  <string name="about_protocol">传输协议</string>
+  <string name="about_protocol_value">UDP 局域网 · Opus 编码</string>
 
-    <!-- Settings -->
-    <string name="settings">设置</string>
-    <string name="back">返回</string>
-    <string name="settings_reset_macros">恢复默认快捷命令</string>
-    <string name="settings_section_connection">连接设置</string>
-    <string name="settings_section_appearance">外观设置</string>
-    <string name="settings_section_data">数据管理</string>
-    <string name="settings_section_input">输入（灵敏度设置）</string>
-    <string name="settings_section_feedback">反馈（触感反馈）</string>
-    <string name="settings_section_about">应用信息</string>
-    <string name="settings_section_sponsor">赞助</string>
-    <string name="settings_home_group">设置项目</string>
-    <string name="settings_group_appearance_data">外观与数据</string>
-    <string name="settings_group_input_feedback">输入与反馈</string>
-    <string name="settings_group_connection">连接设置</string>
-    <string name="settings_group_connection_behavior">自动连接与通知</string>
-    <string name="settings_group_pointer_scroll">指针与滚动</string>
-    <string name="settings_group_feedback">操作反馈</string>
-    <string name="settings_group_commands">快捷命令</string>
-    <string name="settings_group_theme">显示模式</string>
-    <string name="settings_group_theme_color">主题色</string>
-    <string name="settings_theme_color_system_summary">使用系统壁纸的动态取色</string>
-    <string name="settings_group_about">版本与许可</string>
-    <string name="settings_group_device_type">设备类型</string>
-    <string name="settings_device_type_gamepad">游戏手柄</string>
-    <string name="settings_device_type_gamepad_subtitle">注册为标准 HID 游戏控制器，游戏可直接进入手柄模式；键盘、鼠标功能仍可使用</string>
-    <string name="settings_device_type_keyboard_mouse">键鼠组合</string>
-    <string name="settings_device_type_keyboard_mouse_subtitle">注册为键盘 + 触控板组合设备，适合办公与文字输入场景</string>
-    <string name="settings_device_type_switch_note">切换设备类型会断开当前连接，主机重新连接后生效；若主机仍显示为旧设备类型，请在主机上删除配对信息后重新配对</string>
-    <string name="settings_device_type_switch_failed">设备类型暂不可切换，请稍后重试</string>
-    <string name="settings_auto_connect_launch">打开应用后连接上次设备</string>
-    <string name="settings_auto_connect_launch_subtitle">服务启动完成后，自动尝试连接最近使用的蓝牙设备</string>
-    <string name="settings_auto_reconnect">连接中断后自动重连</string>
-    <string name="settings_auto_reconnect_subtitle">非主动断开时，自动尝试恢复当前设备连接</string>
-    <string name="settings_keep_screen_on">连接时保持屏幕常亮</string>
-    <string name="settings_keep_screen_on_subtitle">已连接设备时防止手机自动锁屏</string>
-    <string name="settings_connection_notifications">连接通知</string>
-    <string name="settings_connection_notifications_subtitle">设备连接成功或断开时发送系统通知</string>
-    <string name="settings_touchpad_sensitivity">移动灵敏度</string>
-    <string name="settings_touchpad_sensitivity_subtitle">调高后，较小的手指移动也会产生更明显的光标移动</string>
-    <string name="settings_cursor_speed">光标速度</string>
-    <string name="settings_cursor_speed_subtitle">调高后，同样的滑动距离会让光标移动得更远</string>
-    <string name="settings_scroll_direction_natural">自然滚动</string>
-    <string name="settings_scroll_direction_natural_subtitle">反转双指滚动方向，接近触屏滚动习惯</string>
-    <string name="settings_haptic_feedback">触感反馈</string>
-    <string name="settings_haptic_feedback_subtitle">点击、滚动结束等操作时提供短振动反馈</string>
-    <string name="settings_connection_route_title">连接与设备</string>
-    <string name="settings_summary_connection">管理自动连接、断线重连、屏幕常亮和连接通知</string>
-    <string name="settings_summary_appearance">选择浅色、深色或跟随系统显示</string>
-    <string name="settings_summary_data">恢复内置快捷命令，并清除自定义命令</string>
-    <string name="settings_summary_input">调整移动灵敏度、光标速度和滚动方向</string>
-    <string name="settings_summary_feedback">控制操作时的触感反馈</string>
-    <string name="settings_summary_about">查看版本、应用名称和许可信息</string>
-    <string name="settings_summary_sponsor">支持 SyncTouch 的持续开发与维护</string>
-    <string name="settings_state_on">开启</string>
-    <string name="settings_state_off">关闭</string>
-    <string name="settings_github_repo">GitHub 仓库</string>
-    <string name="settings_github_url">https://github.com/haoze-evolluling/SyncTouch</string>
-    <string name="dialog_reset_macros_confirm">恢复后会删除自定义命令，并重新生成内置快捷命令。</string>
-    <string name="dialog_reset">重置</string>
-    <string name="settings_version">版本</string>
-    <string name="settings_app_name_label">应用名称</string>
-    <string name="settings_open_source">许可信息</string>
-    <string name="switch_send_enter">发送回车</string>
-    <string name="device_list_title">设备列表</string>
-    <string name="device_list_subtitle">选择已配对设备进行连接，或管理当前连接</string>
-    <string name="device_last_connected">上次连接</string>
-    <string name="device_connecting">连接中</string>
-    <string name="device_no_paired">没有已配对设备，请先在系统蓝牙设置中配对</string>
-    <string name="dialog_connect_timeout_title">连接超时</string>
-    <string name="dialog_connect_timeout_message">连接超时，请重试</string>
-    <string name="dialog_ok">确定</string>
-
-    <!-- Bottom Navigation Tabs -->
-    <string name="tab_claude">首页</string>
-    <string name="tab_keyboard">键盘</string>
-    <string name="tab_touchpad">触控板</string>
-    <string name="touchpad_sensitivity">灵敏度</string>
-    <string name="touchpad_not_connected_hint">当前未连接蓝牙设备，触控板暂不可用</string>
-
-
-    <!-- Home page -->
-    <string name="home_functions">功能</string>
-    <string name="home_system">系统</string>
-    <string name="home_hero_subtitle">手机即键盘，指尖控全场</string>
-    <string name="home_connection_status">连接状态</string>
-    <string name="home_connection_connected_hint">点击管理当前设备</string>
-    <string name="home_connection_disconnected_hint">点击选择已配对的蓝牙设备</string>
-    <string name="home_connection_action_connected">管理设备</string>
-    <string name="home_connection_action_disconnected">选择设备</string>
-    <string name="home_device_selector_label">当前设备</string>
-    <string name="home_select_device">选择已配对设备</string>
-    <string name="home_feature_hub">功能中心</string>
-    <string name="home_input_controls">输入控制</string>
-    <string name="home_shortcuts_and_system">快捷与系统</string>
-    <string name="home_agent_chip">Agent</string>
-    <string name="home_keyboard_title">键盘</string>
-    <string name="home_touchpad_title">触控板</string>
-    <string name="home_gamepad_title">游戏手柄</string>
-    <string name="home_touchpad_subtitle">蓝牙 HID 鼠标控制</string>
-    <string name="home_agent_title">Agent 快捷按钮</string>
-    <string name="home_agent_subtitle">快速发送常用命令</string>
-    <string name="home_settings_title">设置</string>
-    <string name="home_settings_subtitle">连接、触控板、主题与快捷命令</string>
-    <string name="home_about_support">应用与支持</string>
-    <string name="home_about_title">应用信息</string>
-    <string name="home_sponsor_title">赞助</string>
-    <string name="home_sponsor_list_title">赞助者名单</string>
-    <string name="nav_back">返回</string>
-
-    <string name="home_tvremote_title">电视遥控器</string>
-    <string name="home_tvremote_subtitle">蓝牙 HID 遥控操作</string>
-
-    <!-- TV Remote -->
-    <string name="tvremote_power">电源</string>
-    <string name="tvremote_back">返回</string>
-    <string name="tvremote_assistant">语音助手</string>
-    <string name="tvremote_home">主页</string>
-    <string name="tvremote_mute">静音</string>
-    <string name="tvremote_volume_up">音量+</string>
-    <string name="tvremote_volume_down">音量-</string>
-    <string name="tvremote_play_pause">播放/暂停</string>
-    <string name="tvremote_next">下一首</string>
-    <string name="tvremote_previous">上一首</string>
-    <string name="tvremote_stop">停止</string>
-    <string name="tvremote_led_label">指示灯</string>
-    <string name="tvremote_ok">OK</string>
-
-    <!-- Quick Settings Tile -->
-    <string name="tile_connected">已连接</string>
-    <string name="tile_disconnected">未连接</string>
-
-    <!-- Preset macro descriptions -->
-    <string name="preset_clear_desc">清除终端屏幕</string>
-    <string name="preset_compact_desc">压缩上下文以节省 token</string>
-    <string name="preset_model_desc">切换当前使用的模型</string>
-    <string name="preset_btw_desc">附带消息继续对话</string>
-<!-- Theme mode -->
-    <string name="settings_theme_mode">应用主题</string>
-    <string name="settings_theme_system">跟随系统</string>
-    <string name="settings_theme_light">浅色</string>
-    <string name="settings_theme_dark">深色</string>
-
-    <!-- Settings Reorganized Sections -->
-    <string name="settings_section_appearance_title">外观与个性化</string>
-    <string name="settings_section_input_title">触控与指针</string>
-    <string name="settings_section_feedback_title">声音与触感反馈</string>
-    <string name="settings_section_connection_title">设备与连接</string>
-    <string name="settings_section_data_title">数据与管理</string>
-    <string name="settings_section_about_title">关于与支持</string>
-    <string name="settings_key_sound">键盘按键音效</string>
-    <string name="settings_key_sound_subtitle">打字时播放模拟机械键盘按键音效</string>
-    <string name="settings_gamepad_vibration">游戏手柄振动</string>
-    <string name="settings_gamepad_vibration_subtitle">操作虚拟手柄时提供振动反馈</string>
+  <!-- 语言 -->
+  <string name="settings_language_title">语言</string>
+  <string name="settings_language_desc">更改后界面立即生效</string>
+  <string name="lang_system">跟随系统</string>
+  <string name="lang_zh">简体中文</string>
+  <string name="lang_en">English</string>
 </resources>

@@ -83,6 +83,10 @@ android {
     buildFeatures {
         compose = true
     }
+    externalNativeBuild {
+        cmake { path = file("src/main/cpp/CMakeLists.txt") }
+    }
+    ndkVersion = "27.0.12077973"
 }
 
 val apkVersionName = android.defaultConfig.versionName ?: "unknown"
@@ -121,6 +125,7 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.datastore.preferences)
     debugImplementation(libs.androidx.compose.ui.tooling)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)

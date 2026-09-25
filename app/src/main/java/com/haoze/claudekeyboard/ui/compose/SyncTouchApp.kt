@@ -1,6 +1,7 @@
 package com.haoze.claudekeyboard.ui.compose
 
 import android.bluetooth.BluetoothDevice
+import android.content.Intent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -40,6 +41,7 @@ import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Keyboard
@@ -193,10 +195,12 @@ fun SyncTouchApp(
                         onShowDeviceList = onShowDeviceList
                     )
                 } else {
+                    val context = LocalContext.current
                     FeatureHubScreen(
                         onOpenKeyboard = onOpenKeyboard,
                         onOpenTouchpad = onOpenTouchpad,
                         onOpenGamepad = onOpenGamepad,
+                        onOpenAudioReceiver = { context.startActivity(Intent(context, com.haoze.claudekeyboard.ui.audio.AudioReceiverActivity::class.java)) },
                         onNavigateAgent = { onNavigate(AppPage.AGENT) },
                         onNavigateTvRemote = { onNavigate(AppPage.TV_REMOTE) },
                         onNavigateSettings = { onNavigate(AppPage.SETTINGS) },
@@ -633,6 +637,7 @@ private fun FeatureHubScreen(
     onOpenKeyboard: () -> Unit,
     onOpenTouchpad: () -> Unit,
     onOpenGamepad: () -> Unit,
+    onOpenAudioReceiver: () -> Unit,
     onNavigateAgent: () -> Unit,
     onNavigateTvRemote: () -> Unit,
     onNavigateSettings: () -> Unit,
@@ -644,7 +649,8 @@ private fun FeatureHubScreen(
         FeatureHubItem(stringResource(R.string.home_keyboard_title), Icons.Default.Keyboard, onOpenKeyboard),
         FeatureHubItem(stringResource(R.string.home_touchpad_title), Icons.Default.Mouse, onOpenTouchpad),
         FeatureHubItem(stringResource(R.string.home_gamepad_title), Icons.Default.SportsEsports, onOpenGamepad),
-        FeatureHubItem(stringResource(R.string.home_tvremote_title), Icons.Default.SettingsRemote, onNavigateTvRemote)
+        FeatureHubItem(stringResource(R.string.home_tvremote_title), Icons.Default.SettingsRemote, onNavigateTvRemote),
+        FeatureHubItem(stringResource(R.string.home_audio_stream_title), Icons.Default.GraphicEq, onOpenAudioReceiver)
     )
     val systemItems = listOf(
         FeatureHubItem(stringResource(R.string.home_agent_title), Icons.Default.Terminal, onNavigateAgent),

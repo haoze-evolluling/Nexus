@@ -1,0 +1,102 @@
+<resources>
+    <string name="app_name">SyncTouch</string>
+    <string name="home_audio_stream_title">Wireless Audio</string>
+    <string name="home_audio_stream_desc">Low-latency PC audio receiver</string>
+
+    <!-- Main screen -->
+    <string name="receiver_active">Receiving audio from %1$s</string>
+    <string name="receiver_idle">Receiver service running · Waiting for a PC</string>
+    <string name="receiver_starting">Starting receiver service…</string>
+    <string name="cd_settings">Settings</string>
+    <string name="cd_back">Back</string>
+    <string name="nearby_pcs">Nearby PCs</string>
+    <string name="nearby_android_devices">Nearby Android devices</string>
+    <string name="android_sync_ready">Ready for clock calibration</string>
+    <string name="android_sync_running">Calibrating clock…</string>
+    <string name="android_sync_failed">Calibration failed; check the network</string>
+    <string name="android_sync_result">Offset %1$d ms · RTT %2$d ms</string>
+    <string name="android_sync_complete">Both devices are synchronized</string>
+    <string name="android_sync_action">Calibrate time</string>
+    <plurals name="device_count">
+        <item quantity="one">%1$d PC</item>
+        <item quantity="other">%1$d PCs</item>
+    </plurals>
+    <string name="pc_denied">The PC rejected the connection request</string>
+    <string name="pc_connect_failed">Could not connect to %1$s. Make sure SteamVoice is running on the PC</string>
+    <string name="btn_connect">Connect</string>
+    <string name="btn_disconnect">Disconnect</string>
+    <string name="btn_remove">Remove</string>
+    <string name="dialog_confirm">Confirm</string>
+    <string name="pc_state_online">Online</string>
+    <string name="pc_state_connecting">Connecting…</string>
+    <string name="pc_state_connected">Connected</string>
+    <string name="searching_title">Searching for nearby PCs</string>
+    <string name="searching_hint">Make sure SteamVoice is running on the PC, and that the phone and the PC are on the same Wi-Fi network.</string>
+    <string name="android_device">Android device</string>
+    <string name="generic_pc">PC</string>
+
+    <!-- Snackbar messages -->
+    <string name="msg_connection_interrupted">Connection to %1$s was interrupted</string>
+    <string name="msg_disconnected">%1$s disconnected</string>
+    <string name="msg_connected">Connected to %1$s</string>
+
+    <!-- Authorization -->
+    <string name="auth_title">Connection request</string>
+    <string name="auth_message">%1$s wants to stream the PC audio to this device.</string>
+    <string name="auth_remember">Always allow this device</string>
+    <string name="auth_allow">Allow</string>
+    <string name="auth_deny">Deny</string>
+    <string name="auth_always_allow">Always allow</string>
+
+    <!-- Sync calibration -->
+    <string name="calibrating">Calibrating sync</string>
+    <string name="calib_synced">In sync</string>
+    <string name="calib_stats">Clock offset %1$d ms · RTT %2$d ms</string>
+    <string name="calib_step_detect">Detect</string>
+    <string name="calib_step_calculate">Calculate</string>
+    <string name="calib_step_sync">Sync</string>
+    <string name="calib_step_done">Done</string>
+    <string name="calib_phase_detect">Detecting the audio signal from the PC</string>
+    <string name="calib_phase_calculate">Measuring clock offset against the PC timebase</string>
+    <string name="calib_phase_sync">Clocks aligned, waiting for the unified playback moment</string>
+    <string name="calib_phase_done">In sync · Returning to normal playback</string>
+
+    <!-- Notifications -->
+    <string name="receiver_channel">SteamVoice receiver service</string>
+    <string name="receiver_notification">Receiving PC audio</string>
+    <string name="receiver_notification_active">Receiving PC audio from %1$s</string>
+    <string name="auth_channel">Connection requests</string>
+    <string name="auth_notification_text">%1$s wants to stream PC audio to this device</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_bitrate_title">Initial bitrate</string>
+    <string name="settings_bitrate_desc">Opus bitrate used when the PC connects; it remains fixed during playback</string>
+    <string name="bitrate_recommended">Recommended · Suits most home networks</string>
+    <string name="settings_frame_title">Audio frame duration</string>
+    <string name="settings_frame_desc">Shorter frames mean lower latency but are more sensitive to network jitter</string>
+    <string name="frame_10_note">Recommended · Lower latency</string>
+    <string name="frame_20_note">More stable</string>
+    <string name="settings_trusted_title">Authorized PCs</string>
+    <string name="settings_trusted_desc">These PCs can connect to this device without confirmation</string>
+    <string name="settings_trusted_empty">No authorized PCs yet. When a PC connects, you can choose “Always allow this device”.</string>
+    <string name="settings_format_title">Receive format</string>
+    <string name="settings_format_desc">Audio format decoded and played on this device</string>
+    <string name="label_codec">Codec</string>
+    <string name="label_sample_rate">Sample rate</string>
+    <string name="label_channels">Channels</string>
+    <string name="channels_stereo">%1$d-channel stereo</string>
+    <string name="label_frame_lengths">Supported frame lengths</string>
+    <string name="settings_about">About</string>
+    <string name="about_sync">Multi-device sync</string>
+    <string name="about_sync_value">Enabled · Clock-aligned playback</string>
+    <string name="about_protocol">Transport</string>
+    <string name="about_protocol_value">UDP over LAN · Opus codec</string>
+
+    <!-- Language -->
+    <string name="settings_language_title">Language</string>
+    <string name="settings_language_desc">The interface switches immediately</string>
+    <string name="lang_system">Follow system</string>
+    <string name="lang_zh">简体中文</string>
+    <string name="lang_en">English</string>
+</resources>
