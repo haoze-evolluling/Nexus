@@ -10,32 +10,36 @@ fun nextConnectionState(state: ConnectionState, event: ConnectionEvent): Connect
         ConnectionEvent.AUTHORIZED -> ConnectionState.CONNECTED
         ConnectionEvent.REQUEST_RECEIVED -> ConnectionState.AWAITING_AUTHORIZATION
         ConnectionEvent.DENIED, ConnectionEvent.HANDSHAKE_TIMEOUT -> ConnectionState.FAILED
-        ConnectionEvent.LOCAL_DISCONNECT, ConnectionEvent.REMOTE_BYE -> ConnectionState.DISCONNECTING
+        ConnectionEvent.LOCAL_DISCONNECT, ConnectionEvent.REMOTE_BYE -> ConnectionState.IDLE
         else -> state
     }
     ConnectionState.AWAITING_AUTHORIZATION -> when (event) {
         ConnectionEvent.AUTHORIZED -> ConnectionState.CONNECTED
         ConnectionEvent.DENIED, ConnectionEvent.HANDSHAKE_TIMEOUT -> ConnectionState.FAILED
-        ConnectionEvent.LOCAL_DISCONNECT, ConnectionEvent.REMOTE_BYE -> ConnectionState.DISCONNECTING
+        ConnectionEvent.LOCAL_DISCONNECT, ConnectionEvent.REMOTE_BYE -> ConnectionState.IDLE
         else -> state
     }
     ConnectionState.CONNECTED -> when (event) {
-        ConnectionEvent.LOCAL_DISCONNECT, ConnectionEvent.REMOTE_BYE -> ConnectionState.DISCONNECTING
+        ConnectionEvent.LOCAL_DISCONNECT, ConnectionEvent.REMOTE_BYE -> ConnectionState.IDLE
         ConnectionEvent.HEARTBEAT_TIMEOUT -> ConnectionState.RECONNECTING
         else -> state
     }
     ConnectionState.DISCONNECTING -> when (event) {
-        ConnectionEvent.RETRY -> ConnectionState.IDLE
+        ConnectionEvent.RETRY, ConnectionEvent.LOCAL_DISCONNECT, ConnectionEvent.REMOTE_BYE -> ConnectionState.IDLE
         ConnectionEvent.CONNECT -> ConnectionState.CONNECTING
         else -> state
     }
     ConnectionState.RECONNECTING -> when (event) {
         ConnectionEvent.AUTHORIZED -> ConnectionState.CONNECTED
         ConnectionEvent.DENIED, ConnectionEvent.HANDSHAKE_TIMEOUT -> ConnectionState.FAILED
-        ConnectionEvent.LOCAL_DISCONNECT, ConnectionEvent.REMOTE_BYE -> ConnectionState.DISCONNECTING
+        ConnectionEvent.LOCAL_DISCONNECT, ConnectionEvent.REMOTE_BYE -> ConnectionState.IDLE
         else -> state
     }
-    ConnectionState.FAILED -> if (event == ConnectionEvent.RETRY || event == ConnectionEvent.CONNECT) ConnectionState.CONNECTING else state
+    ConnectionState.FAILED -> when (event) {
+        ConnectionEvent.RETRY, ConnectionEvent.CONNECT -> ConnectionState.CONNECTING
+        ConnectionEvent.LOCAL_DISCONNECT, ConnectionEvent.REMOTE_BYE -> ConnectionState.IDLE
+        else -> state
+    }
 }
 
 object TransportTiming {

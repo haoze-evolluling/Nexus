@@ -22,15 +22,16 @@ func TestRequestConnectionAcceptsRawResponse(t *testing.T) {
 			if err != nil {
 				return
 			}
-			if n >= 8 && (string(buf[:4]) == "NXCR" || string(buf[:4]) == "SVCR") && buf[5] == 1 {
+			if n >= 16 && string(buf[:4]) == "NXCR" && buf[5] == 1 {
 				id := []byte("receiver-echo")
-				out := make([]byte, 8+len(id)+2)
+				out := make([]byte, 16+len(id)+2)
 				copy(out, "NXCR")
 				out[4] = protocol.Version
 				out[5] = 2
-				copy(out[8:], id)
-				out[8+len(id)] = 0
-				out[8+len(id)+1] = 1
+				copy(out[8:16], buf[8:16]) // echo request nonce
+				copy(out[16:], id)
+				out[16+len(id)] = 0
+				out[16+len(id)+1] = 1
 				_, _ = listener.WriteToUDP(out, src)
 			}
 		}

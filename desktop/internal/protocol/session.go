@@ -49,6 +49,8 @@ func NextState(state ConnectionState, event ConnectionEvent) ConnectionState {
 			return StateAwaitingAuthorization
 		case EventDenied, EventHandshakeTimeout:
 			return StateFailed
+		case EventLocalDisconnect, EventRemoteBye:
+			return StateIdle
 		}
 	case StateAwaitingAuthorization:
 		switch event {
@@ -56,30 +58,35 @@ func NextState(state ConnectionState, event ConnectionEvent) ConnectionState {
 			return StateConnected
 		case EventDenied, EventHandshakeTimeout:
 			return StateFailed
+		case EventLocalDisconnect, EventRemoteBye:
+			return StateIdle
 		}
 	case StateConnected:
 		switch event {
 		case EventLocalDisconnect, EventRemoteBye:
-			return StateDisconnecting
+			return StateIdle
 		case EventHeartbeatTimeout:
 			return StateReconnecting
 		}
 	case StateDisconnecting:
-		if event == EventRetry {
+		if event == EventRetry || event == EventLocalDisconnect || event == EventRemoteBye {
 			return StateIdle
 		}
 	case StateReconnecting:
 		switch event {
 		case EventAuthorized:
 			return StateConnected
-		case EventHandshakeTimeout:
+		case EventHandshakeTimeout, EventDenied:
 			return StateFailed
-		case EventLocalDisconnect:
-			return StateDisconnecting
+		case EventLocalDisconnect, EventRemoteBye:
+			return StateIdle
 		}
 	case StateFailed:
 		if event == EventRetry || event == EventConnect {
 			return StateConnecting
+		}
+		if event == EventLocalDisconnect || event == EventRemoteBye {
+			return StateIdle
 		}
 	}
 	return state
@@ -121,7 +128,7 @@ func EncodeHeartbeat(h Heartbeat) []byte {
 	return b
 }
 func DecodeHeartbeat(b []byte) (Heartbeat, error) {
-	if len(b) != heartbeatSize || (string(b[:4]) != "NXHB" && string(b[:4]) != "SVHB") || b[4] != Version || (b[5] != HeartbeatPing && b[5] != HeartbeatPong) {
+	if len(b) != heartbeatSize || string(b[:4]) != "NXHB" || b[4] != Version || (b[5] != HeartbeatPing && b[5] != HeartbeatPong) {
 		return Heartbeat{}, errors.New("invalid heartbeat")
 	}
 	return Heartbeat{Kind: b[5], Session: binary.BigEndian.Uint32(b[8:]), Sequence: binary.BigEndian.Uint32(b[12:]), TimestampNs: binary.BigEndian.Uint64(b[16:])}, nil

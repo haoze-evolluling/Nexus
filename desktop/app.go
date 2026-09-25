@@ -615,7 +615,7 @@ func (a *App) onConnRequest(peer gateway.Peer) {
 		// are answered without churning the session.
 		needsRebuild := !streaming ||
 			session.device.Host != peer.Addr.IP.String() ||
-			(peer.Nonce != 0 && peer.Nonce != session.sender.ConnNonce()) ||
+			peer.Nonce != session.sender.ConnNonce() ||
 			session.sender.FeedbackIdle() > feedbackStaleAfter
 		var oldSender *stream.Sender
 		if needsRebuild && streaming {
@@ -666,7 +666,7 @@ func (a *App) onConnBye(deviceID string, nonce uint64, _ *net.UDPAddr) {
 	a.mu.Lock()
 	session := a.sessions[deviceID]
 	a.mu.Unlock()
-	if session == nil || (nonce != 0 && session.sender.ConnNonce() != 0 && session.sender.ConnNonce() != nonce) {
+	if session == nil || session.sender.ConnNonce() != nonce {
 		return
 	}
 	if err := a.Disconnect(deviceID); err != nil {

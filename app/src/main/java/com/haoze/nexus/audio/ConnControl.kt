@@ -4,7 +4,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 /**
- * 连接控制报文（SVCR），与桌面端 internal/protocol/conn.go 保持一致。
+ * 连接控制报文（NXCR），与桌面端 internal/protocol/conn.go 保持一致。
  * 请求方携带稳定设备 ID 与名称；响应方返回允许/拒绝；断开用于即时通知对端。
  */
 data class ConnControl(val kind: Int, val deviceId: String, val name: String = "", val allow: Boolean = false, val nonce: Long = 0L) {
@@ -41,12 +41,11 @@ data class ConnControl(val kind: Int, val deviceId: String, val name: String = "
         private const val DENY: Byte = 2
 
         fun decode(data: ByteArray, length: Int): ConnControl? {
-            if (length < HEADER_SIZE) return null
+            if (length < HEADER_SIZE + 8) return null
             val magic = String(data, 0, 4, Charsets.UTF_8)
-            if (magic != MAGIC && magic != "SVCR") return null
+            if (magic != MAGIC) return null
             if (data[4].toInt() != NexusProtocol.version) return null
             val kind = data[5].toInt() and 0xff
-            if (length < HEADER_SIZE + 8) return null
             val nonce = ByteBuffer.wrap(data, HEADER_SIZE, 8).order(ByteOrder.BIG_ENDIAN).long
             val bodyStart = HEADER_SIZE + 8
             val nul = findNul(data, bodyStart, length)

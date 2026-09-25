@@ -148,12 +148,17 @@ class AudioReceiverService : Service() {
                 val currentState = ConnectionBus.stateOf(pc.deviceId).value
                 if (currentState != ConnectionState.RECONNECTING) break
 
-                val result = connector.request(pc, selfId, selfName, timeoutMs = 4_000L)
+                val result = connector.request(pc, selfId, selfName, timeoutMs = 4_000L, manageState = false)
                 if (result is PcConnector.ConnectResult.Accepted) {
                     val actualHost = result.verifiedHost.ifEmpty { pc.host }
                     ConnectionBus.queuedSender = ActivePc(pc.deviceId, pc.name, InetAddress.getByName(actualHost), nonce = result.nonce)
                     ConnectionBus.clearReconnectProgress(pc.deviceId)
+                    ConnectionBus.transition(pc.deviceId, ConnectionEvent.AUTHORIZED)
                     ConnectionBus.notify(R.string.msg_reconnected, pc.name)
+                    return@launch
+                } else if (result is PcConnector.ConnectResult.Denied) {
+                    ConnectionBus.clearReconnectProgress(pc.deviceId)
+                    ConnectionBus.transition(pc.deviceId, ConnectionEvent.DENIED)
                     return@launch
                 }
             }
@@ -265,6 +270,19 @@ class AudioReceiverService : Service() {
             peerOperation = 0L; peerOperationStartedNs = 0L; peerTargetLocalNs = 0L; peerResetRequested = false
             peerDeviceId = ""; peerOffsetMs = null; peerRttMs = null; pendingPeerAddress = null; pendingPeerPort = 0
         }
+        fun resetAudioSession() {
+            activePc = null
+            activeSession = 0L
+            highest = 0L; receivedCount = 0L; lostCount = 0L; fecPending = false; expectedNextTsNs = 0L
+            ConnectionBus.activePc.value = null
+            ConnectionBus.calibration.value = null
+            updatePlaybackState(false)
+            updateForegroundNotification(null)
+            buffer.clear()
+            clockSync.reset()
+            player.resetForSession()
+            clearPeerOperation()
+        }
         // 反馈的队列值表示超出同步预算的多余积压，而非总缓冲：
         // 桌面端以 queue>1 为拥塞信号，直接上报总缓冲会被误判持续降码率。
         fun queueExcess(): Int {
@@ -345,20 +363,10 @@ class AudioReceiverService : Service() {
                     cancelAutoReconnect(disconnectId)
                     if (activePc?.deviceId == disconnectId) {
                         val gone = activePc
-                        activePc = null
-                        ConnectionBus.activePc.value = null
-                        updatePlaybackState(false)
-                        updateForegroundNotification(null)
-                        buffer.clear()
-                        player.resetForSession()
-                        expectedNextTsNs = 0L
+                        resetAudioSession()
                         gone?.let(::sendBye)
-                        ConnectionBus.transition(disconnectId, ConnectionEvent.LOCAL_DISCONNECT)
-                        ConnectionBus.transition(disconnectId, ConnectionEvent.RETRY)
-                    } else {
-                        ConnectionBus.transition(disconnectId, ConnectionEvent.LOCAL_DISCONNECT)
-                        ConnectionBus.transition(disconnectId, ConnectionEvent.RETRY)
                     }
+                    ConnectionBus.transition(disconnectId, ConnectionEvent.LOCAL_DISCONNECT)
                 }
                 expirePrompts()
                 // 周期性时钟同步：多设备对齐播放的基础。
@@ -393,13 +401,7 @@ class AudioReceiverService : Service() {
                     if (activePc != null && System.nanoTime() - lastHeartbeatNs > HEARTBEAT_TIMEOUT_NS) {
                         val gone = activePc
                         val targetPc = gone?.let { PcDevice(it.deviceId, it.name, it.address.hostAddress ?: "", NexusProtocol.desktopControlPort) } ?: lastConnectedPc
-                        activePc = null
-                        ConnectionBus.activePc.value = null
-                        updatePlaybackState(false)
-                        updateForegroundNotification(null)
-                        buffer.clear()
-                        player.resetForSession()
-                        expectedNextTsNs = 0L
+                        resetAudioSession()
                         // 异常中断切勿发送 sendBye，否则会主动杀死电脑端的推流会话
                         gone?.let {
                             ConnectionBus.transition(it.deviceId, ConnectionEvent.HEARTBEAT_TIMEOUT)
@@ -447,7 +449,7 @@ class AudioReceiverService : Service() {
                     continue
                 }
                 val conn = ConnControl.decode(datagram.data, datagram.length)
-                if (conn != null) { handleConnControl(conn, datagram, trust); continue }
+                if (conn != null) { handleConnControl(conn, datagram, trust, ::resetAudioSession); continue }
                 val peerControl = PeerCalibrationControl.decode(datagram.data, datagram.length)
                 if (peerControl != null) {
                     handlePeerCalibration(peerControl, datagram, ::publishPeer, ::clearPeerOperation)
@@ -529,7 +531,12 @@ class AudioReceiverService : Service() {
     }
 
     /** 接收线程：处理连接控制报文。 */
-    private fun handleConnControl(conn: ConnControl, datagram: DatagramPacket, trust: PcTrustRepository) {
+    private fun handleConnControl(
+        conn: ConnControl,
+        datagram: DatagramPacket,
+        trust: PcTrustRepository,
+        resetAudioSession: () -> Unit,
+    ) {
         when (conn.kind) {
             ConnControl.KIND_REQUEST -> {
                 val current = activePc
@@ -558,20 +565,13 @@ class AudioReceiverService : Service() {
                 }
             }
             ConnControl.KIND_BYE -> {
-                if (activePc?.deviceId == conn.deviceId && (activePc?.nonce == conn.nonce || conn.nonce == 0L || activePc?.nonce == 0L)) {
+                if (activePc?.deviceId == conn.deviceId && activePc?.nonce == conn.nonce) {
                     val gone = activePc
                     cancelAutoReconnect(conn.deviceId)
-                    activePc = null
-                    ConnectionBus.activePc.value = null
-                    updatePlaybackState(false)
-                    updateForegroundNotification(null)
-                    peerOperation = 0L
-                    peerTargetLocalNs = 0L
-                    peerResetRequested = false
+                    resetAudioSession()
                     ConnectionBus.peerCalibration.value = emptyMap()
                     ConnectionBus.notify(R.string.msg_disconnected, gone?.name ?: LocaleManager.wrap(this).getString(R.string.generic_pc))
                     ConnectionBus.transition(conn.deviceId, ConnectionEvent.REMOTE_BYE)
-                    ConnectionBus.transition(conn.deviceId, ConnectionEvent.RETRY)
                 }
             }
             ConnControl.KIND_RESPONSE -> {} // 响应发给发起连接的临时 socket，不会到这里
@@ -613,9 +613,6 @@ class AudioReceiverService : Service() {
         ConnectionBus.transition(pc.deviceId, ConnectionEvent.AUTHORIZED)
         updateForegroundNotification(pc.name)
         ConnectionBus.notify(R.string.msg_connected, pc.name)
-        serviceScope.launch {
-            runCatching { PcTrustRepository(applicationContext).trust(pc.deviceId, pc.name) }
-        }
     }
 
     private fun handlePeerCalibration(

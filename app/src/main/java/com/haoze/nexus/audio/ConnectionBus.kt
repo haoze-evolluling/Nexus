@@ -85,7 +85,9 @@ object ConnectionBus {
     }
 
     fun stateOf(deviceId: String): MutableStateFlow<ConnectionState> =
-        states.getOrPut(deviceId) { MutableStateFlow(ConnectionState.IDLE) }
+        states.getOrPut(deviceId) {
+            MutableStateFlow(if (activePc.value?.deviceId == deviceId) ConnectionState.CONNECTED else ConnectionState.IDLE)
+        }
 
     fun setReconnectProgress(deviceId: String, attempt: Int, maxAttempts: Int) {
         reconnectProgress.value = reconnectProgress.value + (deviceId to (attempt to maxAttempts))

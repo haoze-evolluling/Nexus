@@ -70,7 +70,7 @@ class PcDiscovery(context: Context) {
             }
             }
             override fun onServiceFound(serviceInfo: NsdServiceInfo) {
-                if (!serviceInfo.serviceType.contains("nexus") && !serviceInfo.serviceType.contains("steamvoice")) return
+                if (!serviceInfo.serviceType.contains("nexus")) return
                 enqueueResolve(serviceInfo)
             }
         }
@@ -122,7 +122,7 @@ class PcDiscovery(context: Context) {
         val role = attrs["role"]?.decodeToString() ?: return
         val deviceId = attrs["device_id"]?.decodeToString() ?: return
         val host = resolveHost(info) ?: return
-        val name = info.serviceName.removePrefix("Nexus-").removePrefix("SteamVoice-").ifBlank { deviceId.take(8) }
+        val name = info.serviceName.removePrefix("Nexus-").ifBlank { deviceId.take(8) }
         if (role == "speaker") {
             val device = AndroidDevice(deviceId, name, host, info.port)
             _androidDevices.value = (_androidDevices.value.filterNot { it.deviceId == deviceId } + device).sortedBy { it.name.lowercase() }
@@ -134,30 +134,29 @@ class PcDiscovery(context: Context) {
     }
 
     private fun resolveHost(info: NsdServiceInfo): String? {
-        if (Build.VERSION.SDK_INT >= 34) {
-            val nonLoopback = info.hostAddresses.filterNot { it.isLoopbackAddress }
-            val ipv4List = nonLoopback.filterIsInstance<Inet4Address>()
-            if (ipv4List.isNotEmpty()) {
-                val best = findBestSubnetMatch(ipv4List) ?: ipv4List.first()
-                return best.hostAddress
+        val candidates: List<Inet4Address> = if (Build.VERSION.SDK_INT >= 34) {
+            info.hostAddresses.filterNot { it.isLoopbackAddress }.filterIsInstance<Inet4Address>()
+        } else {
+            @Suppress("DEPRECATION")
+            val host = info.host
+            if (host is Inet4Address && !host.isLoopbackAddress) {
+                listOf(host)
+            } else {
+                val candidateHost = host?.hostAddress ?: info.serviceName
+                runCatching {
+                    InetAddress.getAllByName(candidateHost).filterNot { it.isLoopbackAddress }.filterIsInstance<Inet4Address>()
+                }.getOrNull() ?: emptyList()
             }
-            return nonLoopback.firstOrNull()?.hostAddress
+        }
+        if (candidates.isNotEmpty()) {
+            return (findBestSubnetMatch(candidates) ?: candidates.first()).hostAddress
         }
         @Suppress("DEPRECATION")
-        val host = info.host
-        if (host is Inet4Address && !host.isLoopbackAddress) {
-            return host.hostAddress
+        return if (Build.VERSION.SDK_INT >= 34) {
+            info.hostAddresses.firstOrNull { !it.isLoopbackAddress }?.hostAddress
+        } else {
+            info.host?.hostAddress
         }
-        val candidateHost = host?.hostAddress ?: info.serviceName
-        runCatching {
-            val all = InetAddress.getAllByName(candidateHost).filterNot { it.isLoopbackAddress }
-            val ipv4List = all.filterIsInstance<Inet4Address>()
-            if (ipv4List.isNotEmpty()) {
-                val best = findBestSubnetMatch(ipv4List) ?: ipv4List.first()
-                return best.hostAddress
-            }
-        }
-        return host?.hostAddress
     }
 
     private fun findBestSubnetMatch(candidates: List<Inet4Address>): Inet4Address? {

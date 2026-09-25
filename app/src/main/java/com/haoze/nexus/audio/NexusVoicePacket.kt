@@ -62,7 +62,7 @@ data class SettingsControl(val bitrateKbps: Int, val frameMs: Int, val updatedAt
         fun decode(data: ByteArray, length: Int): SettingsControl? {
             if (length != 40) return null
             val magic = data.copyOfRange(0, 4).decodeToString()
-            if (magic != "NXCS" && magic != "SVCS") return null
+            if (magic != "NXCS") return null
             if (data[4].toInt() != NexusProtocol.version || data[5].toInt() != 1) return null
             val b = ByteBuffer.wrap(data, 0, length).order(ByteOrder.BIG_ENDIAN)
             b.position(8)
@@ -77,7 +77,7 @@ data class SettingsControl(val bitrateKbps: Int, val frameMs: Int, val updatedAt
     }
 }
 
-/** NTP 风格的时钟同步报文（NXTS/SVTS）。t4 由请求方本地记录，不经网络传输。 */
+/** NTP 风格的时钟同步报文（NXTS）。t4 由请求方本地记录，不经网络传输。 */
 data class TimeSyncControl(val kind: Int, val t1: Long, val t2: Long, val t3: Long) {
     fun encode(): ByteArray {
         val b = ByteBuffer.allocate(SIZE).order(ByteOrder.BIG_ENDIAN)
@@ -95,7 +95,7 @@ data class TimeSyncControl(val kind: Int, val t1: Long, val t2: Long, val t3: Lo
         fun decode(data: ByteArray, length: Int): TimeSyncControl? {
             if (length != SIZE) return null
             val magic = data.copyOfRange(0, 4).decodeToString()
-            if (magic != MAGIC && magic != "SVTS") return null
+            if (magic != MAGIC) return null
             if (data[4].toInt() != NexusProtocol.version) return null
             val kind = data[5].toInt() and 0xff
             if (kind != KIND_REQUEST && kind != KIND_RESPONSE) return null
@@ -137,7 +137,7 @@ data class PeerCalibrationControl(
         fun decode(data: ByteArray, length: Int): PeerCalibrationControl? {
             if (length < HEADER_SIZE) return null
             val magic = data.copyOfRange(0, 4).decodeToString()
-            if (magic != MAGIC && magic != "SVAC") return null
+            if (magic != MAGIC) return null
             if (data[4].toInt() != NexusProtocol.version) return null
             val kind = data[5].toInt() and 0xff
             if (kind !in REQUEST..CANCEL) return null
@@ -168,7 +168,7 @@ object NexusProtocol {
     fun decode(data: ByteArray, length: Int): NexusVoicePacket? {
         if (length < headerSize) return null
         val magic = data.copyOfRange(0, 4).decodeToString()
-        if (magic != "NX01" && magic != "SV01") return null
+        if (magic != "NX01") return null
         if (data[4].toInt() != version || data[5].toInt() != codecOpus) return null
         val buffer = ByteBuffer.wrap(data, 0, length).order(ByteOrder.BIG_ENDIAN)
         val rate = buffer.getInt(6)
@@ -195,7 +195,7 @@ data class HeartbeatControl(val kind: Int, val session: Long, val sequence: Long
         fun decode(data: ByteArray, length: Int): HeartbeatControl? {
             if (length != SIZE) return null
             val magic = data.copyOfRange(0, 4).decodeToString()
-            if (magic != "NXHB" && magic != "SVHB") return null
+            if (magic != "NXHB") return null
             if (data[4].toInt() != NexusProtocol.version) return null
             val kind = data[5].toInt() and 0xff
             if (kind != KIND_PING && kind != KIND_PONG) return null

@@ -135,7 +135,7 @@ func (s *Sender) RequestConnection(selfID, selfName string, timeout time.Duratio
 		}
 		select {
 		case r := <-s.connResult:
-			return r.Allow && (r.Nonce == nonce || r.Nonce == 0)
+			return r.Allow && r.Nonce == nonce
 		case <-s.feedbackDone:
 			return false
 		case <-time.After(wait):
@@ -166,9 +166,7 @@ func (s *Sender) feedbackLoop() {
 			s.mu.Lock()
 			nonce := s.connNonce
 			s.mu.Unlock()
-			// Zero is the pre-nonce wire format used by older peers; retain
-			// interoperability for responses while all new sessions use nonce.
-			if c.Nonce != nonce && c.Nonce != 0 {
+			if c.Nonce != nonce {
 				continue
 			}
 			select {

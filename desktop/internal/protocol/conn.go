@@ -1,7 +1,6 @@
 package protocol
 
 import (
-	"bytes"
 	"crypto/rand"
 	"encoding/binary"
 	"errors"
@@ -94,24 +93,14 @@ func EncodeConn(c ConnControl) ([]byte, error) {
 }
 
 func DecodeConn(b []byte) (ConnControl, error) {
-	if len(b) < connHeaderSize || (string(b[:4]) != connMagic && string(b[:4]) != "SVCR") || b[4] != Version {
+	if len(b) < connHeaderSize+connNonceSize || string(b[:4]) != connMagic || b[4] != Version {
 		return ConnControl{}, errors.New("invalid connection control")
 	}
-	c := ConnControl{Kind: b[5]}
-	bodyOffset := connHeaderSize
-	if len(b) >= connHeaderSize+connNonceSize {
-		c.Nonce = binary.BigEndian.Uint64(b[connHeaderSize:])
-		bodyOffset += connNonceSize
+	c := ConnControl{
+		Kind:  b[5],
+		Nonce: binary.BigEndian.Uint64(b[connHeaderSize:]),
 	}
-	// Accept legacy response/bye packets whose body starts immediately after
-	// the header. New responses have an explicit nonce followed by id NUL.
-	if c.Kind == ConnResponse {
-		if i := bytes.IndexByte(b[connHeaderSize:], 0); i >= 1 && connHeaderSize+i+2 == len(b) && (b[connHeaderSize+i+1] == connAllow || b[connHeaderSize+i+1] == connDeny) {
-			bodyOffset = connHeaderSize
-			c.Nonce = 0
-		}
-	}
-	body := b[bodyOffset:]
+	body := b[connHeaderSize+connNonceSize:]
 	switch c.Kind {
 	case ConnRequest:
 		deviceID, name, ok := splitConnField(body)

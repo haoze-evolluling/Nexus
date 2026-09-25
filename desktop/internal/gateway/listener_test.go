@@ -10,7 +10,7 @@ import (
 
 func TestListenerDeliversRequestAndResponds(t *testing.T) {
 	requests := make(chan Peer, 1)
-	l, err := Start(0, "desktop-self", func(p Peer) { requests <- p }, func(string, *net.UDPAddr) {})
+	l, err := Start(0, "desktop-self", func(p Peer) { requests <- p }, func(string, uint64, *net.UDPAddr) {})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -52,7 +52,7 @@ func TestListenerDeliversRequestAndResponds(t *testing.T) {
 
 func TestListenerDeliversBye(t *testing.T) {
 	byes := make(chan string, 1)
-	l, err := Start(0, "desktop-self", func(Peer) {}, func(deviceID string, _ *net.UDPAddr) { byes <- deviceID })
+	l, err := Start(0, "desktop-self", func(Peer) {}, func(deviceID string, _ uint64, _ *net.UDPAddr) { byes <- deviceID })
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -80,7 +80,7 @@ func TestListenerDeliversBye(t *testing.T) {
 }
 
 func TestListenerIgnoresGarbage(t *testing.T) {
-	l, err := Start(0, "desktop-self", func(Peer) { t.Fatal("garbage delivered as request") }, func(string, *net.UDPAddr) { t.Fatal("garbage delivered as bye") })
+	l, err := Start(0, "desktop-self", func(Peer) { t.Fatal("garbage delivered as request") }, func(string, uint64, *net.UDPAddr) { t.Fatal("garbage delivered as bye") })
 	if err != nil {
 		t.Fatal(err)
 	}

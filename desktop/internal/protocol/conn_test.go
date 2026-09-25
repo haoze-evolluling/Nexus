@@ -58,14 +58,16 @@ func TestEncodeConnTruncatesLongName(t *testing.T) {
 }
 
 func TestDecodeConnRejectsForeignDatagrams(t *testing.T) {
+	nonce := make([]byte, 8)
 	cases := [][]byte{
 		nil,
 		[]byte("NXCT"),
-		append([]byte("NXCR\x03\x01\x00\x00"), []byte("id")...), // wrong version
-		[]byte("NXCR\x03\x09\x00\x00id\x00name"),                // unknown kind
-		[]byte("NXCR\x03\x01\x00\x00\x00name"),                  // empty device id
-		[]byte("NXCR\x03\x02\x00\x00id"),                        // response without decision
-		[]byte("NXCR\x03\x02\x00\x00id\x00\x07"),                // unknown decision
+		append([]byte("SVCR\x04\x01\x00\x00"), append(nonce, []byte("id\x00name")...)...), // legacy SVCR magic rejected
+		append([]byte("NXCR\x03\x01\x00\x00"), append(nonce, []byte("id")...)...),          // wrong version
+		append([]byte("NXCR\x04\x09\x00\x00"), append(nonce, []byte("id\x00name")...)...), // unknown kind
+		append([]byte("NXCR\x04\x01\x00\x00"), append(nonce, []byte("\x00name")...)...),   // empty device id
+		append([]byte("NXCR\x04\x02\x00\x00"), append(nonce, []byte("id")...)...),          // response without decision
+		append([]byte("NXCR\x04\x02\x00\x00"), append(nonce, []byte("id\x00\x07")...)...),  // unknown decision
 	}
 	for _, b := range cases {
 		if _, err := DecodeConn(b); err == nil {

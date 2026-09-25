@@ -94,6 +94,7 @@ import com.haoze.nexus.audio.ConnectionBus
 import com.haoze.nexus.audio.DeviceIdentity
 import com.haoze.nexus.audio.LocaleManager
 import com.haoze.nexus.audio.PcAuthPrompt
+import com.haoze.nexus.audio.ConnectionEvent
 import com.haoze.nexus.audio.ConnectionState
 import com.haoze.nexus.audio.PcConnector
 import com.haoze.nexus.audio.PcDevice
@@ -193,6 +194,7 @@ class AudioReceiverActivity : ComponentActivity() {
 
     private fun disconnectFromPc(pc: PcDevice) {
         if (selfId.isEmpty()) return
+        ConnectionBus.transition(pc.deviceId, ConnectionEvent.LOCAL_DISCONNECT)
         ConnectionBus.localDisconnects.add(pc.deviceId)
     }
 }

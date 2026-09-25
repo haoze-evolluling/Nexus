@@ -32,19 +32,12 @@ type Listener struct {
 
 // Start binds the control port; port 0 picks an ephemeral port (tests).
 // selfID is the identity stamped into outgoing responses.
-func Start(port int, selfID string, onRequest func(Peer), onBye interface{}) (*Listener, error) {
+func Start(port int, selfID string, onRequest func(Peer), onBye func(deviceID string, nonce uint64, addr *net.UDPAddr)) (*Listener, error) {
 	conn, err := net.ListenUDP("udp", &net.UDPAddr{IP: net.IPv4zero, Port: port})
 	if err != nil {
 		return nil, err
 	}
-	var bye func(string, uint64, *net.UDPAddr)
-	switch fn := onBye.(type) {
-	case func(string, uint64, *net.UDPAddr):
-		bye = fn
-	case func(string, *net.UDPAddr):
-		bye = func(id string, _ uint64, addr *net.UDPAddr) { fn(id, addr) }
-	}
-	l := &Listener{conn: conn, selfID: selfID, onRequest: onRequest, onBye: bye}
+	l := &Listener{conn: conn, selfID: selfID, onRequest: onRequest, onBye: onBye}
 	l.wg.Add(1)
 	go l.loop()
 	return l, nil

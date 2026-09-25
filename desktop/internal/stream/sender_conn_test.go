@@ -23,7 +23,7 @@ func fakeReceiver(t *testing.T, listener *net.UDPConn, allow bool, respondTo *ne
 		close(done)
 		return
 	}
-	response, _ := protocol.EncodeConn(protocol.ConnControl{Kind: protocol.ConnResponse, DeviceID: "receiver-1", Allow: allow})
+	response, _ := protocol.EncodeConn(protocol.ConnControl{Kind: protocol.ConnResponse, DeviceID: "receiver-1", Allow: allow, Nonce: msg.Nonce})
 	target := respondTo
 	if target == nil {
 		target = senderAddr
