@@ -45,7 +45,6 @@ Nexus/
 │   └── build.bat         # Windows 安装包与可执行文件打包脚本
 ├── output/               # 统一构建产物调试输出目录（两端 APK 与 EXE/Installer 汇集地）
 ├── build_all.bat         # 跨端一键构建脚本（打包两端并统一同步输出到 output/）
-├── build_apk.bat         # 根目录便捷打包脚本（自动转调 android/build_apk.bat）
 └── recognition_members.json
 ```
 
@@ -72,14 +71,15 @@ Nexus/
 
 - **环境要求**：JDK 11+、Android SDK（Compile SDK 37，Min SDK 28）、Android NDK（`27.0.12077973`）、CMake。
 - **Android Studio**：直接打开 `Nexus/android` 目录即可开始开发调试。
-- **独立编译**：
+- **交互式打包与设备安装**：
+  ```powershell
+  cd android
+  .\build_apk.bat
+  ```
+- **命令行独立编译**：
   ```powershell
   cd android
   .\gradlew.bat assembleDebug -PsignDebugWithRelease=true
-  ```
-  或者在根目录直接运行快捷打包脚本：
-  ```powershell
-  .\build_apk.bat
   ```
 
 ### Windows 桌面发送端
