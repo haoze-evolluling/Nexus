@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Kept within the adaptive-icon safe zone so launchers render it at three fifths of the visible icon. -->
+    <group
+        android:translateX="25.2"
+        android:translateY="25.2"
+        android:scaleX="2.4"
+        android:scaleY="2.4">
+        <path
+            android:fillColor="@android:color/transparent"
+            android:pathData="M7,8L17,16L12,20L12,4L17,8L7,16"
+            android:strokeColor="#000000"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:strokeWidth="2" />
+    </group>
+</vector>

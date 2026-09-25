@@ -1,0 +1,76 @@
+# Android build outputs
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# JVM and generated files
+*.class
+bin/
+gen/
+out/
+
+# Gradle and Kotlin build caches
+.gradle/
+.kotlin/
+build/
+
+# Local SDK and signing configuration
+local.properties
+key.properties
+keystore.properties
+signing.properties
+*.jks
+*.keystore
+*.p12
+SyncTouch-keystore/
+secrets/
+
+# Android Studio and IntelliJ IDEA
+.idea/
+*.iml
+.navigation/
+captures/
+
+# Native build intermediates
+.externalNativeBuild/
+.cxx/
+
+# Google Services configuration
+google-services.json
+
+# Freeline
+freeline.py
+freeline/
+freeline_project_description.json
+
+# Fastlane generated output
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+fastlane/readme.md
+
+# Lint output
+lint/intermediates/
+lint/generated/
+lint/outputs/
+lint/tmp/
+
+# Operating system and editor files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+# JVM crash logs
+hs_err_pid*
+replay_pid*
+
+# Archived project source
+bluetooth-remote-master/
+
+#Other
+.codebase-memory/
