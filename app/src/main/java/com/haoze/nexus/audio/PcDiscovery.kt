@@ -5,6 +5,9 @@ import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.os.Build
 import android.util.Log
+import java.net.Inet4Address
+import java.net.InetAddress
+import java.net.NetworkInterface
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -132,14 +135,64 @@ class PcDiscovery(context: Context) {
 
     private fun resolveHost(info: NsdServiceInfo): String? {
         if (Build.VERSION.SDK_INT >= 34) {
-            return info.hostAddresses.firstOrNull { !it.isLoopbackAddress }?.hostAddress
+            val nonLoopback = info.hostAddresses.filterNot { it.isLoopbackAddress }
+            val ipv4List = nonLoopback.filterIsInstance<Inet4Address>()
+            if (ipv4List.isNotEmpty()) {
+                val best = findBestSubnetMatch(ipv4List) ?: ipv4List.first()
+                return best.hostAddress
+            }
+            return nonLoopback.firstOrNull()?.hostAddress
         }
         @Suppress("DEPRECATION")
-        return info.host?.hostAddress
+        val host = info.host
+        if (host is Inet4Address && !host.isLoopbackAddress) {
+            return host.hostAddress
+        }
+        val candidateHost = host?.hostAddress ?: info.serviceName
+        runCatching {
+            val all = InetAddress.getAllByName(candidateHost).filterNot { it.isLoopbackAddress }
+            val ipv4List = all.filterIsInstance<Inet4Address>()
+            if (ipv4List.isNotEmpty()) {
+                val best = findBestSubnetMatch(ipv4List) ?: ipv4List.first()
+                return best.hostAddress
+            }
+        }
+        return host?.hostAddress
+    }
+
+    private fun findBestSubnetMatch(candidates: List<Inet4Address>): Inet4Address? {
+        val localIps = runCatching {
+            NetworkInterface.getNetworkInterfaces()?.asSequence()
+                ?.filter { !it.isLoopback && it.isUp }
+                ?.flatMap { it.inetAddresses.asSequence() }
+                ?.filterIsInstance<Inet4Address>()
+                ?.filterNot { it.isLoopbackAddress }
+                ?.map { it.address }
+                ?.toList()
+        }.getOrNull() ?: emptyList()
+
+        if (localIps.isEmpty()) return null
+
+        for (local in localIps) {
+            val match24 = candidates.firstOrNull { c ->
+                val b = c.address
+                b.size == 4 && local.size == 4 && b[0] == local[0] && b[1] == local[1] && b[2] == local[2]
+            }
+            if (match24 != null) return match24
+        }
+        for (local in localIps) {
+            val match16 = candidates.firstOrNull { c ->
+                val b = c.address
+                b.size == 4 && local.size == 4 && b[0] == local[0] && b[1] == local[1]
+            }
+            if (match16 != null) return match16
+        }
+        return null
     }
 
     private fun upsert(transform: (List<PcDevice>) -> List<PcDevice>) {
         _devices.value = transform(_devices.value)
     }
 }
+
 

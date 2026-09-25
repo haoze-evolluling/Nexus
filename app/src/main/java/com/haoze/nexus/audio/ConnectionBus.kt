@@ -1,4 +1,4 @@
-﻿package com.haoze.nexus.audio
+package com.haoze.nexus.audio
 
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -66,6 +66,8 @@ object ConnectionBus {
     val peerCalibrationRequests = ConcurrentLinkedQueue<AndroidDevice>()
     /** Authoritative transport state per stable peer ID. */
     val states = ConcurrentHashMap<String, MutableStateFlow<ConnectionState>>()
+    /** deviceId -> (currentAttempt, maxAttempts) when in RECONNECTING. */
+    val reconnectProgress = MutableStateFlow<Map<String, Pair<Int, Int>>>(emptyMap())
     val messages = MutableSharedFlow<UiMessage>(extraBufferCapacity = 8)
 
     /** 连接器在收到电脑同意后排队登记发送方，接收循环随即采纳。 */
@@ -85,12 +87,23 @@ object ConnectionBus {
     fun stateOf(deviceId: String): MutableStateFlow<ConnectionState> =
         states.getOrPut(deviceId) { MutableStateFlow(ConnectionState.IDLE) }
 
+    fun setReconnectProgress(deviceId: String, attempt: Int, maxAttempts: Int) {
+        reconnectProgress.value = reconnectProgress.value + (deviceId to (attempt to maxAttempts))
+    }
+
+    fun clearReconnectProgress(deviceId: String) {
+        reconnectProgress.value = reconnectProgress.value - deviceId
+    }
+
     /** State transitions are serialized per peer and reject invalid events. */
     fun transition(deviceId: String, event: ConnectionEvent): ConnectionState {
         val flow = stateOf(deviceId)
         synchronized(flow) {
             val next = nextConnectionState(flow.value, event)
             flow.value = next
+            if (next != ConnectionState.RECONNECTING) {
+                clearReconnectProgress(deviceId)
+            }
             return next
         }
     }

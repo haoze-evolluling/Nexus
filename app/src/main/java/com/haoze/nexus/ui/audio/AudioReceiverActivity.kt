@@ -1,4 +1,4 @@
-﻿package com.haoze.nexus.ui.audio
+package com.haoze.nexus.ui.audio
 
 import android.Manifest
 import android.content.Context
@@ -94,7 +94,7 @@ import com.haoze.nexus.audio.ConnectionBus
 import com.haoze.nexus.audio.DeviceIdentity
 import com.haoze.nexus.audio.LocaleManager
 import com.haoze.nexus.audio.PcAuthPrompt
-import com.haoze.nexus.audio.PcConnectionState
+import com.haoze.nexus.audio.ConnectionState
 import com.haoze.nexus.audio.PcConnector
 import com.haoze.nexus.audio.PcDevice
 import com.haoze.nexus.audio.PcDiscovery
@@ -171,19 +171,24 @@ class AudioReceiverActivity : ComponentActivity() {
         receiverRunning = true
     }
 
-    private fun connectToPc(pc: PcDevice, onDone: (PcConnector.ConnectResult) -> Unit) {
+    private fun connectToPc(pc: PcDevice) {
         if (selfId.isEmpty()) return
         ensureReceiverRunning()
         val requestId = selfId
-        Thread {
+        lifecycleScope.launch(Dispatchers.IO) {
             val result = connector.request(pc, requestId, selfName)
             if (result is PcConnector.ConnectResult.Accepted) {
                 runCatching {
-                    ConnectionBus.queuedSender = ActivePc(pc.deviceId, pc.name, java.net.InetAddress.getByName(pc.host), nonce = result.nonce)
+                    val actualHost = result.verifiedHost.ifEmpty { pc.host }
+                    ConnectionBus.queuedSender = ActivePc(pc.deviceId, pc.name, java.net.InetAddress.getByName(actualHost), nonce = result.nonce)
+                    trustRepository.trust(pc.deviceId, pc.name)
                 }
+            } else if (result is PcConnector.ConnectResult.Denied) {
+                ConnectionBus.notify(R.string.pc_denied)
+            } else if (result is PcConnector.ConnectResult.Timeout) {
+                ConnectionBus.notify(R.string.pc_connect_failed, pc.name)
             }
-            runOnUiThread { onDone(result) }
-        }.start()
+        }
     }
 
     private fun disconnectFromPc(pc: PcDevice) {
@@ -201,7 +206,7 @@ fun AudioReceiverScreen(
     selfId: String,
     selfName: String,
     receiverRunning: Boolean,
-    onConnect: (PcDevice, (PcConnector.ConnectResult) -> Unit) -> Unit,
+    onConnect: (PcDevice) -> Unit,
     onDisconnect: (PcDevice) -> Unit,
     onBack: () -> Unit
 ) {
@@ -210,7 +215,7 @@ fun AudioReceiverScreen(
     val activePc by ConnectionBus.activePc.collectAsState()
     val authPrompt by ConnectionBus.authPrompt.collectAsState()
     val calibration by ConnectionBus.calibration.collectAsState()
-    val pcStates = remember { mutableStateMapOf<String, PcConnectionState>() }
+    val reconnectProgress by ConnectionBus.reconnectProgress.collectAsState()
     val peerCalibration by ConnectionBus.peerCalibration.collectAsState()
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -221,10 +226,6 @@ fun AudioReceiverScreen(
         ConnectionBus.messages.collect { msg ->
             scope.launch { snackbar.showSnackbar(context.getString(msg.resId, *msg.args)) }
         }
-    }
-    LaunchedEffect(devices) {
-        val online = devices.map { it.deviceId }.toSet()
-        pcStates.keys.toList().forEach { if (it !in online) pcStates.remove(it) }
     }
 
     Scaffold(
@@ -298,30 +299,16 @@ fun AudioReceiverScreen(
                             }
                         }
                         items(devices, key = { it.deviceId }) { pc ->
-                            val effective = if (activePc?.deviceId == pc.deviceId) PcConnectionState.CONNECTED else pcStates[pc.deviceId] ?: PcConnectionState.ONLINE
+                            val stateFlow = remember(pc.deviceId) { ConnectionBus.stateOf(pc.deviceId) }
+                            val rawState by stateFlow.collectAsState()
+                            val effective = if (activePc?.deviceId == pc.deviceId) ConnectionState.CONNECTED else rawState
+                            val progress = reconnectProgress[pc.deviceId]
                             PcCard(
                                 pc = pc,
                                 state = effective,
-                                onConnect = {
-                                    pcStates[pc.deviceId] = PcConnectionState.CONNECTING
-                                    onConnect(pc) { result ->
-                                        when (result) {
-                                            is PcConnector.ConnectResult.Accepted -> pcStates.remove(pc.deviceId)
-                                            is PcConnector.ConnectResult.Denied -> {
-                                                pcStates.remove(pc.deviceId)
-                                                scope.launch { snackbar.showSnackbar(context.getString(R.string.pc_denied)) }
-                                            }
-                                            is PcConnector.ConnectResult.Timeout -> {
-                                                pcStates.remove(pc.deviceId)
-                                                scope.launch { snackbar.showSnackbar(context.getString(R.string.pc_connect_failed, pc.name)) }
-                                            }
-                                        }
-                                    }
-                                },
-                                onDisconnect = {
-                                    pcStates.remove(pc.deviceId)
-                                    onDisconnect(pc)
-                                },
+                                reconnectProgress = progress,
+                                onConnect = { onConnect(pc) },
+                                onDisconnect = { onDisconnect(pc) },
                             )
                         }
                         if (visibleAndroidDevices.isNotEmpty()) {
@@ -641,8 +628,14 @@ private fun EmptyDevices(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun PcCard(pc: PcDevice, state: PcConnectionState, onConnect: () -> Unit, onDisconnect: () -> Unit) {
-    val connected = state == PcConnectionState.CONNECTED
+private fun PcCard(
+    pc: PcDevice,
+    state: ConnectionState,
+    reconnectProgress: Pair<Int, Int>?,
+    onConnect: () -> Unit,
+    onDisconnect: () -> Unit
+) {
+    val connected = state == ConnectionState.CONNECTED
     Surface(
         shape = MaterialTheme.shapes.large,
         color = if (connected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
@@ -662,16 +655,21 @@ private fun PcCard(pc: PcDevice, state: PcConnectionState, onConnect: () -> Unit
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     StateDot(state)
                     Text(
-                        state.label(),
+                        state.label(reconnectProgress),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
             when (state) {
-                PcConnectionState.CONNECTED -> OutlinedButton(onClick = onDisconnect) { Text(stringResource(R.string.btn_disconnect)) }
-                PcConnectionState.CONNECTING -> CircularProgressIndicator(Modifier.size(26.dp), strokeWidth = 2.dp)
-                PcConnectionState.ONLINE -> Button(onClick = onConnect) { Text(stringResource(R.string.btn_connect)) }
+                ConnectionState.CONNECTED -> OutlinedButton(onClick = onDisconnect) { Text(stringResource(R.string.btn_disconnect)) }
+                ConnectionState.CONNECTING, ConnectionState.AWAITING_AUTHORIZATION -> CircularProgressIndicator(Modifier.size(26.dp), strokeWidth = 2.dp)
+                ConnectionState.RECONNECTING -> Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
+                    OutlinedButton(onClick = onDisconnect) { Text(stringResource(R.string.btn_cancel_reconnect)) }
+                }
+                ConnectionState.FAILED -> Button(onClick = onConnect) { Text(stringResource(R.string.btn_reconnect)) }
+                ConnectionState.IDLE, ConnectionState.DISCONNECTING -> Button(onClick = onConnect) { Text(stringResource(R.string.btn_connect)) }
             }
         }
     }
@@ -725,18 +723,25 @@ private fun AndroidDeviceCard(device: AndroidDevice, state: PeerCalibrationState
 }
 
 @Composable
-private fun StateDot(state: PcConnectionState) {
+private fun StateDot(state: ConnectionState) {
     val color = when (state) {
-        PcConnectionState.CONNECTED -> MaterialTheme.colorScheme.primary
-        PcConnectionState.CONNECTING -> MaterialTheme.colorScheme.tertiary
-        PcConnectionState.ONLINE -> MaterialTheme.colorScheme.outline
+        ConnectionState.CONNECTED -> MaterialTheme.colorScheme.primary
+        ConnectionState.CONNECTING, ConnectionState.AWAITING_AUTHORIZATION -> MaterialTheme.colorScheme.tertiary
+        ConnectionState.RECONNECTING, ConnectionState.FAILED -> MaterialTheme.colorScheme.error
+        ConnectionState.IDLE, ConnectionState.DISCONNECTING -> MaterialTheme.colorScheme.outline
     }
     Surface(color = color, shape = CircleShape, modifier = Modifier.size(8.dp)) {}
 }
 
 @Composable
-private fun PcConnectionState.label(): String = when (this) {
-    PcConnectionState.ONLINE -> stringResource(R.string.pc_state_online)
-    PcConnectionState.CONNECTING -> stringResource(R.string.pc_state_connecting)
-    PcConnectionState.CONNECTED -> stringResource(R.string.pc_state_connected)
+private fun ConnectionState.label(reconnectProgress: Pair<Int, Int>? = null): String = when (this) {
+    ConnectionState.IDLE, ConnectionState.DISCONNECTING -> stringResource(R.string.pc_state_online)
+    ConnectionState.CONNECTING -> stringResource(R.string.pc_state_connecting)
+    ConnectionState.AWAITING_AUTHORIZATION -> stringResource(R.string.pc_state_awaiting_auth)
+    ConnectionState.RECONNECTING -> {
+        if (reconnectProgress != null) stringResource(R.string.pc_state_reconnecting, reconnectProgress.first, reconnectProgress.second)
+        else stringResource(R.string.pc_state_connecting)
+    }
+    ConnectionState.FAILED -> stringResource(R.string.pc_state_failed)
+    ConnectionState.CONNECTED -> stringResource(R.string.pc_state_connected)
 }

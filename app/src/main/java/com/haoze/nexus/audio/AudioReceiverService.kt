@@ -21,7 +21,15 @@ import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
 import kotlin.concurrent.thread
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import com.haoze.nexus.R
 import com.haoze.nexus.ui.audio.AudioReceiverActivity
@@ -38,6 +46,11 @@ class AudioReceiverService : Service() {
     }
 
     @Volatile private var stopRequested = false
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    @Volatile private var cachedSettings = AudioSettings()
+    @Volatile private var cachedTrustedPcs = emptySet<String>()
+    private var reconnectJob: Job? = null
+    @Volatile private var lastConnectedPc: PcDevice? = null
     private var socket: DatagramSocket? = null
     private var worker: Thread? = null
     private var nsd: NsdManager? = null
@@ -72,6 +85,12 @@ class AudioReceiverService : Service() {
         }
         Log.i(TAG, "receiver service starting port=${NexusProtocol.port}")
         stopRequested = false
+        serviceScope.launch {
+            SettingsRepository(applicationContext).settings.collect { cachedSettings = it }
+        }
+        serviceScope.launch {
+            PcTrustRepository(applicationContext).trusted.collect { cachedTrustedPcs = it.keys }
+        }
         ensureMediaSession()
         // Publish the media session-backed notification before doing network
         // work so Android treats this as an active lock-screen playback
@@ -86,6 +105,8 @@ class AudioReceiverService : Service() {
 
     override fun onDestroy() {
         stopRequested = true
+        reconnectJob?.cancel()
+        reconnectJob = null
         activePc?.let { pc ->
             // 让电脑端立即断开会话，而不是等反馈超时。
             sendBye(pc)
@@ -101,12 +122,52 @@ class AudioReceiverService : Service() {
         dismissAuthNotification()
         mediaSession?.release()
         mediaSession = null
+        serviceScope.cancel()
         stopForeground(STOP_FOREGROUND_REMOVE)
         super.onDestroy()
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+    private fun startAutoReconnect(pc: PcDevice) {
+        reconnectJob?.cancel()
+        reconnectJob = serviceScope.launch {
+            val delays = TransportTiming.RECONNECT_BACKOFF_DELAYS_MS
+            val maxAttempts = delays.size
+            val connector = PcConnector()
+            val selfId = cachedSettings.deviceId.ifEmpty { selfIdBlocking() }
+            val selfName = DeviceIdentity.friendlyName(applicationContext)
+
+            for (attempt in 1..maxAttempts) {
+                if (!isActive || stopRequested) break
+                ConnectionBus.setReconnectProgress(pc.deviceId, attempt, maxAttempts)
+                ConnectionBus.notify(R.string.msg_reconnecting, pc.name)
+                delay(delays[attempt - 1])
+                if (!isActive || stopRequested) break
+
+                val currentState = ConnectionBus.stateOf(pc.deviceId).value
+                if (currentState != ConnectionState.RECONNECTING) break
+
+                val result = connector.request(pc, selfId, selfName, timeoutMs = 4_000L)
+                if (result is PcConnector.ConnectResult.Accepted) {
+                    val actualHost = result.verifiedHost.ifEmpty { pc.host }
+                    ConnectionBus.queuedSender = ActivePc(pc.deviceId, pc.name, InetAddress.getByName(actualHost), nonce = result.nonce)
+                    ConnectionBus.clearReconnectProgress(pc.deviceId)
+                    ConnectionBus.notify(R.string.msg_reconnected, pc.name)
+                    return@launch
+                }
+            }
+            ConnectionBus.clearReconnectProgress(pc.deviceId)
+            ConnectionBus.transition(pc.deviceId, ConnectionEvent.HANDSHAKE_TIMEOUT)
+            ConnectionBus.notify(R.string.msg_reconnect_failed, pc.name)
+        }
+    }
+
+    private fun cancelAutoReconnect(deviceId: String) {
+        reconnectJob?.cancel()
+        reconnectJob = null
+        ConnectionBus.clearReconnectProgress(deviceId)
+    }
 
     private fun selfIdBlocking(): String = runBlocking { SettingsRepository(applicationContext).settings.first().deviceId }
 
@@ -186,10 +247,9 @@ class AudioReceiverService : Service() {
         }
         fun fromActivePc(address: InetAddress, port: Int): Boolean {
             val pc = activePc ?: return false
-            // The sender's ephemeral port is learned from its authenticated
-            // SVCR request. Never accept control traffic from the mDNS address
-            // alone, and never use port 0 as a wildcard.
-            return pc.port != 0 && pc.address == address && pc.port == port
+            if (pc.address != address) return false
+            if (pc.port == 0) return true
+            return pc.port == port
         }
         fun fromActivePeer(address: InetAddress, port: Int): Boolean {
             // Peer calibration probes use the other receiver's ephemeral
@@ -252,7 +312,7 @@ class AudioReceiverService : Service() {
                 // 采纳连接器登记的发送方（手机主动连接电脑的场景）。
                 ConnectionBus.queuedSender?.let { queued ->
                     ConnectionBus.queuedSender = null
-                    if (activePc?.deviceId != queued.deviceId) adoptPc(queued)
+                    adoptPc(queued)
                 }
                 // 处理用户授权决定。
                 while (true) {
@@ -282,14 +342,22 @@ class AudioReceiverService : Service() {
                 // 处理用户主动断开。
                 while (true) {
                     val disconnectId = ConnectionBus.localDisconnects.poll() ?: break
+                    cancelAutoReconnect(disconnectId)
                     if (activePc?.deviceId == disconnectId) {
                         val gone = activePc
                         activePc = null
                         ConnectionBus.activePc.value = null
                         updatePlaybackState(false)
                         updateForegroundNotification(null)
+                        buffer.clear()
+                        player.resetForSession()
+                        expectedNextTsNs = 0L
                         gone?.let(::sendBye)
                         ConnectionBus.transition(disconnectId, ConnectionEvent.LOCAL_DISCONNECT)
+                        ConnectionBus.transition(disconnectId, ConnectionEvent.RETRY)
+                    } else {
+                        ConnectionBus.transition(disconnectId, ConnectionEvent.LOCAL_DISCONNECT)
+                        ConnectionBus.transition(disconnectId, ConnectionEvent.RETRY)
                     }
                 }
                 expirePrompts()
@@ -321,17 +389,25 @@ class AudioReceiverService : Service() {
                         }
                         clearPeerOperation()
                     }
-                    // 无音频超过 10s：电脑端可能异常退出或网络中断，主动清理连接状态。
+                    // 无音频或心跳超过 3.5s：网络中断或电脑进入休眠，触发自动重连
                     if (activePc != null && System.nanoTime() - lastHeartbeatNs > HEARTBEAT_TIMEOUT_NS) {
                         val gone = activePc
+                        val targetPc = gone?.let { PcDevice(it.deviceId, it.name, it.address.hostAddress ?: "", NexusProtocol.desktopControlPort) } ?: lastConnectedPc
                         activePc = null
                         ConnectionBus.activePc.value = null
                         updatePlaybackState(false)
                         updateForegroundNotification(null)
-                        // 通知电脑端立即 teardown，避免两端连接状态不一致。
-                        gone?.let(::sendBye)
-                        gone?.let { ConnectionBus.transition(it.deviceId, ConnectionEvent.HEARTBEAT_TIMEOUT) }
-                        ConnectionBus.notify(R.string.msg_connection_interrupted, gone?.name ?: LocaleManager.wrap(this).getString(R.string.generic_pc))
+                        buffer.clear()
+                        player.resetForSession()
+                        expectedNextTsNs = 0L
+                        // 异常中断切勿发送 sendBye，否则会主动杀死电脑端的推流会话
+                        gone?.let {
+                            ConnectionBus.transition(it.deviceId, ConnectionEvent.HEARTBEAT_TIMEOUT)
+                            ConnectionBus.notify(R.string.msg_connection_interrupted, it.name)
+                        }
+                        if (targetPc != null) {
+                            startAutoReconnect(targetPc)
+                        }
                     }
                     if (activePc != null && System.nanoTime() - lastFeedback > 200_000_000L) { sendFeedback(lastAddress, lastPort, activeSession, highest, receivedCount, lostCount, queueExcess(), actualBitrate, currentSyncState(), clockSync.relativeOffsetMs()?.toInt() ?: 0, clockSync.lastRttMs()?.toInt() ?: 0); lastFeedback = System.nanoTime() }
                     publishCalibration()
@@ -353,7 +429,8 @@ class AudioReceiverService : Service() {
                 val control = SettingsControl.decode(datagram.data, datagram.length)
                 if (control != null && fromActivePc(datagram.address, datagram.port)) {
                     val incoming = AudioSettings(control.bitrateKbps, control.frameMs, control.updatedAtMs, control.deviceId)
-                    if (runBlocking { repository.applyIfNewer(incoming) }) settings = incoming
+                    settings = incoming
+                    serviceScope.launch { repository.applyIfNewer(incoming) }
                     continue
                 }
                 val heartbeat = HeartbeatControl.decode(datagram.data, datagram.length)
@@ -390,26 +467,17 @@ class AudioReceiverService : Service() {
                 }
                 received++
                 // 音频门控：只播放已授权发送方的数据。
-                // For a phone-initiated session the peer was discovered via
-                // mDNS, but the desktop may send from another interface. The
-                // control handshake already authorized this peer; bind the
-                // actual source address on its first audio packet.
                 val authorized = fromActivePc(datagram.address, datagram.port)
                 if (!authorized) { unauthorizedDrops++; if (unauthorizedDrops % 100 == 1L) Log.w(TAG, "dropping audio from unauthorized ${datagram.address} (total=$unauthorizedDrops)"); continue }
                 val packet = NexusProtocol.decode(datagram.data, datagram.length)
                 if (packet == null) { Log.w(TAG, "invalid UDP packet length=${datagram.length}"); continue }
-                // The control request originates from the receiver's fixed
-                // port (40125), while the desktop streams from the sender's
-                // own ephemeral UDP socket. Bind feedback/time-sync to that
-                // actual source on the first authenticated audio packet.
-                // Keeping the control port here drops all feedback on the
-                // floor and makes the desktop mark the session as interrupted.
-                if (lastAddress == null || activeSession != packet.session) {
+                if (activePc != null && (activePc!!.port == 0 || lastAddress == null || activeSession != packet.session)) {
                     activePc!!.address = datagram.address
                     activePc!!.port = datagram.port
                 }
                 lastAddress = datagram.address; lastPort = datagram.port
                 lastAudioNs = System.nanoTime()
+                lastHeartbeatNs = System.nanoTime()
                 updatePlaybackState(true)
                 if (activeSession != 0L && activeSession != packet.session) {
                     Log.i(TAG, "new audio session $activeSession -> ${packet.session}; resetting playback timeline")
@@ -477,7 +545,7 @@ class AudioReceiverService : Service() {
                 }
                 if (duplicate != null) return
                 val name = conn.name.ifBlank { conn.deviceId.take(8) }
-                val trusted = runBlocking { trust.isTrusted(conn.deviceId) }
+                val trusted = cachedTrustedPcs.contains(conn.deviceId)
                 if (activePc?.deviceId == conn.deviceId || trusted) {
                     respondConn(datagram.address, datagram.port, allow = true, nonce = conn.nonce)
                     adoptPc(ActivePc(conn.deviceId, name, datagram.address, datagram.port, conn.nonce))
@@ -490,8 +558,9 @@ class AudioReceiverService : Service() {
                 }
             }
             ConnControl.KIND_BYE -> {
-                if (activePc?.deviceId == conn.deviceId && activePc?.nonce == conn.nonce) {
+                if (activePc?.deviceId == conn.deviceId && (activePc?.nonce == conn.nonce || conn.nonce == 0L || activePc?.nonce == 0L)) {
                     val gone = activePc
+                    cancelAutoReconnect(conn.deviceId)
                     activePc = null
                     ConnectionBus.activePc.value = null
                     updatePlaybackState(false)
@@ -502,6 +571,7 @@ class AudioReceiverService : Service() {
                     ConnectionBus.peerCalibration.value = emptyMap()
                     ConnectionBus.notify(R.string.msg_disconnected, gone?.name ?: LocaleManager.wrap(this).getString(R.string.generic_pc))
                     ConnectionBus.transition(conn.deviceId, ConnectionEvent.REMOTE_BYE)
+                    ConnectionBus.transition(conn.deviceId, ConnectionEvent.RETRY)
                 }
             }
             ConnControl.KIND_RESPONSE -> {} // 响应发给发起连接的临时 socket，不会到这里
@@ -514,7 +584,7 @@ class AudioReceiverService : Service() {
         dismissAuthNotification()
         respondConn(record.address, record.port, decision.second, record.nonce)
         if (decision.second) {
-            if (decision.third) runBlocking { PcTrustRepository(applicationContext).trust(record.prompt.deviceId, record.prompt.name) }
+            if (decision.third) serviceScope.launch { runCatching { PcTrustRepository(applicationContext).trust(record.prompt.deviceId, record.prompt.name) } }
             adoptPc(ActivePc(record.prompt.deviceId, record.prompt.name, record.address, record.port, record.nonce))
         }
     }
@@ -535,12 +605,17 @@ class AudioReceiverService : Service() {
     }
 
     private fun adoptPc(pc: ActivePc) {
+        cancelAutoReconnect(pc.deviceId)
         activePc = pc
+        lastConnectedPc = PcDevice(pc.deviceId, pc.name, pc.address.hostAddress ?: "", NexusProtocol.desktopControlPort)
         ConnectionBus.activePc.value = pc
         ConnectionBus.transition(pc.deviceId, ConnectionEvent.REQUEST_RECEIVED)
         ConnectionBus.transition(pc.deviceId, ConnectionEvent.AUTHORIZED)
         updateForegroundNotification(pc.name)
         ConnectionBus.notify(R.string.msg_connected, pc.name)
+        serviceScope.launch {
+            runCatching { PcTrustRepository(applicationContext).trust(pc.deviceId, pc.name) }
+        }
     }
 
     private fun handlePeerCalibration(

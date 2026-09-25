@@ -29,7 +29,12 @@
     <string name="dialog_confirm">Confirm</string>
     <string name="pc_state_online">Online</string>
     <string name="pc_state_connecting">Connecting…</string>
+    <string name="pc_state_awaiting_auth">Waiting for PC confirmation…</string>
+    <string name="pc_state_reconnecting">Reconnecting (%1$d/%2$d)…</string>
+    <string name="pc_state_failed">Connection failed</string>
     <string name="pc_state_connected">Connected</string>
+    <string name="btn_cancel_reconnect">Cancel reconnect</string>
+    <string name="btn_reconnect">Reconnect</string>
     <string name="searching_title">Searching for nearby PCs</string>
     <string name="searching_hint">Make sure Nexus is running on the PC, and that the phone and the PC are on the same Wi-Fi network.</string>
     <string name="android_device">Android device</string>
@@ -37,6 +42,9 @@
 
     <!-- Snackbar messages -->
     <string name="msg_connection_interrupted">Connection to %1$s was interrupted</string>
+    <string name="msg_reconnecting">Reconnecting to %1$s…</string>
+    <string name="msg_reconnect_failed">Auto-reconnect to %1$s failed</string>
+    <string name="msg_reconnected">Reconnected to %1$s</string>
     <string name="msg_disconnected">%1$s disconnected</string>
     <string name="msg_connected">Connected to %1$s</string>
 

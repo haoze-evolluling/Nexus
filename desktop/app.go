@@ -606,15 +606,31 @@ func (a *App) onConnRequest(peer gateway.Peer) {
 	session, streaming := a.sessions[peer.DeviceID]
 	trusted := a.store.IsAuthorized(peer.DeviceID)
 	if streaming || trusted {
-		// Request retransmissions must not churn the live session; only
-		// rebuild it when the peer shows up from a different address.
-		sameAddress := streaming && session.device.Host == peer.Addr.IP.String()
+		// Rebuild the session if:
+		// 1) We are not currently streaming to this device, OR
+		// 2) The peer reconnected from a different IP address, OR
+		// 3) The peer sent a fresh Nonce (new connection / reconnect attempt), OR
+		// 4) The existing session is stale (feedback timed out).
+		// Only fast retransmissions with the exact same nonce on a live healthy session
+		// are answered without churning the session.
+		needsRebuild := !streaming ||
+			session.device.Host != peer.Addr.IP.String() ||
+			(peer.Nonce != 0 && peer.Nonce != session.sender.ConnNonce()) ||
+			session.sender.FeedbackIdle() > feedbackStaleAfter
+		var oldSender *stream.Sender
+		if needsRebuild && streaming {
+			delete(a.sessions, peer.DeviceID)
+			oldSender = session.sender
+		}
 		a.mu.Unlock()
+		if oldSender != nil {
+			_ = oldSender.Close()
+		}
 		if err := a.listener.Respond(peer, true); err != nil {
 			log.Printf("responding to %s failed: %v", peer.DeviceID, err)
 			return
 		}
-		if !sameAddress {
+		if needsRebuild {
 			go func() {
 				if err := a.Connect(a.deviceFromPeer(peer)); err != nil {
 					log.Printf("inbound connect to %s failed: %v", peer.DeviceID, err)
@@ -625,13 +641,12 @@ func (a *App) onConnRequest(peer gateway.Peer) {
 	}
 	if oldID, dup := a.pendingByDevice[peer.DeviceID]; dup {
 		if old, ok := a.pending[oldID]; ok {
-			old.timer.Stop()
-			delete(a.pending, oldID)
-			// Retransmissions from the phone replace the pending request;
-			// tell the frontend to drop the superseded modal entry too.
-			if a.ctx != nil {
-				runtime.EventsEmit(a.ctx, "conn:cancelled", oldID)
-			}
+			// Retransmissions from the phone while awaiting authorization:
+			// keep the existing modal and requestID intact so the user can click it without flicker.
+			// Just update the peer's latest network address and nonce in case they changed.
+			old.peer = peer
+			a.mu.Unlock()
+			return
 		}
 	}
 	requestID := newRequestID()
@@ -651,7 +666,7 @@ func (a *App) onConnBye(deviceID string, nonce uint64, _ *net.UDPAddr) {
 	a.mu.Lock()
 	session := a.sessions[deviceID]
 	a.mu.Unlock()
-	if session == nil || session.sender.ConnNonce() != nonce {
+	if session == nil || (nonce != 0 && session.sender.ConnNonce() != 0 && session.sender.ConnNonce() != nonce) {
 		return
 	}
 	if err := a.Disconnect(deviceID); err != nil {

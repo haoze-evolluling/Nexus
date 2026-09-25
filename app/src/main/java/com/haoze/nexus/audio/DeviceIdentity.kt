@@ -1,4 +1,4 @@
-﻿package com.haoze.nexus.audio
+package com.haoze.nexus.audio
 
 import android.content.Context
 import com.haoze.nexus.R
@@ -11,6 +11,3 @@ object DeviceIdentity {
             .ifEmpty { context.getString(R.string.android_device) }
     }
 }
-
-/** 电脑在设备列表中的连接状态。 */
-enum class PcConnectionState { ONLINE, CONNECTING, CONNECTED }

@@ -216,7 +216,12 @@
   <string name="btn_remove">移除</string>
   <string name="pc_state_online">在线</string>
   <string name="pc_state_connecting">连接中…</string>
+  <string name="pc_state_awaiting_auth">等待电脑确认…</string>
+  <string name="pc_state_reconnecting">正在重连 (%1$d/%2$d)…</string>
+  <string name="pc_state_failed">连接失败</string>
   <string name="pc_state_connected">已连接</string>
+  <string name="btn_cancel_reconnect">取消重连</string>
+  <string name="btn_reconnect">重新连接</string>
   <string name="searching_title">正在搜索附近的电脑</string>
   <string name="searching_hint">请确认电脑端 Nexus 正在运行，且手机和电脑连接到同一 Wi-Fi 网络。</string>
   <string name="android_device">Android 设备</string>
@@ -224,6 +229,9 @@
 
   <!-- snackbar 消息 -->
   <string name="msg_connection_interrupted">%1$s 连接已中断</string>
+  <string name="msg_reconnecting">正在尝试重新连接 %1$s…</string>
+  <string name="msg_reconnect_failed">与 %1$s 的自动重连失败</string>
+  <string name="msg_reconnected">已重新连接至 %1$s</string>
   <string name="msg_disconnected">%1$s 已断开连接</string>
   <string name="msg_connected">已连接 %1$s</string>
 

@@ -175,3 +175,36 @@ func TestByeDisconnectsSession(t *testing.T) {
 		t.Fatal("bye must disconnect the session")
 	}
 }
+
+func TestReconnectWithNewNonceRebuildsSession(t *testing.T) {
+	a, client := newTestApp(t)
+	if err := a.store.Authorize("android-1", "Pixel 9"); err != nil {
+		t.Fatal(err)
+	}
+	oldSession := newTestSession(t, "android-1", "Pixel 9")
+	a.mu.Lock()
+	a.sessions["android-1"] = oldSession
+	a.mu.Unlock()
+
+	sendConn(t, client, protocol.ConnControl{Kind: protocol.ConnRequest, DeviceID: "android-1", Name: "Pixel 9", Nonce: 9999})
+	msg := readConnResponse(t, client)
+	if !msg.Allow {
+		t.Fatal("trusted device reconnect must be allowed")
+	}
+	if msg.Nonce != 9999 {
+		t.Fatalf("response nonce = %d, want 9999", msg.Nonce)
+	}
+
+	deadline := time.Now().Add(time.Second)
+	for time.Now().Before(deadline) {
+		a.mu.Lock()
+		currSession := a.sessions["android-1"]
+		a.mu.Unlock()
+		if currSession != oldSession {
+			return
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
+	t.Fatal("old session was not torn down on nonce change")
+}
+

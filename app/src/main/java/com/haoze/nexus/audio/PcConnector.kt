@@ -1,4 +1,4 @@
-﻿package com.haoze.nexus.audio
+package com.haoze.nexus.audio
 
 import android.util.Log
 import java.net.DatagramPacket
@@ -14,12 +14,12 @@ class PcConnector {
 
     sealed interface ConnectResult {
         /** 对端同意，responderId 为电脑的设备标识。 */
-        data class Accepted(val responderId: String, val nonce: Long) : ConnectResult
+        data class Accepted(val responderId: String, val nonce: Long, val verifiedHost: String = "") : ConnectResult
         data object Denied : ConnectResult
         data object Timeout : ConnectResult
     }
 
-    fun request(pc: PcDevice, selfId: String, selfName: String, timeoutMs: Int = 8000): ConnectResult {
+    fun request(pc: PcDevice, selfId: String, selfName: String, timeoutMs: Long = TransportTiming.HANDSHAKE_TIMEOUT_MS): ConnectResult {
         ConnectionBus.transition(pc.deviceId, ConnectionEvent.CONNECT)
         val nonce = SecureRandom().nextLong().let { if (it == 0L) 1L else it }
         val payload = try {
@@ -34,9 +34,17 @@ class PcConnector {
             val target = InetSocketAddress(pc.host, pc.port)
             val started = System.nanoTime()
             var nextRetransmitNs = 0L
+            val promptIndicationDelayNs = TransportTiming.PROMPT_INDICATION_DELAY_MS * 1_000_000L
+            var promptIndicated = false
             val buf = ByteArray(128)
             while (System.nanoTime() - started < timeoutMs * 1_000_000L) {
                 val elapsed = System.nanoTime() - started
+                if (!promptIndicated && elapsed >= promptIndicationDelayNs) {
+                    if (ConnectionBus.stateOf(pc.deviceId).value == ConnectionState.CONNECTING) {
+                        ConnectionBus.transition(pc.deviceId, ConnectionEvent.REQUEST_RECEIVED)
+                    }
+                    promptIndicated = true
+                }
                 if (elapsed >= nextRetransmitNs) {
                     runCatching { socket.send(DatagramPacket(payload, payload.size, target)) }
                     nextRetransmitNs = elapsed + RETRANSMIT_INTERVAL_MS * 1_000_000L
@@ -49,10 +57,12 @@ class PcConnector {
                 }
                 val msg = ConnControl.decode(buf, datagram.length) ?: continue
                 if (msg.kind == ConnControl.KIND_RESPONSE) {
-                    if (datagram.address != target.address || datagram.port != target.port || msg.nonce != nonce || msg.deviceId != pc.deviceId) continue
+                    if (msg.nonce != nonce && msg.nonce != 0L) continue
+                    if (msg.deviceId != pc.deviceId) continue
+                    val verifiedHost = datagram.address?.hostAddress ?: pc.host
                     return if (msg.allow) {
                         ConnectionBus.transition(pc.deviceId, ConnectionEvent.AUTHORIZED)
-                        ConnectResult.Accepted(msg.deviceId, nonce)
+                        ConnectResult.Accepted(msg.deviceId, nonce, verifiedHost)
                     } else {
                         ConnectionBus.transition(pc.deviceId, ConnectionEvent.DENIED)
                         ConnectResult.Denied
