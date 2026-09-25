@@ -1,4 +1,4 @@
-﻿package com.haoze.nexus.ui.compose
+package com.haoze.nexus.ui.compose
 
 import android.bluetooth.BluetoothDevice
 import android.content.Intent
@@ -81,6 +81,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -507,15 +508,11 @@ private fun HomeConnectionPage(
         label = "BluetoothControlHaloColor"
     )
     val containerColor by animateColorAsState(
-        targetValue = if (isConnected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+        targetValue = if (isConnected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh,
         animationSpec = tween(250),
         label = "BluetoothControlContainerColor"
     )
-    val contentColor by animateColorAsState(
-        targetValue = if (isConnected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
-        animationSpec = tween(250),
-        label = "BluetoothControlContentColor"
-    )
+    val contentColor = Color(0xFF5CB67B)
     val haloSize by animateDpAsState(if (isConnected) 148.dp else 124.dp, tween(250), label = "BluetoothControlHaloSize")
     val glowSize by animateDpAsState(if (isConnected) 128.dp else 108.dp, tween(250), label = "BluetoothControlGlowSize")
     val buttonSize by animateDpAsState(if (isConnected) 92.dp else 84.dp, tween(250), label = "BluetoothControlButtonSize")
@@ -560,7 +557,7 @@ private fun HomeConnectionPage(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.Bluetooth,
+                    painter = painterResource(id = R.drawable.ic_connect),
                     contentDescription = stringResource(
                         if (isConnected) R.string.home_connection_action_connected
                         else R.string.home_connection_action_disconnected

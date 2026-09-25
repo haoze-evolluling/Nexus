@@ -3,7 +3,7 @@
   "name": "Nexus",
   "outputfilename": "Nexus",
   "info": {
-    "productVersion": "2.0.0"
+    "productVersion": "1.0.2"
   },
   "frontend:dir": "frontend",
   "frontend:install": "npm install",
