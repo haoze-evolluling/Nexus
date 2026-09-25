@@ -1,10 +1,6 @@
-﻿package com.haoze.nexus
+package com.haoze.nexus
 
-import android.os.Build
 import android.os.Bundle
-import android.view.View
-import android.view.WindowInsets
-import android.view.WindowInsetsController
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,26 +48,6 @@ class KeyboardActivity : InputActivity() {
     private fun reconnectLastDevice() {
         bluetoothViewModel.getLastConnectedDeviceAddress()?.let { address ->
             Thread { bluetoothViewModel.connectToDevice(address) }.start()
-        }
-    }
-
-    private fun hideSystemBars() {
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                window.insetsController?.hide(
-                    WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars()
-                )
-                window.insetsController?.systemBarsBehavior =
-                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-            } else {
-                @Suppress("DEPRECATION")
-                window.decorView.systemUiVisibility = (
-                    View.SYSTEM_UI_FLAG_FULLSCREEN
-                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                    )
-            }
-        } catch (_: Exception) {
         }
     }
 

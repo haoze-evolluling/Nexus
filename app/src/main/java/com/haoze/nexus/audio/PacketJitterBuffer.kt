@@ -1,4 +1,4 @@
-﻿package com.haoze.nexus.audio
+package com.haoze.nexus.audio
 
 import java.util.TreeMap
 
@@ -10,17 +10,6 @@ class PacketJitterBuffer(private val targetPackets: Int = 4) {
     fun offer(packet: NexusVoicePacket) {
         if (packet.session != session) { packets.clear(); session = packet.session; nextSequence = packet.sequence }
         if (packet.sequence >= nextSequence) packets.putIfAbsent(packet.sequence, packet)
-    }
-    fun take(): NexusVoicePacket? {
-        if (nextSequence < 0 || packets.size < targetPackets) return null
-        val packet = packets.remove(nextSequence)
-        if (packet == null) {
-            // A lost UDP packet must not stall playback forever.
-            nextSequence = packets.firstKey()
-            return packets.remove(nextSequence++)
-        }
-        nextSequence++
-        return packet
     }
     fun takeItem(): Item? {
         if (nextSequence < 0 || packets.size < targetPackets) return null

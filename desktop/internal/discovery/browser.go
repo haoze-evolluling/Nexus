@@ -25,9 +25,6 @@ type Device struct {
 	SettingsDeviceID string
 }
 
-// SupportsOpus reports whether the receiver advertised the v2 codec.
-func (d Device) SupportsOpus() bool { return strings.EqualFold(d.Codec, "opus") }
-
 // grandcat/zeroconf stops re-querying after the first answer and discards
 // partially resolved entries, so one browse run reliably surfaces only one of
 // several receivers. The browser therefore runs short query cycles back to

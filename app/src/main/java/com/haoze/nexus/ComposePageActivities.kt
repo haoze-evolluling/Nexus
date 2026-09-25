@@ -1,4 +1,4 @@
-﻿package com.haoze.nexus
+package com.haoze.nexus
 
 import android.content.Context
 import android.content.Intent
@@ -20,7 +20,6 @@ import com.haoze.nexus.macro.MacroRepository
 import com.haoze.nexus.ui.Routes
 import com.haoze.nexus.ui.compose.AboutSettingsScreen
 import com.haoze.nexus.ui.compose.AgentScreen
-import com.haoze.nexus.ui.compose.AppPage
 import com.haoze.nexus.ui.compose.CoreCommand
 import com.haoze.nexus.ui.compose.ConnectionSettingsScreen
 import com.haoze.nexus.ui.compose.DataSettingsScreen

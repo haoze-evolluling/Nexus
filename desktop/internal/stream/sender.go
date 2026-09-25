@@ -10,7 +10,6 @@ import (
 	"time"
 )
 
-const minBitrate = 48000
 const connectRequestInterval = 1500 * time.Millisecond
 
 type Sender struct {
@@ -203,9 +202,18 @@ func (s *Sender) feedbackLoop() {
 		s.mu.Lock()
 		s.lastFeedback = time.Now()
 		feedbackCB := s.onFeedback
+		bitrateCB := s.onBitrate
+		var newBitrate uint32
+		if f.Bitrate > 0 && f.Bitrate != s.bitrate {
+			s.bitrate = f.Bitrate
+			newBitrate = f.Bitrate
+		}
 		s.mu.Unlock()
 		if feedbackCB != nil {
 			feedbackCB(f)
+		}
+		if newBitrate > 0 && bitrateCB != nil {
+			bitrateCB(int(newBitrate))
 		}
 	}
 }

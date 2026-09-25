@@ -53,7 +53,7 @@ data class ConnControl(val kind: Int, val deviceId: String, val name: String = "
             fun field(start: Int, end: Int) = String(data, start, end - start, Charsets.UTF_8)
             return when (kind) {
                 KIND_REQUEST -> {
-                    if (nul <= HEADER_SIZE) return null
+                    if (nul <= bodyStart) return null
                     val id = field(bodyStart, nul)
                     if (!validId(id)) return null
                     ConnControl(kind, id, field(nul + 1, length), nonce = nonce)

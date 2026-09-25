@@ -1,4 +1,4 @@
-﻿package com.haoze.nexus
+package com.haoze.nexus
 
 import android.Manifest
 import android.bluetooth.BluetoothDevice
@@ -14,11 +14,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.haoze.nexus.bluetooth.BluetoothViewModel
 import com.haoze.nexus.ui.Routes

@@ -1,4 +1,4 @@
-﻿package com.haoze.nexus.audio
+package com.haoze.nexus.audio
 
 import android.media.AudioTrack
 import android.util.Log
@@ -105,7 +105,7 @@ class SynchronizedPlayer(
                 droppedLateFrames++
                 continue
             }
-            val lateness = (-waitNs).coerceAtLeast(0)
+            val lateness = (-waitNs).coerceIn(-LATE_DROP_NS, LATE_DROP_NS)
             latenessEmaNs = latenessEmaNs * EMA_ALPHA + lateness * (1 - EMA_ALPHA)
             adjustRateIfNeeded()
             val written = track.write(head.pcm, 0, head.pcm.size, AudioTrack.WRITE_BLOCKING)
