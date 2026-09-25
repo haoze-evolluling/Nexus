@@ -286,6 +286,10 @@ func (a *App) DiscoverDevices() ([]Device, error) {
 // adaptation keeps working. Reconnecting an already-connected device replaces
 // its session.
 func (a *App) Connect(device Device) error {
+	return a.connect(device, false, 0)
+}
+
+func (a *App) connect(device Device, inbound bool, nonce uint64) error {
 	a.mu.Lock()
 	if a.connecting == nil {
 		a.connecting = map[string]bool{}
@@ -341,11 +345,16 @@ func (a *App) Connect(device Device) error {
 		return err
 	}
 	sender.SetClock(a.streamClock)
-	// The receiver decides whether this desktop may stream; inbound-initiated
-	// sessions re-confirm instantly because the receiver started them.
-	if !sender.RequestConnection(a.store.DeviceID, a.pcName(), authorizationTimeout) {
-		_ = sender.Close()
-		return svErr("err_denied", "")
+	if inbound {
+		if nonce != 0 {
+			sender.SetConnNonce(nonce)
+		}
+	} else {
+		// Outbound connection: ask the receiver for permission to stream.
+		if !sender.RequestConnection(a.store.DeviceID, a.pcName(), authorizationTimeout) {
+			_ = sender.Close()
+			return svErr("err_denied", "")
+		}
 	}
 	encoder, err := codec.NewOpusEncoder(bitrate, frameMs)
 	if err != nil {
@@ -589,7 +598,7 @@ func (a *App) RespondConnection(requestID string, allow bool, remember bool) err
 	}
 	if allow {
 		go func() {
-			if err := a.Connect(a.deviceFromPeer(entry.peer)); err != nil {
+			if err := a.connect(a.deviceFromPeer(entry.peer), true, entry.peer.Nonce); err != nil {
 				log.Printf("inbound connect to %s failed: %v", entry.peer.Name, err)
 				a.emitStatus(DeviceStatus{DeviceID: entry.peer.DeviceID, Name: entry.peer.Name, Message: svMsgf("err_connect", err.Error())})
 			}
@@ -632,8 +641,9 @@ func (a *App) onConnRequest(peer gateway.Peer) {
 		}
 		if needsRebuild {
 			go func() {
-				if err := a.Connect(a.deviceFromPeer(peer)); err != nil {
+				if err := a.connect(a.deviceFromPeer(peer), true, peer.Nonce); err != nil {
 					log.Printf("inbound connect to %s failed: %v", peer.DeviceID, err)
+					a.emitStatus(DeviceStatus{DeviceID: peer.DeviceID, Name: peer.Name, Message: svMsgf("err_connect", err.Error())})
 				}
 			}()
 		}
@@ -666,7 +676,7 @@ func (a *App) onConnBye(deviceID string, nonce uint64, _ *net.UDPAddr) {
 	a.mu.Lock()
 	session := a.sessions[deviceID]
 	a.mu.Unlock()
-	if session == nil || session.sender.ConnNonce() != nonce {
+	if session == nil || (nonce != 0 && session.sender.ConnNonce() != 0 && session.sender.ConnNonce() != nonce) {
 		return
 	}
 	if err := a.Disconnect(deviceID); err != nil {

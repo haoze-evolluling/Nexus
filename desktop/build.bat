@@ -66,6 +66,11 @@ if not defined INSTALLER (
 
 echo [OK] Installer build completed.
 echo [OK] Output: %INSTALLER%
+if exist "..\output" (
+    if exist "build\bin\Nexus.exe" copy /y "build\bin\Nexus.exe" "..\output\Nexus.exe" >nul 2>nul
+    if defined INSTALLER copy /y "%INSTALLER%" "..\output\" >nul 2>nul
+    echo [OK] Copied desktop artifacts to root output directory: ..\output\
+)
 set "BUILD_EXIT=0"
 
 :done

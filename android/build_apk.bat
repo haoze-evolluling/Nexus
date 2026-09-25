@@ -122,6 +122,13 @@ echo.
 echo ================================================================
 echo [SUCCESS] %BUILD_TYPE_NAME% build completed successfully!
 echo [INFO] Located APK: %FOUND_APK%
+if exist "..\output" (
+    copy /y "%FOUND_APK%" "..\output\" >nul 2>nul
+    for /f "delims=" %%V in ('dir /b /a-d "app\build\outputs\apk\versioned\%BUILD_TYPE%\*.apk" 2^>nul') do (
+        copy /y "app\build\outputs\apk\versioned\%BUILD_TYPE%\%%V" "..\output\" >nul 2>nul
+    )
+    echo [INFO] Copied APK to root output directory: ..\output\
+)
 echo ================================================================
 echo.
 

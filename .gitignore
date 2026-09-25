@@ -1,8 +1,10 @@
-# Android build outputs
+# Android and Cross-platform build outputs
 *.apk
 *.aab
 *.ap_
 *.dex
+/output/*
+!/output/.gitkeep
 
 # JVM and generated files
 *.class

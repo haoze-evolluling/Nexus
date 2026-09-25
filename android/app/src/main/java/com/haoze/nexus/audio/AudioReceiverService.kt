@@ -550,19 +550,26 @@ class AudioReceiverService : Service() {
                     it.prompt.deviceId == conn.deviceId && it.nonce == conn.nonce &&
                         it.address == datagram.address && it.port == datagram.port
                 }
-                if (duplicate != null) return
                 val name = conn.name.ifBlank { conn.deviceId.take(8) }
                 val trusted = cachedTrustedPcs.contains(conn.deviceId)
                 if (activePc?.deviceId == conn.deviceId || trusted) {
+                    if (duplicate != null) {
+                        pendingPrompts.remove(duplicate.prompt.requestId)
+                        if (ConnectionBus.authPrompt.value?.requestId == duplicate.prompt.requestId) {
+                            ConnectionBus.authPrompt.value = null
+                            dismissAuthNotification()
+                        }
+                    }
                     respondConn(datagram.address, datagram.port, allow = true, nonce = conn.nonce)
                     adoptPc(ActivePc(conn.deviceId, name, datagram.address, datagram.port, conn.nonce))
-                } else {
-                    val requestId = java.util.UUID.randomUUID().toString().replace("-", "").take(16)
-                    val prompt = PcAuthPrompt(requestId, conn.deviceId, name, datagram.address.hostAddress ?: "", System.currentTimeMillis())
-                    pendingPrompts[requestId] = PromptRecord(prompt, datagram.address, datagram.port, conn.nonce)
-                    ConnectionBus.authPrompt.value = prompt
-                    postAuthNotification(prompt)
+                    return
                 }
+                if (duplicate != null) return
+                val requestId = java.util.UUID.randomUUID().toString().replace("-", "").take(16)
+                val prompt = PcAuthPrompt(requestId, conn.deviceId, name, datagram.address.hostAddress ?: "", System.currentTimeMillis())
+                pendingPrompts[requestId] = PromptRecord(prompt, datagram.address, datagram.port, conn.nonce)
+                ConnectionBus.authPrompt.value = prompt
+                postAuthNotification(prompt)
             }
             ConnControl.KIND_BYE -> {
                 if (activePc?.deviceId == conn.deviceId && activePc?.nonce == conn.nonce) {
@@ -613,6 +620,15 @@ class AudioReceiverService : Service() {
         ConnectionBus.transition(pc.deviceId, ConnectionEvent.AUTHORIZED)
         updateForegroundNotification(pc.name)
         ConnectionBus.notify(R.string.msg_connected, pc.name)
+        val pendingForPc = pendingPrompts.values.filter { it.prompt.deviceId == pc.deviceId }
+        for (rec in pendingForPc) {
+            pendingPrompts.remove(rec.prompt.requestId)
+            respondConn(rec.address, rec.port, allow = true, nonce = rec.nonce)
+        }
+        if (ConnectionBus.authPrompt.value?.deviceId == pc.deviceId) {
+            ConnectionBus.authPrompt.value = null
+            dismissAuthNotification()
+        }
     }
 
     private fun handlePeerCalibration(

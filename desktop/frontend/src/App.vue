@@ -191,6 +191,22 @@ onMounted(async () => {
     const value = normalizeDeviceStatus(raw);
     if (!value.deviceId) return;
     if (value.connected) {
+      if (!devices.value.some((d) => d.id === value.deviceId)) {
+        devices.value.push({
+          name: value.name || 'Android device',
+          host: '',
+          port: 40125,
+          id: value.deviceId,
+          codec: 'opus',
+          sampleRate: 48000,
+          channels: 2,
+          bitrate: value.bitrate || 128000,
+          frameMs: value.frameMs || 10,
+          supportedFrameMs: [10, 20],
+          updatedAtMs: 0,
+          settingsDeviceId: '',
+        });
+      }
       connected.value[value.deviceId] = value;
       calibration.value[value.deviceId] = { phase: value.phase, offsetMs: calibration.value[value.deviceId]?.offsetMs ?? 0, rttMs: calibration.value[value.deviceId]?.rttMs ?? 0, updatedAt: Date.now() };
     } else {

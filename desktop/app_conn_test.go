@@ -208,3 +208,55 @@ func TestReconnectWithNewNonceRebuildsSession(t *testing.T) {
 	t.Fatal("old session was not torn down on nonce change")
 }
 
+func TestSameNonceRetransmissionDoesNotChurnSession(t *testing.T) {
+	a, client := newTestApp(t)
+	if err := a.store.Authorize("android-1", "Pixel 9"); err != nil {
+		t.Fatal(err)
+	}
+	session := newTestSession(t, "android-1", "Pixel 9")
+	session.sender.SetConnNonce(12345)
+	a.mu.Lock()
+	a.sessions["android-1"] = session
+	a.mu.Unlock()
+
+	sendConn(t, client, protocol.ConnControl{Kind: protocol.ConnRequest, DeviceID: "android-1", Name: "Pixel 9", Nonce: 12345})
+	msg := readConnResponse(t, client)
+	if !msg.Allow || msg.Nonce != 12345 {
+		t.Fatalf("unexpected response: %+v", msg)
+	}
+
+	time.Sleep(50 * time.Millisecond)
+	a.mu.Lock()
+	current := a.sessions["android-1"]
+	a.mu.Unlock()
+	if current != session {
+		t.Fatal("session should not be churned for same nonce retransmission on active session")
+	}
+}
+
+func TestByeWithMatchingNonceDisconnects(t *testing.T) {
+	a, client := newTestApp(t)
+	session := newTestSession(t, "android-1", "Pixel 9")
+	session.sender.SetConnNonce(54321)
+	a.mu.Lock()
+	a.sessions["android-1"] = session
+	a.mu.Unlock()
+
+	// Bye with mismatching nonce must be ignored
+	sendConn(t, client, protocol.ConnControl{Kind: protocol.ConnBye, DeviceID: "android-1", Nonce: 99999})
+	time.Sleep(50 * time.Millisecond)
+	if a.GetStatus().ConnectedCount != 1 {
+		t.Fatal("bye with wrong nonce must not disconnect session")
+	}
+
+	// Bye with matching nonce disconnects
+	sendConn(t, client, protocol.ConnControl{Kind: protocol.ConnBye, DeviceID: "android-1", Nonce: 54321})
+	deadline := time.Now().Add(time.Second)
+	for a.GetStatus().ConnectedCount != 0 && time.Now().Before(deadline) {
+		time.Sleep(5 * time.Millisecond)
+	}
+	if a.GetStatus().ConnectedCount != 0 {
+		t.Fatal("bye with matching nonce must disconnect session")
+	}
+}
+

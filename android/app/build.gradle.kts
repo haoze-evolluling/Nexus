@@ -9,7 +9,9 @@ plugins {
 
 val keystorePropertiesFile = listOf(
     rootProject.file("Nexus-keystore/keystore.properties"),
-    rootProject.file("SyncTouch-keystore/keystore.properties")
+    rootProject.file("SyncTouch-keystore/keystore.properties"),
+    rootProject.file("../Nexus-keystore/keystore.properties"),
+    project.file("Nexus-keystore/keystore.properties")
 ).firstOrNull { it.exists() } ?: rootProject.file("Nexus-keystore/keystore.properties")
 
 val keystoreProperties = Properties().apply {
@@ -23,7 +25,13 @@ val releaseStorePassword: String? = keystoreProperties.getProperty("storePasswor
 val releaseKeyAlias: String? = keystoreProperties.getProperty("keyAlias")
 val releaseKeyPassword: String? = keystoreProperties.getProperty("keyPassword")
 
-val releaseKeystoreFile: File? = releaseStoreFilePath?.let { rootProject.file(it) }
+val releaseKeystoreFile: File? = releaseStoreFilePath?.let { path ->
+    listOf(
+        rootProject.file(path),
+        project.file(path),
+        rootProject.file("../$path")
+    ).firstOrNull { it.exists() } ?: rootProject.file(path)
+}
 
 val signDebugWithRelease = project.findProperty("signDebugWithRelease") in listOf("true", "1", "")
 
@@ -98,6 +106,7 @@ listOf("debug", "release").forEach { buildType ->
     val capitalizedBuildType = buildType.replaceFirstChar { it.uppercase() }
     val apkOutputDirectory = layout.buildDirectory.dir("outputs/apk/$buildType")
     val versionedApkOutputDirectory = layout.buildDirectory.dir("outputs/apk/versioned/$buildType")
+    val rootOutputDirectory = rootProject.file("../output")
 
     val copyApkTask = tasks.register<Copy>("copy${capitalizedBuildType}ApkWithVersion") {
         dependsOn("assemble$capitalizedBuildType")
@@ -107,9 +116,25 @@ listOf("debug", "release").forEach { buildType ->
         into(versionedApkOutputDirectory)
     }
 
+    val copyToRootOutputTask = tasks.register<Copy>("copy${capitalizedBuildType}ApkToRootOutput") {
+        dependsOn(copyApkTask)
+        from(apkOutputDirectory)
+        include("app-$buildType.apk")
+        rename("app-$buildType.apk", "Nexus-$buildType-v$apkVersionName.apk")
+        into(rootOutputDirectory)
+    }
+
+    val copyGenericToRootOutputTask = tasks.register<Copy>("copy${capitalizedBuildType}GenericApkToRootOutput") {
+        dependsOn(copyApkTask)
+        from(apkOutputDirectory)
+        include("app-$buildType.apk")
+        rename("app-$buildType.apk", "Nexus-$buildType.apk")
+        into(rootOutputDirectory)
+    }
+
     tasks.configureEach {
         if (name == "assemble$capitalizedBuildType") {
-            finalizedBy(copyApkTask)
+            finalizedBy(copyApkTask, copyToRootOutputTask, copyGenericToRootOutputTask)
         }
     }
 }

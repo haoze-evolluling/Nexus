@@ -15,7 +15,7 @@ func newTestSession(t *testing.T, id string, name string) *deviceSession {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { _ = sender.Close() })
-	return &deviceSession{device: Device{ID: id, Name: name}, sender: sender, status: DeviceStatus{DeviceID: id, Name: name, Connected: true, Message: svMsg("streaming"), Bitrate: 128000, FrameMs: 10}}
+	return &deviceSession{device: Device{ID: id, Name: name, Host: "127.0.0.1", Port: 1}, sender: sender, status: DeviceStatus{DeviceID: id, Name: name, Connected: true, Message: svMsg("streaming"), Bitrate: 128000, FrameMs: 10}}
 }
 
 func TestNewAppHasNoConnectedDevices(t *testing.T) {

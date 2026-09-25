@@ -103,6 +103,12 @@ func (s *Sender) LocalAddr() net.Addr { return s.conn.LocalAddr() }
 
 func (s *Sender) ConnNonce() uint64 { s.mu.Lock(); defer s.mu.Unlock(); return s.connNonce }
 
+func (s *Sender) SetConnNonce(n uint64) {
+	s.mu.Lock()
+	s.connNonce = n
+	s.mu.Unlock()
+}
+
 func (s *Sender) SendSettings(settings protocol.Settings) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
