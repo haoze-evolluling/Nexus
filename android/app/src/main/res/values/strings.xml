@@ -370,13 +370,13 @@
   <!-- 主题配色名称 -->
   <string name="theme_color_system">跟随系统</string>
   <string name="theme_color_indigo">经典靛蓝</string>
-  <string name="theme_color_blue">冷灰幽蓝</string>
-  <string name="theme_color_cyan">碧空青翠</string>
-  <string name="theme_color_green">苍翠墨绿</string>
-  <string name="theme_color_amber">秋日琥珀</string>
-  <string name="theme_color_orange">落日暖橙</string>
+  <string name="theme_color_blue">睡莲蓝</string>
+  <string name="theme_color_cyan">池水青</string>
+  <string name="theme_color_green">柳叶绿</string>
+  <string name="theme_color_amber">琥珀金</string>
+  <string name="theme_color_orange">落日橙</string>
   <string name="theme_color_pink">暮霞粉</string>
-  <string name="theme_color_purple">星空幻紫</string>
+  <string name="theme_color_purple">鸢尾紫</string>
   <string name="theme_color_slate">云石灰</string>
 
   <!-- 通知与对话框 -->
