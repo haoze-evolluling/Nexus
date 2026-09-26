@@ -77,3 +77,4 @@ bluetooth-remote-master/
 
 #Other
 .codebase-memory/
+scripts/__pycache__
