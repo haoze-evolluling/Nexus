@@ -1,29 +1,21 @@
-﻿package com.haoze.nexus.bluetooth
+package com.haoze.nexus.bluetooth
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.app.Service
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothHidDevice
-import android.bluetooth.BluetoothHidDeviceAppSdpSettings
 import android.bluetooth.BluetoothProfile
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.SharedPreferences
 import android.os.Binder
-import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import com.haoze.nexus.MainActivity
 import com.haoze.nexus.R
+import java.util.concurrent.CopyOnWriteArraySet
 import java.util.concurrent.Executors
 
 /**
@@ -34,22 +26,7 @@ class BluetoothHidService : Service() {
 
     companion object {
         private const val TAG = "BluetoothHidService"
-        private const val NOTIFICATION_CHANNEL_ID = "bluetooth_hid_channel"
-        private const val NOTIFICATION_ID = 1001
-        private const val CONNECTION_NOTIFICATION_CHANNEL_ID = "connection_events"
-        private const val CONNECTION_NOTIFICATION_ID = 1002
-        private const val MAX_REGISTRATION_RETRIES = 3
-        private const val MAX_RECONNECT_RETRIES = 5
-        private const val RECONNECT_BASE_DELAY_MS = 2_000L
-        private const val RECONNECT_MAX_DELAY_MS = 30_000L
         private const val HID_PROXY_TIMEOUT_MS = 15_000L
-        private const val PREFS_NAME = "bluetooth_prefs"
-        private const val KEY_LAST_DEVICE_ADDRESS = "last_device_address"
-        private const val KEY_LAST_DEVICE_NAME = "last_device_name"
-        private const val PREFS_SETTINGS_NAME = "settings_prefs"
-        private const val KEY_AUTO_CONNECT_LAUNCH = "auto_connect_on_launch"
-        private const val KEY_AUTO_RECONNECT = "auto_reconnect_on_disconnect"
-        private const val KEY_HID_PROFILE = "hid_profile"
         /** 切换 Profile 后等主机断连完成再重新注册的间隔 */
         private const val REREGISTER_DELAY_MS = 600L
     }
@@ -63,6 +40,13 @@ class BluetoothHidService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder = binder
+
+    // ---- Helper components ----
+
+    private val notificationManager by lazy { HidNotificationManager(this) }
+    private val hidPreferences by lazy { HidPreferences(this) }
+    private val reconnectManager = HidReconnectManager()
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     // ---- Bluetooth components ----
 
@@ -81,10 +65,6 @@ class BluetoothHidService : Service() {
     @Volatile
     private var userInitiatedDisconnect = false
     private var isShuttingDown = false
-    private var registrationRetryCount = 0
-    private var reconnectRetryCount = 0
-    @Volatile
-    private var lastReconnectAttempt: Long = 0
 
     /**
      * 当前对外呈现的 HID 身份（游戏手柄 / 键鼠组合）。
@@ -106,22 +86,10 @@ class BluetoothHidService : Service() {
 
     // ---- Callbacks ----
 
-    private val connectionStateListeners = java.util.concurrent.CopyOnWriteArraySet<(Boolean, String?) -> Unit>()
-    private val registrationStateListeners = java.util.concurrent.CopyOnWriteArraySet<(Boolean) -> Unit>()
-    private val sendErrorListeners = java.util.concurrent.CopyOnWriteArraySet<(String) -> Unit>()
-    private val profileListeners = java.util.concurrent.CopyOnWriteArraySet<(HidProfile) -> Unit>()
-
-    // ---- Persistence ----
-
-    private val prefs: SharedPreferences by lazy {
-        getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-    }
-
-    private val settingsPrefs: SharedPreferences by lazy {
-        getSharedPreferences(PREFS_SETTINGS_NAME, Context.MODE_PRIVATE)
-    }
-
-    private val mainHandler = Handler(Looper.getMainLooper())
+    private val connectionStateListeners = CopyOnWriteArraySet<(Boolean, String?) -> Unit>()
+    private val registrationStateListeners = CopyOnWriteArraySet<(Boolean) -> Unit>()
+    private val sendErrorListeners = CopyOnWriteArraySet<(String) -> Unit>()
+    private val profileListeners = CopyOnWriteArraySet<(HidProfile) -> Unit>()
 
     // ---- Bluetooth state receiver ----
 
@@ -139,7 +107,7 @@ class BluetoothHidService : Service() {
                         Log.d(TAG, "Bluetooth turned off")
                         resetToUnregistered()
                         notifyConnectionStateChanged(false, null)
-                        updateNotification(getString(R.string.notification_waiting))
+                        notificationManager.updateForegroundNotification(getString(R.string.notification_waiting))
                     }
                 }
             }
@@ -159,15 +127,17 @@ class BluetoothHidService : Service() {
             return
         }
 
-        activeProfile = HidProfile.fromStorageKey(settingsPrefs.getString(KEY_HID_PROFILE, null))
+        activeProfile = hidPreferences.getStoredHidProfile()
         Log.d(TAG, "Active HID profile: $activeProfile")
 
         val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
         registerReceiver(bluetoothStateReceiver, filter)
 
-        createNotificationChannel()
-        createConnectionNotificationChannel()
-        startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_waiting)))
+        notificationManager.createNotificationChannels()
+        startForeground(
+            HidNotificationManager.NOTIFICATION_ID,
+            notificationManager.createForegroundNotification(getString(R.string.notification_waiting))
+        )
         initializeHidDevice()
     }
 
@@ -275,7 +245,7 @@ class BluetoothHidService : Service() {
         if (hd == null) {
             // 代理还没拿到：先落盘，等 registerHidDevice 时自然生效
             activeProfile = profile
-            settingsPrefs.edit().putString(KEY_HID_PROFILE, profile.storageKey).apply()
+            hidPreferences.saveHidProfile(profile)
             notifyProfileChanged(profile)
             Log.d(TAG, "HID profile saved (proxy not ready): $profile")
             return true
@@ -283,7 +253,7 @@ class BluetoothHidService : Service() {
 
         Log.d(TAG, "Switching HID profile: $activeProfile → $profile")
         activeProfile = profile
-        settingsPrefs.edit().putString(KEY_HID_PROFILE, profile.storageKey).apply()
+        hidPreferences.saveHidProfile(profile)
         notifyProfileChanged(profile)
 
         // 断开现有连接 —— 主机必须重新枚举 Report Map 才能拿到新的设备类型
@@ -295,12 +265,13 @@ class BluetoothHidService : Service() {
         mainHandler.postDelayed({
             if (isShuttingDown) return@postDelayed
             forceUnregisterApp()
-            registrationRetryCount = 0
+            reconnectManager.resetRegistration()
             registerHidDevice()
         }, REREGISTER_DELAY_MS)
         return true
     }
-    fun getLastConnectedDeviceAddress(): String? = prefs.getString(KEY_LAST_DEVICE_ADDRESS, null)
+
+    fun getLastConnectedDeviceAddress(): String? = hidPreferences.getLastDeviceAddress()
 
     fun disconnect() {
         userInitiatedDisconnect = true
@@ -331,18 +302,14 @@ class BluetoothHidService : Service() {
         }
 
         // Update last device for reconnect
-        prefs.edit()
-            .putString(KEY_LAST_DEVICE_ADDRESS, address)
-            .putString(KEY_LAST_DEVICE_NAME, device.name)
-            .apply()
+        hidPreferences.saveLastConnectedDevice(address, device.name)
         // NOTE: userInitiatedDisconnect intentionally NOT reset here.
         // It was set to true above if we were connected to a previous device.
         // After the async disconnect callback fires, it will check this flag and
         // skip scheduleReconnect(). The flag is reset in onConnectionStateChanged:
         //   - STATE_CONNECTED resets it on successful connection
         //   - STATE_DISCONNECTED resets it after checking (to prevent stale state)
-        lastReconnectAttempt = 0
-        reconnectRetryCount = 0
+        reconnectManager.resetReconnect()
         setDiscoverable()
 
         Log.d(TAG, "Attempting HID connect to ${device.name} ($address)")
@@ -423,15 +390,15 @@ class BluetoothHidService : Service() {
                 Log.d(TAG, "HID app registration status changed: $registered")
 
                 if (registered) {
-                    registrationRetryCount = 0
+                    reconnectManager.resetRegistration()
                     state = HidState.Registered(
-                        lastDeviceAddress = prefs.getString(KEY_LAST_DEVICE_ADDRESS, null),
-                        lastDeviceName = prefs.getString(KEY_LAST_DEVICE_NAME, null)
+                        lastDeviceAddress = hidPreferences.getLastDeviceAddress(),
+                        lastDeviceName = hidPreferences.getLastDeviceName()
                     )
-                    updateNotification(getString(R.string.notification_waiting))
+                    notificationManager.updateForegroundNotification(getString(R.string.notification_waiting))
                     notifyRegistrationStateChanged(true)
-                    if (settingsPrefs.getBoolean(KEY_AUTO_CONNECT_LAUNCH, true)) {
-                        val lastAddr = prefs.getString(KEY_LAST_DEVICE_ADDRESS, null)
+                    if (hidPreferences.isAutoConnectOnLaunchEnabled()) {
+                        val lastAddr = hidPreferences.getLastDeviceAddress()
                         if (lastAddr != null) {
                             tryConnectToLastDevice()
                         }
@@ -453,16 +420,16 @@ class BluetoothHidService : Service() {
                         val name = device.name
                         state = HidState.Connected(device, name)
                         userInitiatedDisconnect = false
-                        reconnectRetryCount = 0
+                        reconnectManager.resetReconnect()
 
                         // Persist last connected device
-                        prefs.edit()
-                            .putString(KEY_LAST_DEVICE_ADDRESS, device.address)
-                            .putString(KEY_LAST_DEVICE_NAME, name)
-                            .apply()
+                        hidPreferences.saveLastConnectedDevice(device.address, name)
 
                         Log.d(TAG, "Connected to: $name")
-                        showConnectionNotification(getString(R.string.notification_connected, name ?: ""))
+                        notificationManager.showConnectionNotification(
+                            getString(R.string.notification_connected, name ?: ""),
+                            hidPreferences.isConnectionNotificationsEnabled()
+                        )
 
                         // Create senders
                         keyboardSender = KeyboardSender(hidDevice!!, device).also {
@@ -479,38 +446,29 @@ class BluetoothHidService : Service() {
                         }
 
                         // Set connection policy for auto-reconnect (API 33+)
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            try {
-                                val method = hidDevice!!.javaClass.getMethod(
-                                    "setConnectionPolicy",
-                                    BluetoothDevice::class.java,
-                                    Int::class.javaPrimitiveType
-                                )
-                                method.invoke(hidDevice, device, 1) // CONNECTION_POLICY_ALLOWED
-                            } catch (e: Exception) {
-                                Log.w(TAG, "Failed to set connection policy: ${e.message}")
-                            }
-                        }
-                        updateNotification(getString(R.string.notification_connected, name ?: ""))
+                        HidDevicePolicyHelper.setConnectionPolicy(hidDevice!!, device)
+                        notificationManager.updateForegroundNotification(getString(R.string.notification_connected, name ?: ""))
                         notifyConnectionStateChanged(true, name)
                     }
                     BluetoothProfile.STATE_DISCONNECTED -> {
-                        val wasConnected = state is HidState.Connected
                         state = HidState.Registered(
-                            lastDeviceAddress = prefs.getString(KEY_LAST_DEVICE_ADDRESS, null),
-                            lastDeviceName = prefs.getString(KEY_LAST_DEVICE_NAME, null)
+                            lastDeviceAddress = hidPreferences.getLastDeviceAddress(),
+                            lastDeviceName = hidPreferences.getLastDeviceName()
                         )
                         keyboardSender = null
                         mouseSender = null
                         tvRemoteSender = null
                         gamepadSender = null
                         Log.d(TAG, "Disconnected")
-                        showConnectionNotification(getString(R.string.notification_disconnected))
-                        updateNotification(getString(R.string.notification_waiting))
+                        notificationManager.showConnectionNotification(
+                            getString(R.string.notification_disconnected),
+                            hidPreferences.isConnectionNotificationsEnabled()
+                        )
+                        notificationManager.updateForegroundNotification(getString(R.string.notification_waiting))
                         notifyConnectionStateChanged(false, null)
                         setDiscoverable()
 
-                        if (!userInitiatedDisconnect && settingsPrefs.getBoolean(KEY_AUTO_RECONNECT, true)) {
+                        if (!userInitiatedDisconnect && hidPreferences.isAutoReconnectOnDisconnectEnabled()) {
                             scheduleReconnect()
                         }
                         userInitiatedDisconnect = false
@@ -520,23 +478,8 @@ class BluetoothHidService : Service() {
 
             override fun onGetReport(device: BluetoothDevice, type: Byte, id: Byte, bufferSize: Int) {
                 super.onGetReport(device, type, id, bufferSize)
-                try {
-                    val method = hidDevice!!.javaClass.getMethod(
-                        "sendReply",
-                        BluetoothDevice::class.java,
-                        Byte::class.javaPrimitiveType,
-                        Byte::class.javaPrimitiveType,
-                        ByteArray::class.java
-                    )
-                    method.invoke(hidDevice, device, type, id, ByteArray(8))
-                } catch (e: Exception) {
-                    Log.w(TAG, "Failed to send GET_REPORT reply: ${e.message}")
-                }
+                HidDevicePolicyHelper.sendReportReply(hidDevice!!, device, type, id)
             }
-
-            // NOTE: BluetoothHidDevice.Callback does not have an onError method.
-            // HID errors are surfaced through onConnectionStateChanged(DISCONNECTED)
-            // which is already handled above with reconnect logic.
         }
 
         state = HidState.Registering
@@ -551,17 +494,7 @@ class BluetoothHidService : Service() {
     // ---- Discoverability ----
 
     private fun setDiscoverable() {
-        try {
-            val method = bluetoothAdapter?.javaClass?.getMethod(
-                "setScanMode",
-                Int::class.javaPrimitiveType,
-                Int::class.javaPrimitiveType
-            )
-            val result = method?.invoke(bluetoothAdapter, 23, 300)
-            Log.d(TAG, "setScanMode result: $result")
-        } catch (e: Exception) {
-            Log.w(TAG, "Failed to set discoverable mode: ${e.message}")
-        }
+        HidDevicePolicyHelper.setDiscoverable(bluetoothAdapter)
     }
 
     // ---- Retry logic ----
@@ -570,39 +503,21 @@ class BluetoothHidService : Service() {
         val adapter = bluetoothAdapter ?: return
         if (isShuttingDown || !adapter.isEnabled || hidDevice == null) return
         if (state is HidState.Registered || state is HidState.Connected) return
-        if (registrationRetryCount >= MAX_REGISTRATION_RETRIES) {
-            Log.w(TAG, "HID app registration failed after retries")
-            notifyRegistrationStateChanged(false)
-            return
-        }
 
-        registrationRetryCount++
-        Log.d(TAG, "Retrying HID app registration ($registrationRetryCount/$MAX_REGISTRATION_RETRIES)")
-        mainHandler.postDelayed({
-            registerHidDevice()
-        }, 1000L * registrationRetryCount)
+        reconnectManager.scheduleRegistrationRetry(
+            handler = mainHandler,
+            onRetry = { registerHidDevice() },
+            onExhausted = { notifyRegistrationStateChanged(false) }
+        )
     }
 
     private fun scheduleReconnect() {
         val address = getLastDeviceAddress() ?: return
-        if (reconnectRetryCount >= MAX_RECONNECT_RETRIES) {
-            Log.w(TAG, "Reconnect retries exhausted ($MAX_RECONNECT_RETRIES) for $address")
-            return
-        }
-
-        // Exponential backoff: 2s, 4s, 8s, 16s, 30s (capped)
-        val delay = minOf(
-            RECONNECT_BASE_DELAY_MS * (1L shl reconnectRetryCount),
-            RECONNECT_MAX_DELAY_MS
-        )
-        reconnectRetryCount++
-        Log.d(TAG, "Scheduling reconnect attempt $reconnectRetryCount/$MAX_RECONNECT_RETRIES to $address in ${delay}ms")
-
-        mainHandler.postDelayed({
-            val hd = hidDevice ?: return@postDelayed
-            if (state is HidState.Connected || userInitiatedDisconnect) return@postDelayed
+        reconnectManager.scheduleReconnect(mainHandler, address) {
+            val hd = hidDevice ?: return@scheduleReconnect
+            if (state is HidState.Connected || userInitiatedDisconnect) return@scheduleReconnect
             tryConnectToLastDevice()
-        }, delay)
+        }
     }
 
     private fun tryConnectToLastDevice(): Boolean {
@@ -613,14 +528,12 @@ class BluetoothHidService : Service() {
         if (state !is HidState.Registered) {
             Log.w(TAG, "Cannot connect: HID not registered yet")
             // Don't count this as a retry — registration may complete later
-            reconnectRetryCount = maxOf(0, reconnectRetryCount - 1)
+            reconnectManager.decrementReconnectRetryCount()
             scheduleReconnect()
             return false
         }
 
-        val now = System.currentTimeMillis()
-        if (now - lastReconnectAttempt < 2000) return false
-        lastReconnectAttempt = now
+        if (!reconnectManager.checkAndRecordReconnectAttempt()) return false
 
         val device = adapter.bondedDevices?.find { it.address == address } ?: run {
             Log.w(TAG, "Last device ($address) not found in bonded devices")
@@ -675,7 +588,7 @@ class BluetoothHidService : Service() {
 
     private fun resetToUnregistered() {
         state = HidState.Unregistered
-        registrationRetryCount = 0
+        reconnectManager.resetRegistration()
         keyboardSender = null
         mouseSender = null
         tvRemoteSender = null
@@ -689,84 +602,9 @@ class BluetoothHidService : Service() {
         hidDevice = null
     }
 
-    private fun getLastDeviceAddress(): String? = prefs.getString(KEY_LAST_DEVICE_ADDRESS, null)
-
-    // ---- Notifications ----
-
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                NOTIFICATION_CHANNEL_ID,
-                getString(R.string.notification_channel_name),
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = getString(R.string.notification_channel_description)
-            }
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
-
-    private fun createConnectionNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CONNECTION_NOTIFICATION_CHANNEL_ID,
-                getString(R.string.notification_connection_channel_name),
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                description = "设备连接和断开通知"
-                setShowBadge(false)
-            }
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
-
-    private fun showConnectionNotification(contentText: String) {
-        if (!settingsPrefs.getBoolean("connection_notifications", true)) return
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-        }
-        val pendingIntent = PendingIntent.getActivity(
-            this, 1, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        val notification = NotificationCompat.Builder(this, CONNECTION_NOTIFICATION_CHANNEL_ID)
-            .setContentTitle(getString(R.string.notification_title))
-            .setContentText(contentText)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-            .build()
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(CONNECTION_NOTIFICATION_ID, notification)
-    }
+    private fun getLastDeviceAddress(): String? = hidPreferences.getLastDeviceAddress()
 
     fun dismissConnectionNotification() {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancel(CONNECTION_NOTIFICATION_ID)
-    }
-
-    private fun createNotification(contentText: String): Notification {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-        }
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setContentTitle(getString(R.string.notification_title))
-            .setContentText(contentText)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentIntent(pendingIntent)
-            .setOngoing(true)
-            .build()
-    }
-
-    private fun updateNotification(contentText: String) {
-        val notification = createNotification(contentText)
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(NOTIFICATION_ID, notification)
+        notificationManager.dismissConnectionNotification()
     }
 }
