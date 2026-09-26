@@ -5,8 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.haoze.nexus.R
 import com.haoze.nexus.ui.component.animation.bouncyCardClickable
 
@@ -59,7 +62,9 @@ internal fun PeripheralDeck(
     ) {
         // 第一行：键盘与触控板
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min),
             horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             PeripheralCard(
@@ -68,7 +73,9 @@ internal fun PeripheralDeck(
                 tag = stringResource(R.string.home_tag_keyboard),
                 icon = Icons.Default.Keyboard,
                 onClick = onOpenKeyboard,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
             )
             PeripheralCard(
                 title = stringResource(R.string.home_touchpad_title),
@@ -76,13 +83,17 @@ internal fun PeripheralDeck(
                 tag = stringResource(R.string.home_tag_touchpad),
                 icon = Icons.Default.Mouse,
                 onClick = onOpenTouchpad,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
             )
         }
 
         // 第二行：手柄与电视遥控
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min),
             horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             PeripheralCard(
@@ -91,7 +102,9 @@ internal fun PeripheralDeck(
                 tag = stringResource(R.string.home_tag_gamepad),
                 icon = Icons.Default.SportsEsports,
                 onClick = onOpenGamepad,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
             )
             PeripheralCard(
                 title = stringResource(R.string.home_tvremote_title),
@@ -99,7 +112,9 @@ internal fun PeripheralDeck(
                 tag = stringResource(R.string.home_tag_tvremote),
                 icon = Icons.Default.SettingsRemote,
                 onClick = onOpenTvRemote,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
             )
         }
 
@@ -174,9 +189,15 @@ internal fun PeripheralCard(
                 ) {
                     Text(
                         text = tag,
-                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Medium
+                        ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.5.dp)
                     )
                 }
             }
@@ -261,7 +282,9 @@ internal fun PeripheralWideCard(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Surface(
                         shape = M3ShapeTag,
@@ -271,6 +294,9 @@ internal fun PeripheralWideCard(
                             text = tag,
                             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
                             color = MaterialTheme.colorScheme.onTertiaryContainer,
+                            maxLines = 1,
+                            softWrap = false,
+                            overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.5.dp)
                         )
                     }

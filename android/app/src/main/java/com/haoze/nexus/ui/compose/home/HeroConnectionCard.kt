@@ -11,6 +11,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -56,6 +58,7 @@ import com.haoze.nexus.ui.component.animation.bouncyCardClickable
  * Hero 连接中枢卡片：
  * 页面视觉焦点，拥有充裕的内边距、自然的微呼吸光效、清晰的设备态与模式切换。
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun HeroConnectionCard(
     isConnected: Boolean,
@@ -201,7 +204,7 @@ internal fun HeroConnectionCard(
                         else stringResource(R.string.home_device_disconnected_desc),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
+                        maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
@@ -212,10 +215,10 @@ internal fun HeroConnectionCard(
             )
 
             // 模式选择与主控交互操作
-            Row(
+            FlowRow(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 // HID 模式切换 Chip 组
                 Row(
@@ -234,8 +237,10 @@ internal fun HeroConnectionCard(
                         },
                         label = {
                             Text(
-                                text = stringResource(R.string.settings_device_type_keyboard_mouse),
-                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium)
+                                text = stringResource(R.string.home_mode_keyboard),
+                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium),
+                                maxLines = 1,
+                                softWrap = false
                             )
                         },
                         shape = RoundedCornerShape(12.dp),
@@ -260,8 +265,10 @@ internal fun HeroConnectionCard(
                         },
                         label = {
                             Text(
-                                text = stringResource(R.string.settings_device_type_gamepad),
-                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium)
+                                text = stringResource(R.string.home_mode_gamepad),
+                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium),
+                                maxLines = 1,
+                                softWrap = false
                             )
                         },
                         shape = RoundedCornerShape(12.dp),
@@ -287,7 +294,9 @@ internal fun HeroConnectionCard(
                         Text(
                             text = stringResource(R.string.home_disconnect_device),
                             style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
-                            color = MaterialTheme.colorScheme.error
+                            color = MaterialTheme.colorScheme.error,
+                            maxLines = 1,
+                            softWrap = false
                         )
                     }
                 } else {
@@ -305,7 +314,9 @@ internal fun HeroConnectionCard(
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = stringResource(R.string.home_connection_action_disconnected),
-                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold)
+                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                            maxLines = 1,
+                            softWrap = false
                         )
                     }
                 }

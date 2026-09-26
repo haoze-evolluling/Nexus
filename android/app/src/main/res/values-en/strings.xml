@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Nexus</string>
-    <string name="btn_yes">Confirm</string>
-    <string name="btn_no">Decline</string>
+    <string name="btn_yes">Yes</string>
+    <string name="btn_no">No</string>
     <string name="btn_ctrl_c">Ctrl+C</string>
     <string name="btn_backspace">Backspace</string>
     <string name="btn_enter">Enter</string>
-    <string name="btn_yes_to_all">Confirm All</string>
+    <string name="btn_yes_to_all">Yes All</string>
     <string name="btn_add_macro">+ Add Custom Macro</string>
     <string name="btn_disconnect">Disconnect</string>
     <string name="status_unknown_device">Unknown Device</string>
@@ -297,16 +297,18 @@
     <string name="home_quick_preferences_title">Preferences &amp; Tools</string>
     <string name="home_device_profile_label">Device Mode</string>
     <string name="home_device_connected_desc">Bluetooth HID connected · Peripherals ready</string>
-    <string name="home_device_disconnected_desc">Tap to connect recent devices or scan new</string>
+    <string name="home_device_disconnected_desc">Tap to connect recent devices or scan new devices</string>
     <string name="home_quick_reconnect">Reconnect</string>
-    <string name="home_tag_keyboard">Mechanical Sound</string>
+    <string name="home_tag_keyboard">Sound FX</string>
     <string name="home_tag_touchpad">Multi-touch</string>
-    <string name="home_tag_gamepad">Haptic Rumble</string>
+    <string name="home_tag_gamepad">Haptics</string>
     <string name="home_tag_tvremote">Multimedia</string>
     <string name="home_tag_audio">Low Latency</string>
     <string name="home_header_slogan">All-in-one Wireless Peripheral Companion</string>
     <string name="home_manage_device">Manage</string>
     <string name="home_disconnect_device">Disconnect</string>
+    <string name="home_mode_keyboard">Keyboard</string>
+    <string name="home_mode_gamepad">Gamepad</string>
     <string name="language_settings">Language</string>
     <string name="language_settings_summary">Select application display language</string>
     <string name="language_follow_system">Follow System</string>

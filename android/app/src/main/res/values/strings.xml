@@ -336,6 +336,8 @@
   <string name="home_header_slogan">全能无线外设中枢</string>
   <string name="home_manage_device">管理</string>
   <string name="home_disconnect_device">断开</string>
+  <string name="home_mode_keyboard">键鼠</string>
+  <string name="home_mode_gamepad">手柄</string>
 
   <!-- 语言设置 (统一多语言管理) -->
   <string name="language_settings">语言设置</string>
