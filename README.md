@@ -1,97 +1,271 @@
 # Nexus
 
-Nexus 是一款集**低延迟蓝牙外设模拟**与**局域网高保真无线音频串流**于一体的全能跨端控制套件。
+Nexus is an open-source, cross-platform control suite combining **driverless Bluetooth HID peripheral emulation** on Android with **ultra-low-latency LAN wireless audio streaming** from Windows.
 
-- **移动端（Android）**：提供基于标准蓝牙 HID 的虚拟触控板、机械按键音效键盘、双摇杆游戏手柄、电视遥控器，并内置超低延迟 Opus 音频串流接收引擎与微秒级多设备时钟同播对齐。
-- **桌面端（Windows）**：基于 Wails v2 + Vue 3 构建的轻量级发送端，通过 WASAPI Loopback 实时捕获系统音频并经 Opus 高保真压缩，毫秒级推流至一台或多台 Android 设备。
-
----
-
-## ✨ 核心特性
-
-### 1. 局域网高保真无线音频串流
-- **超低延迟传输**：基于 48 kHz 双声道 Opus 实时编解码，支持 10 ms / 20 ms 极低帧长及 64 ~ 192 kbps 动态码率。
-- **高精度时钟同步与平滑播放**：NTP 风格纳秒级往返时钟对齐结合 Jitter Buffer 与自适应微调重采样，彻底消除跳音与多设备同播回音。
-- **分体式多声道与同播校准**：单台电脑可向多台 Android 设备分发独立声道（立体声 / 左 / 右），支持设备间直接发起同播校准（NXAC）。
-- **双向 mDNS 发现与授权**：两端自动发现并支持双向发起连接，提供设备指纹授权与免密重连。
-
-### 2. 全功能蓝牙 HID 外设模拟
-- **虚拟触控板**：精准手势滑动、双指滚动、左右键点按与平滑指针加速。
-- **模拟键盘与按键音效**：全键盘布局，内置 Alpaca、Black Ink、Blue Alps 等多种经典机械键盘按键原声合成音效。
-- **游戏手柄与触感反馈**：双模拟摇杆、方向十字键与功能按键，配备操作振动触感反馈。
-- **电视遥控与快捷指令**：便捷控制智能电视 / PC 多媒体播放，支持自定义宏命令。
-
-### 3. 现代设计与极佳视觉
-- **Material 3 & Monet**：全面支持 Android 12+ 动态取色、深浅色模式与流体交互质感。
+- **Android Client**: A native Android application (Jetpack Compose + NDK/C++ Opus) that emulates standard Bluetooth HID input hardware (multitouch touchpad, customizable mechanical keyboard, dual-stick gamepad, and smart TV remote) alongside a synchronized low-latency Opus audio receiver.
+- **Windows Desktop Sender**: A lightweight desktop background streamer (Go + Wails v2 + Vue 3) that captures system audio via WASAPI Loopback, compresses it in real time using libopus, and multicasts it over UDP to one or more Android devices with per-device channel routing and clock synchronization.
 
 ---
 
-## 📦 项目架构
+## Architecture Overview
+
+```text
+┌────────────────────────────────────────────────────────┐
+│               Windows Desktop Streamer                 │
+│  (Go / Wails v2 / Vue 3 / WASAPI Loopback / libopus)   │
+└──────────────┬───────────────────────────▲─────────────┘
+               │ UDP Audio (NX01)          │ Feedback (NXCT)
+               │ Control / Handshake       │ TimeSync (NXTS)
+               ▼                           │
+┌──────────────────────────────────────────┴─────────────┐
+│                 Android Client (Nexus)                 │
+│         (Kotlin / Jetpack Compose / NDK libopus)        │
+├────────────────────────────┬───────────────────────────┤
+│    Audio Receiver Engine   │   Bluetooth HID Emulation  │
+│  - UDP Jitter Buffer       │   - Touchpad (Gestures)   │
+│  - NTP Clock Sync (NXTS)   │   - Mechanical Keyboard   │
+│  - Peer Calibration (NXAC) │   - Dual-Stick Gamepad    │
+│  - Background MediaSession │   - TV & Media Remote     │
+│                            │   - AI Agent Console      │
+└────────────────────────────┴─────────────┬─────────────┘
+                                           │ Standard Bluetooth HID
+                                           ▼
+                                 ┌───────────────────┐
+                                 │   Target Host     │
+                                 │ (PC / TV / Console│
+                                 │  No Drivers Req.) │
+                                 └───────────────────┘
+```
+
+---
+
+## Key Features
+
+### 1. Bluetooth HID Peripheral Emulation (Android)
+
+Nexus transforms your Android phone or tablet into standard Bluetooth HID hardware without requiring any client-side software or proprietary drivers on the target host.
+
+- **Dual HID Enumeration Profiles**:
+  - `KEYBOARD_MOUSE`: Keyboard Top-Level Collection (TLC) placed first; host enumerates as a composite keyboard and mouse.
+  - `GAMEPAD`: Gamepad TLC placed first; recognized natively as a standard 6-axis 16-button HID Game Controller across Windows DirectInput/XInput, Linux, SDL, browser Gamepad API, and Android TV.
+- **Virtual Multi-Touch Touchpad**:
+  - Single-finger cursor tracking and single-tap (left click).
+  - Two-finger scrolling and two-finger tap (right click).
+  - Three-finger tap (middle click).
+  - Long-press to drag with anti-jitter thresholds.
+  - Configurable sensitivity (1–10 scale), cursor speed, natural/inverted scroll direction, and on-screen hardware-style click buttons.
+- **Mechanical Keyboard & Switch Acoustic Synthesizer**:
+  - Full on-screen keyboard layout with modifier keys (Ctrl, Shift, Alt, GUI) and 6-key rollover.
+  - Built-in real-time physical acoustic synthesizer (`KeyboardSoundSynthesizer`) generating authentic switch sound profiles:
+    - *Tactile / Clicky / Linear*: Cherry MX Browns, Cherry MX Blues, Cherry MX Blacks, Holy Pandas, Alpacas, Turquoise Tealios, Gateron Black Inks, Kailh Box Navies, Buckling Spring, SKCM Blue Alps, Topre 45g, and NovelKeys Creams.
+- **Virtual Gamepad**:
+  - Dual 16-bit analog thumbsticks ($X/Y$ and $Z/R_x$), 8-direction hat switch D-pad, analog triggers ($R_y/R_z$), and 16 digital buttons.
+  - Switchable console layout themes: **Xbox Series** (A/B/X/Y, View/Menu, Xbox Guide) and **PlayStation 5** ($\triangle$/$\bigcirc$/$\times$/$\square$, Create/Options, PS Guide).
+  - Interactive Layout Customizer: Drag and scale thumbsticks, D-pads, and buttons with per-element coordinate persistence.
+  - Haptic vibration feedback on button activation.
+- **Smart TV Remote**:
+  - Circular navigation D-pad, OK/Confirm, Back, Home, Power, Volume +/−/Mute, Play/Pause, Next/Previous/Stop, and Google Assistant key using standard Consumer Control report codes.
+- **Developer / Agent Remote Console**:
+  - Dedicated controller optimized for terminal workflows and coding agents (e.g., Claude Code CLI).
+  - One-tap Core Commands: Yes (`y`), Yes to All, No (`n`), `Ctrl+C`, Backspace, Enter.
+  - Built-in slash command presets: `/clear`, `/compact`, `/model`, `/btw`.
+  - Custom macro manager: create, edit, sort, and trigger repetitive shell sequences.
+
+### 2. Low-Latency LAN Wireless Audio Streaming
+
+Nexus streams low-latency PC system audio to one or multiple Android devices over local Wi-Fi.
+
+- **Audio Engine**:
+  - High-fidelity Opus codec operating at 48 kHz stereo.
+  - Configurable low frame lengths (10 ms or 20 ms) and bitrates (64, 96, 128, 192 kbps).
+  - Windows WASAPI Loopback system audio capture via miniaudio.
+  - Native C++ Opus decoding on Android via NDK/CMake.
+- **High-Precision Clock Synchronization & Multi-Device Playback**:
+  - Nanosecond-accuracy sender timestamps embedded in audio packets (`NX01`).
+  - NTP-style four-timestamp round-trip probe protocol (`NXTS`) calculating running offset and network jitter.
+  - Adaptive jitter buffer and playback scheduler eliminating drift and audio stuttering.
+  - Multi-receiver support: stream simultaneously to multiple phones/tablets.
+  - Independent channel routing per receiver: `Stereo` (pass-through), `Left` (mono duplicated to L/R), or `Right` (mono duplicated to L/R), allowing two phones to act as dedicated split left/right desktop speakers.
+  - Receiver-to-receiver sync calibration protocol (`NXAC`) for multi-speaker acoustic alignment.
+- **Zero-Configuration Discovery & Security**:
+  - Automatic LAN discovery and advertising via mDNS (`_nexus-audio._udp`).
+  - Cryptographic nonces and device fingerprint authorization (`NXCR`).
+  - Sender and receiver approval prompts with permanent whitelist options ("Remember device").
+  - Instant session termination signals (`ConnBye`) preventing lingering feedback loops.
+- **Background & Lock-Screen Playback**:
+  - Foreground Android Service with MediaSession integration and sticky lifecycle.
+  - Automatic reconnection manager when network interfaces switch.
+
+### 3. Modern Design & User Experience
+
+- **Android**:
+  - Pure Jetpack Compose architecture following Material Design 3 and Material You Expressive standards.
+  - Dynamic Monet color scheme extraction (Android 12+), explicit dark/light mode toggle, and custom palette selection.
+  - Customizable floating bottom navigation bar (reorder/toggle tabs: Home, Audio Receiver, Agent, TV Remote, Settings).
+  - Fully bilingual interface (English and Simplified Chinese).
+- **Desktop**:
+  - Modern desktop interface built with Vue 3, TypeScript, and Wails v2.
+  - Real-time connection feedback monitors, bitrate selectors, channel matrix router, NTP diagnostics, and trusted device manager.
+
+---
+
+## Network & Wire Protocol
+
+All audio and control communication runs over UDP:
+
+| Port | Protocol | Description |
+| :--- | :--- | :--- |
+| **`40125`** | UDP | **Android Receiver Port**: Receives audio datagrams (`NX01`), connection requests (`NXCR`), time sync probes (`NXTS`), setting sync (`NXCS`), and peer calibration (`NXAC`). |
+| **`40126`** | UDP | **Desktop Control Port**: Receives inbound connection requests and session control from Android receivers. |
+
+### Datagram Packet Types
+
+- **`NX01` (Audio Frame)**: 40-byte header containing codec type, sample rate (48 kHz), channel count, bitrate, session ID, sequence counter, payload length, frame duration (10/20 ms), flags (FEC/DTX), and nanosecond sender capture timestamp (`timestampNs`), followed by Opus-encoded bytes.
+- **`NXCR` (Connection Control)**: Handshake datagrams for connection request (`Kind=1`), response (`Kind=2`), and immediate disconnection notice (`Kind=3`), carrying random nonces and 64-byte UTF-8 device identities.
+- **`NXCT` (Receiver Feedback)**: 35-byte periodic report (session, highest sequence, received, lost, buffer queue depth, current bitrate, sync state 0–3, clock offset in ms, and round-trip time).
+- **`NXCS` (Stream Settings)**: Propagates bitrate and frame size adjustments across peers.
+- **`NXTS` (Time Sync)**: 40-byte NTP-style round-trip probe carrying $T_1, T_2, T_3$ timestamps to calculate monotonic clock drift between host and receiver.
+- **`NXAC` (Peer Calibration)**: Android-to-Android coordinate datagrams (`REQUEST`, `ACCEPT`, `REJECT`, `COMMIT`, `COMPLETE`, `CANCEL`) for speaker-to-speaker acoustic alignment.
+- **`NXHB` (Heartbeat)**: Keepalive ping/pong packets maintaining connection state during idle or silent periods.
+
+---
+
+## Repository Structure
 
 ```text
 Nexus/
-├── android/              # Android 客户端工程（Kotlin、Jetpack Compose、NDK/CMake）
-│   ├── app/              # 主模块源码及 CMakeLists.txt
-│   ├── gradle/           # Gradle Wrapper 及依赖版本管理
-│   ├── Nexus-keystore/   # 签名密钥库配置
-│   ├── build.gradle.kts
-│   ├── settings.gradle.kts
-│   ├── gradlew.bat
-│   └── build_apk.bat     # Android 编译与调试安装脚本
-├── desktop/              # Windows 桌面发送端工程（Go、Wails v2、Vue 3）
-│   ├── frontend/         # Vue 3 用户界面
-│   ├── internal/         # WASAPI 采集、Opus 编码、mDNS 发现、UDP 传输引擎
-│   ├── wails.json
-│   └── build.bat         # Windows 安装包与可执行文件打包脚本
-├── output/               # 统一构建产物调试输出目录（两端 APK 与 EXE/Installer 汇集地）
-├── build_all.bat         # 跨端一键构建脚本（打包两端并统一同步输出到 output/）
-└── recognition_members.json
+├── android/                   # Android client project (Kotlin, Jetpack Compose, C++/NDK)
+│   ├── app/
+│   │   ├── src/main/cpp/      # CMakeLists.txt and third-party libopus source tree
+│   │   ├── src/main/java/     # Kotlin application source code
+│   │   │   └── com/haoze/nexus/
+│   │   │       ├── audio/     # UDP streaming, JitterBuffer, ClockSync, Nsd, JNI bindings
+│   │   │       ├── bluetooth/ # Android BluetoothHidDevice service, descriptors, senders
+│   │   │       ├── macro/     # Macro definitions and repository for CLI agents
+│   │   │       ├── sound/     # Mechanical keyboard switch audio synthesizer
+│   │   │       ├── ui/        # Compose UI (Touchpad, Keyboard, Gamepad, TV Remote, Home)
+│   │   │       └── util/      # Haptic feedback and platform helpers
+│   │   └── build.gradle.kts   # Module build configuration and APK versioned output copy tasks
+│   ├── build_apk.bat          # Interactive Android compilation & ADB device installer
+│   └── gradlew.bat            # Gradle wrapper executable
+├── desktop/                   # Windows desktop streamer (Go, Wails v2, Vue 3)
+│   ├── frontend/              # Vue 3 + TypeScript + Vite frontend source
+│   ├── internal/
+│   │   ├── capture/           # WASAPI loopback audio capture (malgo)
+│   │   ├── codec/             # libopus CGO wrapper and encoder logic
+│   │   ├── config/            # Local settings and trusted device identity store
+│   │   ├── discovery/         # mDNS advertiser and browser (zeroconf)
+│   │   ├── gateway/           # Desktop UDP control listener
+│   │   ├── ntp/               # External NTP verification helper
+│   │   ├── protocol/          # Packet encoding/decoding (NX01, NXCR, NXCT, NXTS, NXCS)
+│   │   └── stream/            # UDP multi-client streaming and keepalive engine
+│   ├── app.go                 # Wails application bindings
+│   ├── build.bat              # Standalone Windows NSIS installer & exe packaging script
+│   └── wails.json             # Wails project configuration
+├── output/                    # Unified build destination for all generated APKs and EXEs
+├── scripts/                   # Auxiliary repository maintenance scripts
+└── build_all.bat              # One-click master script to build both Android and Windows targets
 ```
 
 ---
 
-## 🛠️ 构建与开发
+## Prerequisites & Requirements
 
-### 一键构建全工程（Windows）
+### Android Client
+- **JDK**: Java Development Kit 11 or higher.
+- **Android SDK**: Compile SDK `37`, Target SDK `37`, Min SDK `28` (Android 9.0+).
+- **Android NDK**: Version `27.0.12077973` (installed via Android SDK Manager).
+- **CMake**: 3.22.1 or newer.
+- **Hardware**: Android device with Bluetooth HID Device profile support (`BluetoothHidDevice`).
+
+### Windows Desktop Streamer
+- **Operating System**: Windows 10 / 11 (64-bit).
+- **Go**: Version 1.22 or newer.
+- **Node.js & npm**: Node.js 18+ and current npm.
+- **Wails CLI v2**: Installed via `go install github.com/wailsapp/wails/v2/cmd/wails@latest`.
+- **C/C++ Compiler**: MinGW-w64 (GCC) or MSVC with CGO support.
+- **libopus & pkg-config**: Development headers and static library for Opus accessible by `pkg-config`.
+- **NSIS** *(Optional, for installer generation)*: Nullsoft Scriptable Install System on `PATH`.
+
+---
+
+## Building from Source
+
+### 1. One-Click Unified Build (All Platforms)
+
+To build both the signed Android APK and the Windows desktop binaries into a single directory:
 
 ```powershell
-# 编译 Android Debug APK（使用 Release 签名证书）并构建 Windows 桌面端，产物统一输出至 output/
+# Run the root build script (interactive mode)
 .\build_all.bat
 
-# CI / 脚本静默调用（构建完成后不暂停）：
+# Or run non-interactively (ideal for CI / automated pipelines):
 .\build_all.bat --no-pause
 ```
 
-> **构建产物统一目录**：构建成功后，所有可执行文件与安装包将自动汇总至根目录的 `output/` 文件夹中：
-> - `Nexus-debug-vX.X.X.apk` / `Nexus-debug.apk`：已签名 Release 证书的 Android 端安装包。
-> - `Nexus.exe`：免安装绿色版桌面端可执行程序，双击即可进行调试。
-> - `Nexus-amd64-installer.exe`：Windows 桌面端完整安装包。
+Once completed, all artifacts will be copied automatically to the `output/` directory:
+- `Nexus-debug-v1.0.3.apk` (and `Nexus-debug.apk`): Android package signed with release keystore.
+- `Nexus.exe`: Standalone portable Windows executable.
+- `Nexus-amd64-installer.exe`: Windows desktop setup installer.
 
-### Android 客户端
+---
 
-- **环境要求**：JDK 11+、Android SDK（Compile SDK 37，Min SDK 28）、Android NDK（`27.0.12077973`）、CMake。
-- **Android Studio**：直接打开 `Nexus/android` 目录即可开始开发调试。
-- **交互式打包与设备安装**：
-  ```powershell
-  cd android
-  .\build_apk.bat
-  ```
-- **命令行独立编译**：
-  ```powershell
-  cd android
-  .\gradlew.bat assembleDebug -PsignDebugWithRelease=true
-  ```
+### 2. Standalone Android Client Build
 
-### Windows 桌面发送端
+You can open the `android/` directory directly in Android Studio, or compile from the terminal:
 
-- **环境要求**：Go 1.26+、Node.js、Wails CLI、C/C++ 编译器（MSVC 或 MinGW-w64）、libopus。
-- **编译运行**：
-  ```powershell
-  cd desktop
-  wails dev -tags "nexus_opus nolibopusfile"
-  ```
-- **独立打包**：
-  ```powershell
-  cd desktop
-  .\build.bat
-  ```
+```powershell
+cd android
+
+# Option A: Interactive script with ADB wireless/USB install menu:
+.\build_apk.bat
+
+# Option B: Direct Gradle compilation:
+.\gradlew.bat assembleDebug -PsignDebugWithRelease=true
+```
+
+---
+
+### 3. Standalone Windows Desktop Build
+
+```powershell
+cd desktop
+
+# Live development mode with hot reload:
+wails dev -tags "nexus_opus nolibopusfile"
+
+# Production installer build:
+.\build.bat
+```
+
+---
+
+## How to Use
+
+### Bluetooth HID Peripherals
+1. Launch **Nexus** on your Android device.
+2. In the top connection card, tap **Connect** to select or pair with your host device (PC, Mac, Smart TV, Tablet).
+3. If connecting to a PC/console for gaming, switch the profile from **Keyboard / Mouse** to **Gamepad** in Settings or on the Home screen to ensure the host enumerates a native game controller.
+4. Open the **Touchpad**, **Keyboard**, **Gamepad**, or **TV Remote** tab to start controlling.
+5. In the Gamepad view, tap **Edit Layout** to reposition and resize on-screen thumbsticks, buttons, and triggers to fit your grip.
+
+### LAN Audio Streaming
+1. Ensure both your Windows PC and Android device are connected to the same Wi-Fi / LAN network.
+2. Launch `Nexus.exe` on your Windows PC.
+3. Open the **Audio Receiver** tab on the Android app and start the receiver service.
+4. The desktop application will automatically discover the phone via mDNS.
+5. Click **Connect** on the desktop card corresponding to your phone. Approve the pairing prompt on your phone (select "Remember" to avoid prompts in the future).
+6. To configure a split stereo setup:
+   - Connect two Android phones to the desktop streamer.
+   - On the desktop device list, switch one device's channel route to **Left** and the second to **Right**. Both phones will now act as synchronized independent stereo speakers.
+
+### Terminal Agent Console
+1. Navigate to the **Agent** tab on Android.
+2. Pair via Bluetooth HID to your development workstation.
+3. With a terminal running an AI coding assistant (such as Claude Code) focused on your workstation, use one-tap responses (**Yes**, **No**, **Yes to All**, **Ctrl+C**) or trigger custom slash commands without touching the physical keyboard.
+
+---
+
+## Recognition & Acknowledgments
+
+We express sincere gratitude to all community supporters and co-builders who contribute to the project. See [`recognition_members.json`](./recognition_members.json) for the full list of recognized contributors and sponsors.
