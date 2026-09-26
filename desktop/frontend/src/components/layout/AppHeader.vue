@@ -47,7 +47,7 @@ const emit = defineEmits<{
         :class="{ active: activeTab === 'devices' }"
         @click="emit('update:activeTab', 'devices')"
       >
-        <Icons name="radio" :size="15" />
+        <Icons name="radio" :size="16" />
         <span>{{ t('header.devices') }}</span>
       </button>
 
@@ -59,7 +59,7 @@ const emit = defineEmits<{
         :class="{ active: activeTab === 'settings' }"
         @click="emit('update:activeTab', 'settings')"
       >
-        <Icons name="settings" :size="15" />
+        <Icons name="settings" :size="16" />
         <span>{{ t('header.settings') }}</span>
       </button>
     </nav>
@@ -72,7 +72,7 @@ const emit = defineEmits<{
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 16px 24px;
+  padding: 14px 28px;
   background-color: var(--color-bg-surface);
   border-bottom: 1px solid var(--color-border-subtle);
   position: sticky;
@@ -118,7 +118,7 @@ const emit = defineEmits<{
 
 .brand-eyebrow {
   font-size: var(--font-size-xs);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -142,7 +142,7 @@ const emit = defineEmits<{
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   font-weight: 500;
-  max-width: 420px;
+  max-width: 440px;
   transition: all var(--transition-normal);
 }
 
@@ -150,6 +150,7 @@ const emit = defineEmits<{
   background-color: var(--color-primary-soft);
   border-color: var(--color-primary-soft-border);
   color: var(--color-primary);
+  font-weight: 600;
 }
 
 .status-dot {
@@ -157,8 +158,9 @@ const emit = defineEmits<{
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: var(--color-text-muted);
+  background-color: var(--color-border-strong);
   flex-shrink: 0;
+  transition: background-color var(--transition-normal);
 }
 
 .status-pill.live .status-dot {
@@ -170,7 +172,7 @@ const emit = defineEmits<{
   inset: -3px;
   border-radius: 50%;
   background-color: var(--color-primary);
-  opacity: 0.4;
+  opacity: 0.45;
   animation: pulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
@@ -194,8 +196,9 @@ const emit = defineEmits<{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 6px 16px;
+  gap: 7px;
+  height: 32px;
+  padding: 0 16px;
   border-radius: var(--radius-md);
   font-size: var(--font-size-sm);
   font-weight: 600;
@@ -213,10 +216,15 @@ const emit = defineEmits<{
   background-color: var(--color-bg-surface);
 }
 
+.nav-tab:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
 .nav-tab.active {
   background-color: var(--color-primary);
   color: var(--color-primary-contrast);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-xs);
 }
 
 @media (max-width: 760px) {

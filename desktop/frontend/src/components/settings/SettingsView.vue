@@ -70,7 +70,9 @@ function restoreDefaultNtp() {
         </button>
       </div>
 
-      <div class="card-header" style="margin-top: 20px;">
+      <div class="card-divider"></div>
+
+      <div class="card-header">
         <Icons name="activity" :size="18" />
         <h3 class="card-title">{{ t('settings.frame') }}</h3>
       </div>
@@ -265,7 +267,7 @@ function restoreDefaultNtp() {
 .settings-view {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 }
 
 .settings-head {
@@ -279,19 +281,27 @@ function restoreDefaultNtp() {
   font-weight: 750;
   color: var(--color-text-primary);
   letter-spacing: -0.4px;
+  line-height: 1.25;
 }
 
 .settings-subtitle {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
+  line-height: 1.4;
 }
 
 .settings-card {
   background-color: var(--color-bg-surface);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
-  padding: 20px;
+  padding: 22px 24px;
   box-shadow: var(--shadow-xs);
+}
+
+.card-divider {
+  height: 1px;
+  background-color: var(--color-border-subtle);
+  margin: 24px 0 20px;
 }
 
 .settings-grid-cols {
@@ -305,7 +315,7 @@ function restoreDefaultNtp() {
   align-items: center;
   gap: 10px;
   color: var(--color-primary);
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .card-title {
@@ -316,8 +326,8 @@ function restoreDefaultNtp() {
 
 .chips-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(136px, 1fr));
+  gap: 12px;
 }
 
 .chip-option {
@@ -326,6 +336,8 @@ function restoreDefaultNtp() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  height: auto;
+  min-height: 58px;
   padding: 12px 14px;
   background-color: var(--color-bg-surface-elevated);
   border: 1.5px solid var(--color-border-subtle);
@@ -354,36 +366,39 @@ function restoreDefaultNtp() {
 }
 
 .chip-main {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   font-weight: 700;
 }
 
 .chip-tag {
-  font-size: 10px;
-  color: var(--color-text-muted);
-  margin-top: 2px;
+  font-size: var(--font-size-2xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-top: 3px;
 }
 
 .chip-option.selected .chip-tag {
   color: var(--color-primary);
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
 .warning-banner {
-  margin-top: 12px;
-  padding: 8px 12px;
+  margin-top: 14px;
+  padding: 10px 14px;
   border-radius: var(--radius-md);
   background-color: var(--color-warning-soft);
-  color: var(--color-warning);
+  color: var(--color-warning-text);
   border: 1px solid var(--color-warning-border);
   font-size: var(--font-size-xs);
   font-weight: 500;
+  line-height: 1.45;
 }
 
 .field-hint {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
-  margin-bottom: 12px;
+  margin-bottom: 14px;
+  line-height: 1.45;
 }
 
 .ntp-input-row {
@@ -400,7 +415,8 @@ function restoreDefaultNtp() {
 
 .text-input {
   width: 100%;
-  padding: 8px 12px;
+  height: 38px;
+  padding: 0 14px;
   border-radius: var(--radius-md);
   border: 1.5px solid var(--color-border-subtle);
   background-color: var(--color-bg-surface-elevated);
@@ -419,11 +435,12 @@ function restoreDefaultNtp() {
 .ntp-result-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 10px;
-  padding: 4px 10px;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 6px 12px;
   border-radius: var(--radius-full);
   background-color: var(--color-primary-soft);
+  border: 1px solid var(--color-primary-soft-border);
   color: var(--color-primary);
   font-size: var(--font-size-xs);
   font-weight: 600;
@@ -432,15 +449,16 @@ function restoreDefaultNtp() {
 .segmented-col {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .segmented-item {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 10px;
-  padding: 10px 14px;
+  gap: 12px;
+  height: 44px;
+  padding: 0 16px;
   border-radius: var(--radius-md);
   background-color: var(--color-bg-surface-elevated);
   border: 1.5px solid var(--color-border-subtle);
@@ -455,6 +473,7 @@ function restoreDefaultNtp() {
 .segmented-item:hover:not(.active) {
   border-color: var(--color-border-strong);
   color: var(--color-text-primary);
+  background-color: var(--color-bg-surface-hover);
 }
 
 .segmented-item.active {
@@ -473,7 +492,7 @@ function restoreDefaultNtp() {
 .auth-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .auth-item {
@@ -481,7 +500,7 @@ function restoreDefaultNtp() {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 14px;
+  padding: 12px 16px;
   border-radius: var(--radius-md);
   background-color: var(--color-bg-surface-elevated);
   border: 1px solid var(--color-border-subtle);
@@ -490,33 +509,37 @@ function restoreDefaultNtp() {
 .auth-meta {
   display: flex;
   flex-direction: column;
+  gap: 2px;
   min-width: 0;
 }
 
 .auth-name {
   font-size: var(--font-size-sm);
+  font-weight: 700;
   color: var(--color-text-primary);
 }
 
 .auth-id {
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   font-family: monospace;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 .remove-btn {
-  padding: 4px 10px;
+  height: 30px;
+  padding: 0 12px;
   font-size: var(--font-size-xs);
   flex-shrink: 0;
 }
 
 .auth-empty {
-  padding: 16px;
+  padding: 24px;
   text-align: center;
-  color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
   background-color: var(--color-bg-surface-elevated);
   border-radius: var(--radius-md);
+  border: 1px dashed var(--color-border-subtle);
 }
 
 /* Local PC Identity */
@@ -527,17 +550,18 @@ function restoreDefaultNtp() {
 .info-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 14px;
+  gap: 16px;
 }
 
 .info-item {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .info-label {
-  font-size: 11px;
+  font-size: var(--font-size-2xs);
+  font-weight: 600;
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -545,13 +569,14 @@ function restoreDefaultNtp() {
 
 .info-value {
   font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-text-primary);
 }
 
 .info-value.code {
   font-family: monospace;
-  font-size: 11px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
   word-break: break-all;
 }
 </style>

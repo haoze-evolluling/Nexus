@@ -39,20 +39,20 @@ defineProps<{
 <style scoped>
 .app-footer {
   margin-top: auto;
-  padding: 12px 24px;
+  padding: 12px 28px;
   background-color: var(--color-bg-surface);
   border-top: 1px solid var(--color-border-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 .footer-content {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
   justify-content: center;
 }
@@ -60,12 +60,14 @@ defineProps<{
 .footer-badge.connected {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 2px 8px;
+  gap: 6px;
+  padding: 3px 10px;
   border-radius: var(--radius-full);
   background-color: var(--color-primary-soft);
+  border: 1px solid var(--color-primary-soft-border);
   color: var(--color-primary);
   font-weight: 600;
+  font-size: var(--font-size-xs);
 }
 
 .footer-item {
@@ -76,14 +78,15 @@ defineProps<{
 
 .metric-val {
   font-weight: 600;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary);
 }
 
 .divider {
   color: var(--color-border-strong);
+  font-weight: 700;
 }
 
 .specs {
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 </style>

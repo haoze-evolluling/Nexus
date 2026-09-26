@@ -10,13 +10,6 @@ const props = defineProps<{
   calibration: Record<string, Calibration>;
 }>();
 
-const phaseLabels = computed(() => [
-  t('phase.detect'),
-  t('phase.calculate'),
-  t('phase.sync'),
-  t('phase.done'),
-]);
-
 const phaseHints = computed(() => [
   t('phaseHint.detect'),
   t('phaseHint.calculate'),
@@ -89,18 +82,6 @@ const phaseHints = computed(() => [
             {{ phaseHints[devicePhase(device)] }}
           </span>
         </div>
-
-        <div class="mini-steps" aria-hidden="true">
-          <i
-            v-for="(label, i) in phaseLabels"
-            :key="label"
-            :class="{
-              active: i === devicePhase(device),
-              done: i < devicePhase(device),
-            }"
-            :title="label"
-          ></i>
-        </div>
       </div>
     </div>
   </div>
@@ -111,7 +92,7 @@ const phaseHints = computed(() => [
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-primary-soft-border);
   background: linear-gradient(135deg, var(--color-primary-soft), var(--color-bg-surface));
-  padding: 18px 20px;
+  padding: 20px 24px;
   margin-bottom: 20px;
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-normal);
@@ -131,10 +112,10 @@ const phaseHints = computed(() => [
 }
 
 .pc-chip {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-md);
-  background-color: var(--color-primary);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -154,7 +135,7 @@ const phaseHints = computed(() => [
   font-size: var(--font-size-md);
   font-weight: 700;
   color: var(--color-text-primary);
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 
 .sync-panel.done .sync-title h3 {
@@ -184,16 +165,16 @@ const phaseHints = computed(() => [
   height: 8px;
   border-radius: 2px;
   background-color: var(--color-primary);
-  opacity: 0.8;
+  opacity: 0.85;
   animation: wavebar 1s ease-in-out infinite;
 }
 
 .node-rows {
-  margin-top: 14px;
+  margin-top: 16px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding-top: 12px;
+  gap: 12px;
+  padding-top: 14px;
   border-top: 1px solid var(--color-primary-soft-border);
 }
 
@@ -266,6 +247,7 @@ const phaseHints = computed(() => [
   min-width: 0;
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 .node-name-row {
@@ -277,14 +259,14 @@ const phaseHints = computed(() => [
 
 .node-name {
   font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-text-primary);
 }
 
 .node-stats-badge {
-  font-size: 10px;
+  font-size: var(--font-size-2xs);
   font-weight: 600;
-  padding: 1px 6px;
+  padding: 2px 8px;
   border-radius: var(--radius-full);
   background-color: var(--color-bg-surface);
   border: 1px solid var(--color-border-subtle);
@@ -293,35 +275,11 @@ const phaseHints = computed(() => [
 
 .node-hint {
   font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 .node-hint.ok {
   color: var(--color-primary);
-  font-weight: 500;
-}
-
-.mini-steps {
-  display: flex;
-  gap: 5px;
-  flex-shrink: 0;
-}
-
-.mini-steps i {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background-color: var(--color-border-subtle);
-  transition: all var(--transition-normal);
-}
-
-.mini-steps i.done {
-  background-color: var(--color-primary-soft-border);
-}
-
-.mini-steps i.active {
-  background-color: var(--color-primary);
-  transform: scale(1.3);
-  box-shadow: 0 0 0 3px var(--color-primary-glow);
+  font-weight: 600;
 }
 </style>

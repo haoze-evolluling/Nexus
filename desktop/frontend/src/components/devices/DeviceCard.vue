@@ -148,7 +148,7 @@ const phaseHints = computed(() => [
           class="connect-btn"
           @click="emit('connect', device)"
         >
-          <Icons name="radio" :size="15" />
+          <Icons name="radio" :size="16" />
           <span>{{ t('device.connect') }}</span>
         </button>
       </div>
@@ -161,7 +161,7 @@ const phaseHints = computed(() => [
   background-color: var(--color-bg-surface);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
-  padding: 16px 20px;
+  padding: 18px 22px;
   box-shadow: var(--shadow-xs);
   transition: all var(--transition-normal);
   position: relative;
@@ -185,7 +185,8 @@ const phaseHints = computed(() => [
   left: 0;
   top: 0;
   bottom: 0;
-  width: 4px;
+  width: 3.5px;
+  border-radius: 0 2px 2px 0;
   background-color: var(--color-primary);
 }
 
@@ -226,7 +227,7 @@ const phaseHints = computed(() => [
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 }
 
 .device-name {
@@ -239,7 +240,7 @@ const phaseHints = computed(() => [
 .live-badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
+  padding: 3px 9px;
   border-radius: var(--radius-full);
   font-size: var(--font-size-xs);
   font-weight: 600;
@@ -250,14 +251,14 @@ const phaseHints = computed(() => [
 
 .live-badge.warn {
   background-color: var(--color-warning-soft);
-  color: var(--color-warning);
+  color: var(--color-warning-text);
   border-color: var(--color-warning-border);
 }
 
 .device-meta {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
   flex-wrap: wrap;
@@ -265,22 +266,24 @@ const phaseHints = computed(() => [
 
 .host-text {
   font-family: monospace;
+  color: var(--color-text-secondary);
 }
 
 .meta-dot {
   color: var(--color-border-strong);
+  font-weight: 700;
 }
 
 .frame-tag {
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 .channel-section {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 12px;
-  padding-top: 10px;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 12px;
   border-top: 1px dashed var(--color-border-subtle);
   flex-wrap: wrap;
 }
@@ -293,18 +296,19 @@ const phaseHints = computed(() => [
 
 .channel-group {
   display: inline-flex;
-  padding: 2px;
+  padding: 3px;
   background-color: var(--color-bg-surface-elevated);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-md);
-  overflow: hidden;
+  gap: 2px;
 }
 
 .channel-btn {
-  padding: 4px 10px;
+  height: 28px;
+  padding: 0 12px;
   border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
-  font-weight: 500;
+  font-weight: 600;
   background: transparent;
   color: var(--color-text-secondary);
   border: none;
@@ -329,7 +333,7 @@ const phaseHints = computed(() => [
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 10px;
+  margin-top: 12px;
   flex-wrap: wrap;
 }
 
@@ -350,15 +354,16 @@ const phaseHints = computed(() => [
 
 .calib-steps {
   display: flex;
-  gap: 4px;
+  gap: 5px;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
 .calib-steps li {
-  font-size: 10px;
-  padding: 2px 7px;
+  font-size: var(--font-size-2xs);
+  font-weight: 500;
+  padding: 2.5px 8px;
   border-radius: var(--radius-full);
   background-color: var(--color-bg-surface-elevated);
   color: var(--color-text-muted);
@@ -370,18 +375,21 @@ const phaseHints = computed(() => [
   background-color: var(--color-primary-soft);
   color: var(--color-primary);
   border-color: var(--color-primary-soft-border);
+  font-weight: 600;
 }
 
 .calib-steps li.active {
   background-color: var(--color-primary);
   color: #ffffff;
   border-color: var(--color-primary);
+  font-weight: 600;
   animation: breathe 1.2s ease-in-out infinite;
 }
 
 .calib-hint {
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
+  font-weight: 500;
 }
 
 .device-actions {
@@ -391,10 +399,12 @@ const phaseHints = computed(() => [
 }
 
 .connect-btn {
-  min-width: 88px;
+  min-width: 96px;
+  height: 36px;
 }
 
 .disconnect-btn {
-  min-width: 88px;
+  min-width: 96px;
+  height: 36px;
 }
 </style>

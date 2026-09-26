@@ -81,8 +81,8 @@ const emit = defineEmits<{
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(11, 15, 25, 0.6);
-  backdrop-filter: blur(6px);
+  background-color: rgba(11, 15, 25, 0.65);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -93,11 +93,11 @@ const emit = defineEmits<{
 
 .modal-card {
   width: 100%;
-  max-width: 440px;
+  max-width: 460px;
   background-color: var(--color-bg-surface);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-xl);
-  padding: 24px;
+  padding: 26px;
   box-shadow: var(--shadow-modal);
   animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -116,7 +116,7 @@ const emit = defineEmits<{
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .modal-icon-badge {
@@ -124,6 +124,7 @@ const emit = defineEmits<{
   height: 44px;
   border-radius: var(--radius-md);
   background-color: var(--color-primary-soft);
+  border: 1px solid var(--color-primary-soft-border);
   color: var(--color-primary);
   display: flex;
   align-items: center;
@@ -134,38 +135,40 @@ const emit = defineEmits<{
 .modal-title-group {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .modal-title {
   font-size: var(--font-size-lg);
   font-weight: 750;
   color: var(--color-text-primary);
+  line-height: 1.25;
 }
 
 .modal-count {
   font-size: var(--font-size-xs);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-primary);
 }
 
 .modal-desc {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
+  line-height: 1.45;
 }
 
 .modal-body {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-bottom: 20px;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .device-highlight-box {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 12px 14px;
+  gap: 4px;
+  padding: 14px 16px;
   border-radius: var(--radius-md);
   background-color: var(--color-bg-surface-elevated);
   border: 1px solid var(--color-border-subtle);
@@ -180,26 +183,26 @@ const emit = defineEmits<{
 .device-ip {
   font-size: var(--font-size-xs);
   font-family: monospace;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 .remember-label {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
   user-select: none;
 }
 
 .checkbox-input {
-  width: 16px;
-  height: 16px;
+  width: 17px;
+  height: 17px;
   accent-color: var(--color-primary);
   cursor: pointer;
 }
 
 .checkbox-text {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
 }
 
@@ -207,14 +210,16 @@ const emit = defineEmits<{
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 12px;
 }
 
 .deny-btn {
-  min-width: 80px;
+  min-width: 90px;
+  height: 38px;
 }
 
 .allow-btn {
-  min-width: 90px;
+  min-width: 100px;
+  height: 38px;
 }
 </style>

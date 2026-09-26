@@ -108,7 +108,7 @@ const emit = defineEmits<{
 .device-section {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .section-head {
@@ -116,13 +116,13 @@ const emit = defineEmits<{
   align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .head-text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .section-title {
@@ -130,15 +130,18 @@ const emit = defineEmits<{
   font-weight: 750;
   color: var(--color-text-primary);
   letter-spacing: -0.3px;
+  line-height: 1.25;
 }
 
 .section-hint {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
+  line-height: 1.4;
 }
 
 .rescan-btn {
-  padding: 7px 14px;
+  height: 36px;
+  padding: 0 16px;
   font-size: var(--font-size-sm);
   flex-shrink: 0;
 }
@@ -150,7 +153,7 @@ const emit = defineEmits<{
 .device-grid {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 /* Modern Radar Empty State */
@@ -159,21 +162,22 @@ const emit = defineEmits<{
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 48px 24px;
+  padding: 56px 24px;
   background-color: var(--color-bg-surface);
-  border: 1px dashed var(--color-border-subtle);
+  border: 1px dashed var(--color-border-strong);
   border-radius: var(--radius-xl);
   text-align: center;
+  box-shadow: var(--shadow-xs);
 }
 
 .radar-box {
   position: relative;
-  width: 72px;
-  height: 72px;
+  width: 76px;
+  height: 76px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .radar-ring {
@@ -185,15 +189,16 @@ const emit = defineEmits<{
 }
 
 .radar-ring.r2 {
-  inset: -12px;
+  inset: -14px;
   animation-delay: 0.8s;
 }
 
 .radar-center {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   background-color: var(--color-primary-soft);
+  border: 1px solid var(--color-primary-soft-border);
   color: var(--color-primary);
   display: flex;
   align-items: center;
@@ -202,28 +207,29 @@ const emit = defineEmits<{
 }
 
 .empty-title {
-  font-size: var(--font-size-base);
-  font-weight: 600;
+  font-size: var(--font-size-md);
+  font-weight: 700;
   color: var(--color-text-primary);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .empty-hint {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-  max-width: 360px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  max-width: 420px;
+  line-height: 1.5;
 }
 
 .sync-banner {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  border-radius: var(--radius-md);
+  gap: 12px;
+  padding: 12px 18px;
+  border-radius: var(--radius-lg);
   background-color: var(--color-primary-soft);
   border: 1px solid var(--color-primary-soft-border);
   color: var(--color-primary);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   font-weight: 500;
   margin-top: 8px;
 }

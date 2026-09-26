@@ -37,14 +37,24 @@ button, input, select, textarea {
   color: inherit;
 }
 
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="tab"]:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 8px 16px;
+  height: 36px;
+  padding: 0 16px;
   border-radius: var(--radius-md);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   font-weight: 600;
   white-space: nowrap;
   user-select: none;
@@ -53,7 +63,7 @@ button {
   transition: background-color var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
   background-color: var(--color-primary);
   color: var(--color-primary-contrast);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-xs);
   outline: none;
 }
 
@@ -68,7 +78,7 @@ button:active:not(:disabled) {
 }
 
 button:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
   box-shadow: none;
 }
@@ -83,6 +93,7 @@ button.btn-secondary {
 button.btn-secondary:hover:not(:disabled) {
   background-color: var(--color-bg-surface-elevated);
   border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
   box-shadow: var(--shadow-sm);
 }
 
@@ -100,7 +111,7 @@ button.btn-ghost:hover:not(:disabled) {
 
 button.btn-danger {
   background-color: var(--color-danger-soft);
-  color: var(--color-danger);
+  color: var(--color-danger-text);
   border-color: var(--color-danger-border);
   box-shadow: none;
 }
@@ -109,7 +120,7 @@ button.btn-danger:hover:not(:disabled) {
   background-color: var(--color-danger);
   color: #ffffff;
   border-color: var(--color-danger);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.28);
 }
 
 /* Custom Scrollbars */

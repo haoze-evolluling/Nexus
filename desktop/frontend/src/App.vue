@@ -184,7 +184,7 @@ onMounted(() => {
 
 .app-main-content {
   flex: 1;
-  padding: 28px 24px;
+  padding: 32px 32px 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -192,12 +192,12 @@ onMounted(() => {
 
 .content-container {
   width: 100%;
-  max-width: 860px;
+  max-width: 920px;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 720px) {
   .app-main-content {
-    padding: 16px;
+    padding: 20px 16px 28px;
   }
 }
 </style>
