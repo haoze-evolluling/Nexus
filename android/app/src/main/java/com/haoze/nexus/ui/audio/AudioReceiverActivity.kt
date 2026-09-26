@@ -33,7 +33,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class AudioReceiverActivity : ComponentActivity() {
+class AudioReceiverActivity : com.haoze.nexus.AppLocalizedActivity() {
     private val notificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { startReceiver() }
     private val discovery by lazy { PcDiscovery(this) }
     private val connector = PcConnector()
@@ -42,10 +42,6 @@ class AudioReceiverActivity : ComponentActivity() {
     private var selfId by mutableStateOf("")
     private val selfName: String by lazy { DeviceIdentity.friendlyName(applicationContext) }
     private var receiverRunning by mutableStateOf(false)
-
-    override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(LocaleManager.wrap(newBase))
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -16,7 +16,7 @@ import com.haoze.nexus.bluetooth.BluetoothViewModel
  * 输入类页面（键盘/触控板/手柄）宿主基类：横屏、全出血绘制，
  * 内容由子类通过 setContent 构建的 Compose 界面填充。
  */
-abstract class InputActivity : ComponentActivity() {
+abstract class InputActivity : AppLocalizedActivity() {
 
     protected val bluetoothViewModel: BluetoothViewModel by viewModels()
 

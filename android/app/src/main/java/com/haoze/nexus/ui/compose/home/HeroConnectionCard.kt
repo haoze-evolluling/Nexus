@@ -170,9 +170,9 @@ internal fun HeroConnectionCard(
                     ) {
                         Text(
                             text = when {
-                                isConnected -> "已连接"
-                                isConnecting -> "正在连接..."
-                                else -> "待连接"
+                                isConnected -> stringResource(R.string.status_connected_label)
+                                isConnecting -> stringResource(R.string.status_connecting)
+                                else -> stringResource(R.string.status_not_connected)
                             },
                             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
                             color = when {

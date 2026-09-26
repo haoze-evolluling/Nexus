@@ -336,4 +336,123 @@
   <string name="home_header_slogan">全能无线外设中枢</string>
   <string name="home_manage_device">管理</string>
   <string name="home_disconnect_device">断开</string>
+
+  <!-- 语言设置 (统一多语言管理) -->
+  <string name="language_settings">语言设置</string>
+  <string name="language_settings_summary">选择应用界面显示语言</string>
+  <string name="language_follow_system">跟随系统</string>
+  <string name="language_chinese">简体中文</string>
+  <string name="language_english">English</string>
+
+  <!-- 连接卡片状态补充 -->
+  <string name="status_connecting">连接中…</string>
+
+  <!-- 外设面板副标题 -->
+  <string name="peripheral_keyboard_subtitle">全尺寸输入</string>
+  <string name="peripheral_touchpad_subtitle">多指手势</string>
+  <string name="peripheral_gamepad_subtitle">双摇杆控制</string>
+  <string name="peripheral_tvremote_subtitle">多向导航与媒体</string>
+
+  <!-- 快捷指令卡片 -->
+  <string name="quick_commands_desc">快速响应终端提示</string>
+  <string name="quick_macros_title">快捷宏</string>
+  <string name="quick_macros_empty">暂无快捷宏，可在 Agent 页面添加</string>
+  <string name="quick_macros_add">添加宏</string>
+
+  <!-- 快捷工具与偏好卡片 -->
+  <string name="quick_tools_prefs">偏好设置</string>
+  <string name="quick_tools_tilt_desc">设备倾斜屏幕自动跟随</string>
+  <string name="quick_tools_haptic_desc">细微触觉反馈</string>
+  <string name="quick_tools_sound_desc">真实模拟机械音效</string>
+  <string name="quick_tools_about_support">关于与支持</string>
+  <string name="quick_tools_about_desc">版本信息与开源支持</string>
+
+  <!-- 主题配色名称 -->
+  <string name="theme_color_system">跟随系统</string>
+  <string name="theme_color_indigo">经典靛蓝</string>
+  <string name="theme_color_blue">冷灰幽蓝</string>
+  <string name="theme_color_cyan">碧空青翠</string>
+  <string name="theme_color_green">苍翠墨绿</string>
+  <string name="theme_color_amber">秋日琥珀</string>
+  <string name="theme_color_orange">落日暖橙</string>
+  <string name="theme_color_pink">暮霞粉</string>
+  <string name="theme_color_purple">星空幻紫</string>
+  <string name="theme_color_slate">云石灰</string>
+
+  <!-- 通知与对话框 -->
+  <string name="notification_connection_channel_desc">设备连接和断开通知</string>
+  <string name="toast_macros_reset">已恢复默认快捷宏</string>
+
+  <!-- 设置关于板块卡片 -->
+  <string name="about_section_version_prefix">版本 %1$s · 查看功能与边界</string>
+  <string name="about_section_version_empty">查看功能与边界</string>
+  <string name="about_section_sponsor_subtitle">请开发者喝冰雪碧，支持项目持续维护</string>
+  <string name="about_section_sponsor_list_subtitle">感谢所有支持 Nexus 的朋友</string>
+
+  <!-- 应用信息页面 (功能、边界与关于) -->
+  <string name="about_info_title">应用信息</string>
+  <string name="about_capabilities_section">功能能力</string>
+  <string name="about_capabilities_section_sub">01 / CAPABILITIES</string>
+  <string name="about_boundary_section">架构与边界</string>
+  <string name="about_boundary_section_sub">02 / ARCHITECTURE</string>
+  <string name="about_capability_keyboard_title">键盘</string>
+  <string name="about_capability_keyboard_desc">通过标准 HID 将手机转换为无线键盘输入。</string>
+  <string name="about_capability_touchpad_title">触控板</string>
+  <string name="about_capability_touchpad_desc">提供移动、点击与双指平滑滚动控制。</string>
+  <string name="about_capability_tvremote_title">遥控器</string>
+  <string name="about_capability_tvremote_desc">发送方向、多媒体、音量和电源遥控键值。</string>
+  <string name="about_capability_agent_title">Agent 快捷键</string>
+  <string name="about_capability_agent_desc">点击可编辑的快捷按钮快速发送终端命令。</string>
+  <string name="about_capability_multi_title">多设备协同</string>
+  <string name="about_capability_multi_desc">跨设备支持自动重连与状态同步。</string>
+  <string name="about_capability_tile_title">状态磁贴</string>
+  <string name="about_capability_tile_desc">通过系统下拉磁贴快速查看并切换连接状态。</string>
+  <string name="about_boundary_direct_title">原生直接通信</string>
+  <string name="about_boundary_direct_desc">Nexus 通过 Android 原生 HID 蓝牙与目标设备直接通信，无需安装远程服务端。</string>
+  <string name="about_boundary_compat_title">设备系统兼容</string>
+  <string name="about_boundary_compat_desc">目标设备需要支持标准蓝牙 HID 键盘、鼠标或遥控器，实际效果取决于目标设备系统实现。</string>
+  <string name="about_boundary_storage_title">本地偏好存储</string>
+  <string name="about_boundary_storage_desc">连接设备信息、应用偏好和自定义宏保存在本地设备，便于恢复使用习惯。</string>
+  <string name="about_hero_tagline">全能无线外设中枢</string>
+  <string name="about_hero_sub_tagline">将手机化为键盘、触控板与遥控器，让常用操作触手可及</string>
+  <string name="about_badge_version">版本 %1$s</string>
+  <string name="about_badge_native">原生直接通信</string>
+  <string name="about_open_browser_failed">无法打开浏览器</string>
+  <string name="about_github_desc">Nexus 开源项目</string>
+  <string name="about_github_repo_title">开源项目仓库</string>
+  <string name="about_open_github_repo">打开项目仓库</string>
+
+  <!-- 赞助与支持页面 -->
+  <string name="sponsor_screen_title">请作者喝杯冰雪碧</string>
+  <string name="sponsor_card_title">请作者喝杯冰雪碧 🥤</string>
+  <string name="sponsor_card_desc">如果 Nexus 帮助了你，欢迎请作者喝杯冰雪碧！</string>
+  <string name="sponsor_alipay">支付宝</string>
+  <string name="sponsor_wechat">微信支付</string>
+  <string name="sponsor_note">转账时请备注昵称与留言，以便记录到支持者名单中。</string>
+  <string name="sponsor_group_help">每一笔支持都将用于</string>
+  <string name="sponsor_help_item1">外设功能持续迭代与完善</string>
+  <string name="sponsor_help_item2">优化连接稳定性与修复 Bug</string>
+  <string name="sponsor_help_item3">购买测试设备适配更多机型</string>
+  <string name="sponsor_group_other_help">非赞助支持也同样珍贵</string>
+  <string name="sponsor_other_item1">在 GitHub 上点一颗 Star ⭐</string>
+  <string name="sponsor_other_item2">提交 Issue 反馈问题或建议</string>
+  <string name="sponsor_other_item3">提交 Pull Request 共同改进代码</string>
+  <string name="sponsor_other_item4">向身边的朋友推荐 Nexus</string>
+  <string name="sponsor_footer_thanks">感谢每一位支持项目持续发展的朋友！</string>
+
+  <!-- 赞助者名单页面 -->
+  <string name="sponsor_list_copy_failed">复制失败：%1$s</string>
+  <string name="sponsor_list_copied">已复制：%1$s</string>
+  <string name="sponsor_list_avatar_syncing">已更新名单，正在后台缓存头像…</string>
+  <string name="sponsor_list_avatar_cached">头像已全部缓存，无需重复刷新</string>
+  <string name="sponsor_list_avatar_refreshed_all">已刷新 %1$d 位成员头像</string>
+  <string name="sponsor_list_avatar_refreshed_partial">已刷新 %1$d 位成员头像，%2$d 位头像未更新</string>
+  <string name="sponsor_list_refresh_avatars">刷新头像缓存</string>
+  <string name="sponsor_list_sort_newest">当前按时间倒序排列</string>
+  <string name="sponsor_list_sort_oldest">当前按时间正序排列</string>
+  <string name="sponsor_list_sort_desc">当前按时间倒序，点击切换为正序</string>
+  <string name="sponsor_list_sort_asc">当前按时间正序，点击切换为倒序</string>
+  <string name="sponsor_list_banner_text">感谢每一位支持 Nexus 项目的朋友！默认按时间倒序排列，可通过右上角按钮切换为正序；金额无论多少，每一份心意都同样珍贵。</string>
+  <string name="sponsor_list_empty">暂时还没有赞助者记录，期待你的名字出现在这里！</string>
+  <string name="sponsor_list_avatar_cd">成员头像</string>
 </resources>

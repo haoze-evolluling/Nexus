@@ -40,7 +40,7 @@ fun AboutSettingsCard(
     SettingsCard(modifier = modifier) {
         SettingsActionItem(
             title = stringResource(R.string.home_about_title),
-            subtitle = if (versionName.isNotBlank()) "版本 $versionName · 查看核心能力与运行边界" else "查看核心能力与运行边界",
+            subtitle = if (versionName.isNotBlank()) stringResource(R.string.about_section_version_prefix, versionName) else stringResource(R.string.about_section_version_empty),
             leadingIcon = Icons.Default.Info,
             onClick = { onNavigateToAbout?.invoke() },
             trailing = {
@@ -56,7 +56,7 @@ fun AboutSettingsCard(
 
         SettingsActionItem(
             title = stringResource(R.string.home_sponsor_title),
-            subtitle = "请作者喝杯蜜雪，支持项目持续维护",
+            subtitle = stringResource(R.string.about_section_sponsor_subtitle),
             leadingIcon = Icons.Default.Favorite,
             onClick = { onNavigateToSponsor?.invoke() },
             trailing = {
@@ -72,7 +72,7 @@ fun AboutSettingsCard(
 
         SettingsActionItem(
             title = stringResource(R.string.home_sponsor_list_title),
-            subtitle = "感谢所有支持 Nexus 的朋友",
+            subtitle = stringResource(R.string.about_section_sponsor_list_subtitle),
             leadingIcon = Icons.Default.WorkspacePremium,
             onClick = { onNavigateToSponsorList?.invoke() },
             trailing = {

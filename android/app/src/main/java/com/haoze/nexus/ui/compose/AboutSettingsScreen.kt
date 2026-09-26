@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -53,21 +54,21 @@ import kotlin.math.sqrt
 
 private const val PROJECT_REPOSITORY_URL = "https://github.com/haoze-evolluling/Nexus"
 
-private data class AboutCapability(val title: String, val description: String)
+private data class AboutCapability(val titleRes: Int, val descriptionRes: Int)
 
 private val aboutCapabilities = listOf(
-    AboutCapability("蓝牙键盘", "通过蓝牙 HID 将手机输入转换为键盘按键。"),
-    AboutCapability("触控板", "提供光标移动、点击和双指滚动等鼠标控制。"),
-    AboutCapability("电视遥控", "发送方向、媒体、音量和电源等遥控按键。"),
-    AboutCapability("Agent 快捷命令", "用可编辑的快捷按钮快速发送常用命令。"),
-    AboutCapability("设备连接", "管理已配对设备，并支持自动连接与断线重连。"),
-    AboutCapability("快捷设置", "通过系统快捷设置磁贴查看并进入连接状态。")
+    AboutCapability(R.string.about_capability_keyboard_title, R.string.about_capability_keyboard_desc),
+    AboutCapability(R.string.about_capability_touchpad_title, R.string.about_capability_touchpad_desc),
+    AboutCapability(R.string.about_capability_tvremote_title, R.string.about_capability_tvremote_desc),
+    AboutCapability(R.string.about_capability_agent_title, R.string.about_capability_agent_desc),
+    AboutCapability(R.string.about_capability_multi_title, R.string.about_capability_multi_desc),
+    AboutCapability(R.string.about_capability_tile_title, R.string.about_capability_tile_desc)
 )
 
 private val aboutBoundaries = listOf(
-    "本机蓝牙直连" to "Nexus 通过 Android 蓝牙 HID 与已配对设备直接通信，不经过远程服务器。",
-    "设备兼容性" to "接收设备需要支持相应的蓝牙 HID 键盘、鼠标或遥控输入能力；实际表现取决于设备系统和蓝牙环境。",
-    "本地数据存储" to "已连接设备信息、应用偏好和自定义快捷命令保存在本机，用于恢复你的使用习惯。"
+    R.string.about_boundary_direct_title to R.string.about_boundary_direct_desc,
+    R.string.about_boundary_compat_title to R.string.about_boundary_compat_desc,
+    R.string.about_boundary_storage_title to R.string.about_boundary_storage_desc
 )
 
 @Composable
@@ -75,12 +76,12 @@ fun AboutSettingsScreen(onBack: () -> Unit, versionName: String, isConnected: Bo
     val context = LocalContext.current
     val openRepository = {
         runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(PROJECT_REPOSITORY_URL))) }
-            .onFailure { Toast.makeText(context, "无法打开链接", Toast.LENGTH_SHORT).show() }
+            .onFailure { Toast.makeText(context, R.string.about_open_browser_failed, Toast.LENGTH_SHORT).show() }
         Unit
     }
 
     SettingsScaffold(
-        title = "应用信息",
+        title = stringResource(R.string.about_info_title),
         onBack = onBack,
         titleTrailing = {
             Box(
@@ -107,8 +108,8 @@ fun AboutSettingsScreen(onBack: () -> Unit, versionName: String, isConnected: Bo
             verticalArrangement = Arrangement.spacedBy(SettingsSectionSpacing)
         ) {
             item { AboutHero(versionName) }
-            item { AboutSectionHeading("核心能力", "01 / CAPABILITIES"); CapabilityGrid() }
-            item { AboutSectionHeading("运行边界", "02 / ARCHITECTURE"); BoundaryGrid() }
+            item { AboutSectionHeading(stringResource(R.string.about_capabilities_section), stringResource(R.string.about_capabilities_section_sub)); CapabilityGrid() }
+            item { AboutSectionHeading(stringResource(R.string.about_boundary_section), stringResource(R.string.about_boundary_section_sub)); BoundaryGrid() }
             item { ProjectCard(openRepository) }
             item {
                 Text(
@@ -148,12 +149,12 @@ private fun AboutHero(versionName: String) {
 private fun HeroCopy(versionName: String, modifier: Modifier = Modifier) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("// BLUETOOTH HID CONTROL", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-        Text("Nexus 蓝牙输入控制", color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-        Text("将手机变为蓝牙键盘、触控板和遥控器，让常用输入与设备控制触手可及。", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyLarge)
+        Text(stringResource(R.string.about_hero_tagline), color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.about_hero_sub_tagline), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyLarge)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            AboutBadge("版本 ${versionName.ifBlank { "--" }}")
+            AboutBadge(stringResource(R.string.about_badge_version, versionName.ifBlank { "--" }))
             AboutBadge("Bluetooth HID")
-            AboutBadge("本地直连")
+            AboutBadge(stringResource(R.string.about_badge_native))
         }
     }
 }
@@ -236,8 +237,8 @@ private fun CapabilityCard(capability: AboutCapability, index: Int, modifier: Mo
     Card(modifier = modifier.fillMaxHeight(), shape = SettingsCornerShape, colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f))) {
         Column(Modifier.padding(15.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text("[%02d]".format(index), color = MaterialTheme.colorScheme.primary, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
-            Text(capability.title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-            Text(capability.description, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(capability.titleRes), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+            Text(stringResource(capability.descriptionRes), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
         }
     }
 }
@@ -254,13 +255,13 @@ private fun BoundaryGrid() {
 }
 
 @Composable
-private fun BoundaryCard(title: String, description: String, index: Int, modifier: Modifier) {
+private fun BoundaryCard(titleRes: Int, descriptionRes: Int, index: Int, modifier: Modifier) {
     val accents = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.tertiary)
     Column(modifier.background(MaterialTheme.colorScheme.surface)) {
         HorizontalDivider(thickness = 2.dp, color = accents[index])
         Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            Text(description, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+            Text(stringResource(titleRes), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(stringResource(descriptionRes), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
@@ -272,15 +273,15 @@ private fun ProjectCard(onOpenRepository: () -> Unit) {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text("MAINTAINED BY", color = MaterialTheme.colorScheme.primary, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                 Text("haoze-evolluling", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                Text("Nexus 开源项目", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(R.string.about_github_desc), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
             }
             Surface(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable(onClick = onOpenRepository), shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.primary.copy(alpha = 0.10f), border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.38f))) {
                 Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text("开源项目仓库", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.about_github_repo_title), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                         Text(PROJECT_REPOSITORY_URL.removePrefix("https://"), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
-                    Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = "打开项目仓库", tint = MaterialTheme.colorScheme.primary)
+                    Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = stringResource(R.string.about_open_github_repo), tint = MaterialTheme.colorScheme.primary)
                 }
             }
         }

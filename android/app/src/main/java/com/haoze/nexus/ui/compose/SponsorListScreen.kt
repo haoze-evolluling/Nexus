@@ -1,4 +1,4 @@
-﻿package com.haoze.nexus.ui.compose
+package com.haoze.nexus.ui.compose
 
 import android.content.Context
 import android.graphics.BitmapFactory
@@ -71,7 +71,7 @@ fun SponsorListScreen(
         if (cachedConfiguration != null) isConfigurationLoading = false
         runCatching { RecognitionMembersRepository.refresh(context.applicationContext) }
             .onFailure { error ->
-                context.showToast("名单更新失败：")
+                context.showToast(context.getString(R.string.sponsor_list_copy_failed, error.message ?: ""))
             }
             .getOrNull()
             ?.let { configuration = it }
@@ -89,19 +89,19 @@ fun SponsorListScreen(
                         val refreshedConfiguration = runCatching {
                             RecognitionMembersRepository.refresh(context.applicationContext)
                         }.getOrElse { error ->
-                            context.showToast("名单更新失败：")
+                            context.showToast(context.getString(R.string.sponsor_list_copy_failed, error.message ?: ""))
                             return@launch
                         }
                         if (refreshedConfiguration != null) {
                             configuration = refreshedConfiguration
-                            context.showToast("名单已更新，正在加载头像")
+                            context.showToast(context.getString(R.string.sponsor_list_avatar_syncing))
                             return@launch
                         }
                         val result = avatarLoader.retryMissingOrFailed()
                         val message = when {
-                            result.refreshedCount == 0 && result.failedCount == 0 -> "头像均已缓存，无需刷新"
-                            result.failedCount == 0 -> "已刷新  个头像"
-                            else -> "已刷新  个头像， 个头像仍未加载"
+                            result.refreshedCount == 0 && result.failedCount == 0 -> context.getString(R.string.sponsor_list_avatar_cached)
+                            result.failedCount == 0 -> context.getString(R.string.sponsor_list_avatar_refreshed_all, result.refreshedCount)
+                            else -> context.getString(R.string.sponsor_list_avatar_refreshed_partial, result.refreshedCount, result.failedCount)
                         }
                         context.showToast(message, Toast.LENGTH_SHORT)
                     }
@@ -110,16 +110,16 @@ fun SponsorListScreen(
                 if (avatarLoader.isRefreshing) {
                     CircularProgressIndicator(modifier = Modifier.padding(10.dp))
                 } else {
-                    Icon(imageVector = Icons.Default.Refresh, contentDescription = "刷新头像")
+                    Icon(imageVector = Icons.Default.Refresh, contentDescription = stringResource(R.string.sponsor_list_refresh_avatars))
                 }
             }
             IconButton(onClick = {
                 newestFirst = !newestFirst
-                context.showToast(if (newestFirst) "当前按赞助时间由晚到早排列" else "当前按赞助时间由早到晚排列")
+                context.showToast(if (newestFirst) context.getString(R.string.sponsor_list_sort_newest) else context.getString(R.string.sponsor_list_sort_oldest))
             }) {
                 Icon(
                     imageVector = Icons.Default.SwapVert,
-                    contentDescription = if (newestFirst) "当前按赞助时间由晚到早排列，点击切换为由早到晚" else "当前按赞助时间由早到晚排列，点击切换为由晚到早"
+                    contentDescription = if (newestFirst) stringResource(R.string.sponsor_list_sort_desc) else stringResource(R.string.sponsor_list_sort_asc)
                 )
             }
         }
@@ -131,7 +131,7 @@ fun SponsorListScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             SettingsInfoText(
-                text = "感谢每一位支持 Nexus 项目的朋友！名单默认按赞助时间由早到晚排列，可通过右上角按钮切换为由晚到早；与赞助金额无关，每一份支持都同样珍贵。",
+                text = stringResource(R.string.sponsor_list_banner_text),
                 modifier = Modifier.padding(top = 8.dp)
             )
             if (isConfigurationLoading) {
@@ -139,7 +139,7 @@ fun SponsorListScreen(
             } else {
                 RecognitionList(
                     members = displayedSponsors,
-                    emptyText = "暂时还没有赞助者，期待在这里写下你的名字。",
+                    emptyText = stringResource(R.string.sponsor_list_empty),
                     avatarStates = avatarLoader.states
                 )
             }

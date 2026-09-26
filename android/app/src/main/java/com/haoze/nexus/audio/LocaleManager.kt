@@ -1,47 +1,44 @@
-﻿package com.haoze.nexus.audio
+package com.haoze.nexus.audio
 
 import android.content.Context
-import android.content.res.Configuration
-import android.os.LocaleList
-import java.util.Locale
+import com.haoze.nexus.ui.AppLanguageManager
+import com.haoze.nexus.ui.AppLanguageMode
 
-/** 应用内语言选项：跟随系统，或固定为中文/英文。 */
+/** 应用内语言选项：跟随系统，或固定为中文/英文。保留此枚举以兼容现有音频模块调用。 */
 enum class AppLanguage(val storageValue: String, val tag: String?) {
-    SYSTEM("system", null),
-    ZH("zh", "zh"),
-    EN("en", "en");
+    SYSTEM(AppLanguageMode.SYSTEM.storageValue, null),
+    ZH(AppLanguageMode.CHINESE.storageValue, "zh"),
+    EN(AppLanguageMode.ENGLISH.storageValue, "en");
 
     companion object {
         fun fromStorage(value: String?): AppLanguage = entries.firstOrNull { it.storageValue == value } ?: SYSTEM
+
+        fun fromMode(mode: AppLanguageMode): AppLanguage = when (mode) {
+            AppLanguageMode.SYSTEM -> SYSTEM
+            AppLanguageMode.CHINESE -> ZH
+            AppLanguageMode.ENGLISH -> EN
+        }
+    }
+
+    fun toMode(): AppLanguageMode = when (this) {
+        SYSTEM -> AppLanguageMode.SYSTEM
+        ZH -> AppLanguageMode.CHINESE
+        EN -> AppLanguageMode.ENGLISH
     }
 }
 
 /**
- * 应用内语言切换。偏好存于普通 SharedPreferences：attachBaseContext 需要同步读取，
- * 不适合走 DataStore 的挂起接口。Activity 在 attachBaseContext 里用 wrap() 包一层
- * 配置化 Context，接收服务在构建通知时同样用 wrap() 取本地化文案。
+ * 语言管理桥接单例：已对齐至全局 AppLanguageManager，
+ * 保证音频后台服务、通知栏及多端校时与全应用语言偏好完全同步。
  */
 object LocaleManager {
-    private const val PREFS_NAME = "nexus_language"
-    private const val KEY_LANGUAGE = "app_language"
-
     fun current(context: Context): AppLanguage =
-        AppLanguage.fromStorage(prefs(context).getString(KEY_LANGUAGE, null))
+        AppLanguage.fromMode(AppLanguageManager.getMode(context))
 
     fun set(context: Context, language: AppLanguage) {
-        prefs(context).edit().putString(KEY_LANGUAGE, language.storageValue).apply()
+        AppLanguageManager.setMode(context, language.toMode())
     }
 
-    /** 按语言偏好返回本地化 Context；跟随系统时原样返回。 */
-    fun wrap(context: Context): Context {
-        val tag = current(context).tag ?: return context
-        val locale = Locale.forLanguageTag(tag)
-        val config = Configuration(context.resources.configuration)
-        config.setLocale(locale)
-        config.setLocales(LocaleList(locale))
-        return context.createConfigurationContext(config)
-    }
-
-    private fun prefs(context: Context) = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    /** 返回本地化 Context，跟随全局 AppLanguageManager 规则 */
+    fun wrap(context: Context): Context = AppLanguageManager.wrap(context)
 }
-

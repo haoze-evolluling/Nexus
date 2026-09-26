@@ -120,6 +120,9 @@ fun SettingsScreen(
                     },
                     onNavigateToBottomBarCustomization = onNavigateToRoute?.let { navigate ->
                         { navigate(Routes.BOTTOM_BAR_CUSTOMIZATION) }
+                    },
+                    onNavigateToLanguageSettings = onNavigateToRoute?.let { navigate ->
+                        { navigate(Routes.LANGUAGE_SETTINGS) }
                     }
                 )
             }

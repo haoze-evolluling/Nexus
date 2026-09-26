@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -18,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.haoze.nexus.R
+import com.haoze.nexus.ui.AppLanguageManager
 import com.haoze.nexus.ui.Routes
 
 // ==========================================
@@ -77,6 +79,19 @@ fun AppearanceSettingsScreen(
                         title = stringResource(R.string.bottom_bar_customization),
                         subtitle = stringResource(R.string.bottom_bar_customization_subtitle),
                         onClick = { onNavigateToRoute(Routes.BOTTOM_BAR_CUSTOMIZATION) }
+                    )
+                }
+            }
+            item {
+                SettingsSectionHeader(stringResource(R.string.language_settings), icon = Icons.Default.Language)
+            }
+            item {
+                val currentMode = AppLanguageManager.getMode(context)
+                SettingsCard {
+                    SettingsActionItem(
+                        title = stringResource(R.string.language_settings),
+                        subtitle = stringResource(currentMode.labelRes),
+                        onClick = { onNavigateToRoute(Routes.LANGUAGE_SETTINGS) }
                     )
                 }
             }

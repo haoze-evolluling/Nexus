@@ -116,7 +116,7 @@ fun SettingsThemeColorPicker(
             )
             Spacer(Modifier.weight(1f))
             Text(
-                text = selectedStyle.displayName,
+                text = stringResource(selectedStyle.titleRes),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold

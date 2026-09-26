@@ -28,6 +28,8 @@ import com.haoze.nexus.ui.compose.DayNightModeScreen
 import com.haoze.nexus.ui.compose.FeedbackSettingsScreen
 import com.haoze.nexus.ui.compose.InputSettingsScreen
 import com.haoze.nexus.ui.compose.MacroEditorAlertDialog
+import com.haoze.nexus.ui.AppLanguageManager
+import com.haoze.nexus.ui.compose.LanguageSettingsScreen
 import com.haoze.nexus.ui.compose.AppearanceSettingsScreen
 import com.haoze.nexus.ui.compose.SettingsScreen
 import com.haoze.nexus.ui.compose.SponsorListScreen
@@ -39,7 +41,7 @@ import com.haoze.nexus.ui.compose.TvRemoteAction
 import com.haoze.nexus.ui.compose.TvRemoteScreen
 import com.haoze.nexus.ui.compose.getThemeColorStyle
 
-abstract class ComposePageActivity : ComponentActivity() {
+abstract class ComposePageActivity : AppLocalizedActivity() {
     protected val bluetoothViewModel: BluetoothViewModel by viewModels()
     protected var isConnected by mutableStateOf(false)
     protected var connectedDeviceName by mutableStateOf<String?>(null)
@@ -240,6 +242,13 @@ class SettingsActivity : ComposePageActivity() {
                 onResetMacros = onResetMacros
             )
             Routes.APPEARANCE_SETTINGS -> AppearanceSettingsScreen(onBack, onNavigate)
+            Routes.LANGUAGE_SETTINGS -> LanguageSettingsScreen(
+                onBack = onBack,
+                onLanguageChanged = { mode ->
+                    AppLanguageManager.setMode(this@SettingsActivity, mode)
+                    recreate()
+                }
+            )
             Routes.BOTTOM_BAR_CUSTOMIZATION -> BottomBarCustomizationScreen(onBack)
             Routes.DAY_NIGHT_MODE -> DayNightModeScreen(onBack)
             Routes.THEME_COLOR_SETTINGS -> ThemeColorSettingsScreen(onBack, onThemeColorStyleChanged)

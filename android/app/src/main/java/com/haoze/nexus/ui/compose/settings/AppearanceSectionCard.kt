@@ -19,14 +19,17 @@ import com.haoze.nexus.ui.compose.SettingsThemeModeSelector
 import com.haoze.nexus.ui.compose.ThemeColorStyle
 import com.haoze.nexus.ui.compose.ThemeController
 
+import com.haoze.nexus.ui.AppLanguageManager
+
 /**
- * 设置主页 - 外观与个性化配置卡片 (主题模式、强调色风格、底栏自定义入口)
+ * 设置主页 - 外观与个性化配置卡片 (主题模式、强调色风格、底栏自定义入口、语言设置入口)
  */
 @Composable
 fun AppearanceSettingsCard(
     currentThemeColorStyle: ThemeColorStyle,
     onThemeColorStyleSelected: (ThemeColorStyle) -> Unit,
     onNavigateToBottomBarCustomization: (() -> Unit)?,
+    onNavigateToLanguageSettings: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -63,6 +66,16 @@ fun AppearanceSettingsCard(
                 title = stringResource(R.string.bottom_bar_customization),
                 subtitle = stringResource(R.string.bottom_bar_customization_subtitle),
                 onClick = onNavigateToBottomBarCustomization
+            )
+        }
+
+        if (onNavigateToLanguageSettings != null) {
+            SettingsItemDivider()
+            val currentMode = AppLanguageManager.getMode(context)
+            SettingsActionItem(
+                title = stringResource(R.string.language_settings),
+                subtitle = stringResource(currentMode.labelRes),
+                onClick = onNavigateToLanguageSettings
             )
         }
     }

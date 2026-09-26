@@ -13,4 +13,5 @@ object Routes {
     const val SPONSOR = "sponsor"
     const val SPONSOR_LIST = "sponsor_list"
     const val BOTTOM_BAR_CUSTOMIZATION = "bottom_bar_customization"
+    const val LANGUAGE_SETTINGS = "language_settings"
 }

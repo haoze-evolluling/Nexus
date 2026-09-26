@@ -64,7 +64,7 @@ internal fun PeripheralDeck(
         ) {
             PeripheralCard(
                 title = stringResource(R.string.home_keyboard_title),
-                subtitle = "全尺寸虚拟键盘",
+                subtitle = stringResource(R.string.peripheral_keyboard_subtitle),
                 tag = stringResource(R.string.home_tag_keyboard),
                 icon = Icons.Default.Keyboard,
                 onClick = onOpenKeyboard,
@@ -72,7 +72,7 @@ internal fun PeripheralDeck(
             )
             PeripheralCard(
                 title = stringResource(R.string.home_touchpad_title),
-                subtitle = "手势与指针控制",
+                subtitle = stringResource(R.string.peripheral_touchpad_subtitle),
                 tag = stringResource(R.string.home_tag_touchpad),
                 icon = Icons.Default.Mouse,
                 onClick = onOpenTouchpad,
@@ -87,7 +87,7 @@ internal fun PeripheralDeck(
         ) {
             PeripheralCard(
                 title = stringResource(R.string.home_gamepad_title),
-                subtitle = "双摇杆与线性扳机",
+                subtitle = stringResource(R.string.peripheral_gamepad_subtitle),
                 tag = stringResource(R.string.home_tag_gamepad),
                 icon = Icons.Default.SportsEsports,
                 onClick = onOpenGamepad,
@@ -95,7 +95,7 @@ internal fun PeripheralDeck(
             )
             PeripheralCard(
                 title = stringResource(R.string.home_tvremote_title),
-                subtitle = "方向导航与媒体控制",
+                subtitle = stringResource(R.string.peripheral_tvremote_subtitle),
                 tag = stringResource(R.string.home_tag_tvremote),
                 icon = Icons.Default.SettingsRemote,
                 onClick = onOpenTvRemote,

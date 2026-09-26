@@ -51,7 +51,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppLocalizedActivity() {
 
     private val bluetoothViewModel: BluetoothViewModel by viewModels()
 

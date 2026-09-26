@@ -27,7 +27,7 @@ fun ResetMacrosConfirmDialog(
             TextButton(onClick = {
                 onResetConfirmed()
                 onDismissRequest()
-                Toast.makeText(context, "已恢复默认快捷命令", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.toast_macros_reset, Toast.LENGTH_SHORT).show()
             }) {
                 Text(stringResource(R.string.dialog_reset), color = MaterialTheme.colorScheme.error)
             }

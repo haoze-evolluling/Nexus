@@ -76,7 +76,7 @@ internal fun QuickToolsCard(
         ) {
             // 分区 1: 交互与硬件控制偏好
             Text(
-                text = "交互与控制偏好",
+                text = stringResource(R.string.quick_tools_prefs),
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 4.dp)
@@ -84,7 +84,7 @@ internal fun QuickToolsCard(
 
             QuickToggleRow(
                 title = stringResource(R.string.settings_keep_screen_on),
-                subtitle = "控制过程中避免屏幕自动锁定休眠",
+                subtitle = stringResource(R.string.quick_tools_tilt_desc),
                 icon = Icons.Default.PowerSettingsNew,
                 checked = keepScreenOn,
                 onCheckedChange = onKeepScreenOnChanged
@@ -95,7 +95,7 @@ internal fun QuickToolsCard(
             )
             QuickToggleRow(
                 title = stringResource(R.string.settings_haptic_feedback),
-                subtitle = "按键触控与操作震动轻微提示",
+                subtitle = stringResource(R.string.quick_tools_haptic_desc),
                 icon = Icons.Default.Vibration,
                 checked = hapticFeedback,
                 onCheckedChange = onHapticFeedbackChanged
@@ -106,7 +106,7 @@ internal fun QuickToolsCard(
             )
             QuickToggleRow(
                 title = stringResource(R.string.settings_key_sound),
-                subtitle = "键盘输入打字模拟机械声效",
+                subtitle = stringResource(R.string.quick_tools_sound_desc),
                 icon = Icons.AutoMirrored.Filled.VolumeUp,
                 checked = keySound,
                 onCheckedChange = onKeySoundChanged
@@ -119,7 +119,7 @@ internal fun QuickToolsCard(
             )
 
             Text(
-                text = "个性化与支持",
+                text = stringResource(R.string.quick_tools_about_support),
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 4.dp)
@@ -137,7 +137,7 @@ internal fun QuickToolsCard(
             )
             QuickLinkRow(
                 title = stringResource(R.string.home_about_title),
-                subtitle = "版本信息、开源声明与诊断支持",
+                subtitle = stringResource(R.string.quick_tools_about_desc),
                 icon = Icons.Default.Info,
                 onClick = onOpenAbout
             )

@@ -71,7 +71,7 @@ internal fun QuickCommandsCard(
         ) {
             // 提示标签
             Text(
-                text = "高频终端响应按键",
+                text = stringResource(R.string.quick_commands_desc),
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -120,7 +120,7 @@ internal fun QuickCommandsCard(
 
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(
-                        text = "常用宏捷径",
+                        text = stringResource(R.string.quick_macros_title),
                         style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -166,7 +166,7 @@ internal fun QuickCommandsCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "暂无快捷宏，可在 Agent 中配置",
+                        text = stringResource(R.string.quick_macros_empty),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -182,7 +182,7 @@ internal fun QuickCommandsCard(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "添加宏",
+                            text = stringResource(R.string.quick_macros_add),
                             style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
                             color = MaterialTheme.colorScheme.primary
                         )
