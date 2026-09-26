@@ -226,6 +226,20 @@ class BluetoothHidService : Service() {
     private fun initializeHidDevice() {
         Log.d(TAG, "Initializing HID device")
 
+        val adapter = bluetoothAdapter
+        if (adapter == null) {
+            Log.e(TAG, "BluetoothAdapter is null")
+            isHidSupportedState = false
+            eventManager.notifyHidSupported(false)
+            eventManager.notifyRegistrationStateChanged(false)
+            return
+        }
+
+        if (!adapter.isEnabled) {
+            Log.d(TAG, "Bluetooth is disabled. Awaiting Bluetooth state change to STATE_ON.")
+            return
+        }
+
         val proxyTimeout = Runnable {
             if (coordinator.hidDevice == null && coordinator.state is HidState.Unregistered) {
                 Log.e(TAG, "getProfileProxy timed out after ${HID_PROXY_TIMEOUT_MS}ms")
@@ -237,7 +251,7 @@ class BluetoothHidService : Service() {
         mainHandler.postDelayed(proxyTimeout, HID_PROXY_TIMEOUT_MS)
 
         val proxyInitiated = try {
-            bluetoothAdapter?.getProfileProxy(this, object : BluetoothProfile.ServiceListener {
+            adapter.getProfileProxy(this, object : BluetoothProfile.ServiceListener {
                 override fun onServiceConnected(profile: Int, proxy: BluetoothProfile) {
                     mainHandler.removeCallbacks(proxyTimeout)
                     if (profile == BluetoothProfile.HID_DEVICE) {
@@ -258,7 +272,7 @@ class BluetoothHidService : Service() {
                         Log.d(TAG, "HID device proxy disconnected")
                     }
                 }
-            }, BluetoothProfile.HID_DEVICE) ?: false
+            }, BluetoothProfile.HID_DEVICE)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to get HID profile proxy: ${e.message}", e)
             false

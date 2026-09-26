@@ -33,6 +33,7 @@
     <string name="toast_bluetooth_not_supported">This device does not support Bluetooth HID</string>
     <string name="toast_hid_registration_failed">Bluetooth HID registration failed, please try restarting Bluetooth</string>
     <string name="toast_permission_denied">Bluetooth permission denied</string>
+    <string name="toast_bluetooth_disabled">Bluetooth is turned off, please turn on Bluetooth</string>
     <string name="toast_macro_added">Macro added</string>
     <string name="toast_macro_updated">Macro updated</string>
     <string name="toast_macro_deleted">Macro deleted</string>

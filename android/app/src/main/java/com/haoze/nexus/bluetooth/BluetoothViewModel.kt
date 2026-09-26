@@ -1,6 +1,7 @@
 package com.haoze.nexus.bluetooth
 
 import android.app.Application
+import android.bluetooth.BluetoothManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -166,6 +167,12 @@ class BluetoothViewModel(application: Application) : AndroidViewModel(applicatio
     fun hasBluetoothSupport(): Boolean {
         val context = getApplication<Application>()
         return context.packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)
+    }
+
+    fun isBluetoothEnabled(): Boolean {
+        val context = getApplication<Application>()
+        val adapter = (context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager)?.adapter
+        return adapter?.isEnabled == true
     }
 
     // ---- Lifecycle ----

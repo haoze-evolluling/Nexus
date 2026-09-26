@@ -119,6 +119,10 @@ class MainActivity : AppLocalizedActivity() {
             return
         }
 
+        if (!bluetoothViewModel.isBluetoothEnabled()) {
+            Toast.makeText(this, R.string.toast_bluetooth_disabled, Toast.LENGTH_SHORT).show()
+        }
+
         val missing = getMissingPermissions()
         if (missing.isNotEmpty()) {
             permissionLauncher.launch(missing)
@@ -279,7 +283,7 @@ class MainActivity : AppLocalizedActivity() {
         }
 
         bluetoothViewModel.hidSupported.observe(this) { isSupported ->
-            if (!isSupported) {
+            if (!isSupported && bluetoothViewModel.isBluetoothEnabled()) {
                 Toast.makeText(this, R.string.toast_bluetooth_not_supported, Toast.LENGTH_SHORT).show()
             }
         }
