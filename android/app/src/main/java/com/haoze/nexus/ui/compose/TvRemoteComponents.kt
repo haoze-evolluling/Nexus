@@ -1,5 +1,6 @@
 package com.haoze.nexus.ui.compose
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
@@ -27,9 +29,10 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.haoze.nexus.util.performKeyClick
 
 internal data class RemoteButtonSpec(
@@ -44,11 +47,13 @@ internal data class RemoteButtonSpec(
 internal fun RemoteIconBadge(
     iconRes: Int,
     background: Color,
-    tint: Color
+    tint: Color,
+    badgeSize: Dp = 34.dp,
+    iconSize: Dp = 20.dp
 ) {
     Box(
         modifier = Modifier
-            .size(32.dp)
+            .size(badgeSize)
             .clip(CircleShape)
             .background(background),
         contentAlignment = Alignment.Center
@@ -57,7 +62,7 @@ internal fun RemoteIconBadge(
             painter = painterResource(iconRes),
             contentDescription = null,
             tint = tint,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(iconSize)
         )
     }
 }
@@ -67,17 +72,19 @@ internal fun RemoteCapsuleButton(
     spec: RemoteButtonSpec,
     colors: TvRemoteColors,
     enabled: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    height: Dp = 48.dp
 ) {
     val view = LocalView.current
+    val shape = RoundedCornerShape(percent = 50)
     Row(
         modifier = modifier
             .width(130.dp)
-            .height(52.dp)
-            .alpha(if (enabled) 1f else 0.4f)
-            .clip(RoundedCornerShape(12.dp))
+            .height(height)
+            .alpha(if (enabled) 1f else 0.38f)
+            .clip(shape)
             .background(colors.controlSurface)
-            .border(1.dp, colors.outlineVariant, RoundedCornerShape(12.dp))
+            .border(BorderStroke(1.dp, colors.outlineVariant.copy(alpha = 0.5f)), shape)
             .clickable(
                 interactionSource = null,
                 indication = ripple(color = colors.primary),
@@ -87,19 +94,22 @@ internal fun RemoteCapsuleButton(
                 spec.onClick()
             }
             .semantics { contentDescription = spec.label }
-            .padding(horizontal = 12.dp),
+            .padding(start = 10.dp, end = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         RemoteIconBadge(
             iconRes = spec.iconRes,
             background = spec.iconBackground,
-            tint = spec.iconTint
+            tint = spec.iconTint,
+            badgeSize = 32.dp,
+            iconSize = 18.dp
         )
         Text(
             text = spec.label,
-            modifier = Modifier.padding(start = 10.dp),
+            modifier = Modifier.padding(start = 8.dp),
             color = colors.onSurface,
-            fontSize = 14.sp,
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.Medium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
@@ -115,16 +125,25 @@ internal fun IconOnlyCircleButton(
     onClick: () -> Unit,
     background: Color = colors.controlSurface,
     iconTint: Color = colors.onSurfaceVariant,
-    rippleColor: Color = colors.primary
+    rippleColor: Color = colors.primary,
+    size: Dp = 46.dp,
+    iconSize: Dp = 22.dp,
+    hasBorder: Boolean = false
 ) {
     val view = LocalView.current
     Box(
         modifier = Modifier
-            .size(60.dp)
-            .alpha(if (enabled) 1f else 0.4f)
+            .size(size)
+            .alpha(if (enabled) 1f else 0.38f)
             .clip(CircleShape)
             .background(background)
-            .border(1.dp, colors.outlineVariant, CircleShape)
+            .then(
+                if (hasBorder) {
+                    Modifier.border(BorderStroke(1.dp, colors.outlineVariant.copy(alpha = 0.5f)), CircleShape)
+                } else {
+                    Modifier
+                }
+            )
             .clickable(
                 interactionSource = null,
                 indication = ripple(color = rippleColor),
@@ -140,7 +159,7 @@ internal fun IconOnlyCircleButton(
             painter = painterResource(iconRes),
             contentDescription = null,
             tint = iconTint,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(iconSize)
         )
     }
 }

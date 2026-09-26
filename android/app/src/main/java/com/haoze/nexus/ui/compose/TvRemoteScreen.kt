@@ -53,6 +53,12 @@ fun TvRemoteScreen(
         }
     }
 
+    val cardBottomPadding = if (contentBottomPadding > 0.dp) {
+        (contentBottomPadding - 6.dp).coerceAtLeast(8.dp)
+    } else {
+        16.dp
+    }
+
     SettingsScaffold(
         title = stringResource(R.string.home_tvremote_title),
         onBack = onBack,
@@ -62,18 +68,21 @@ fun TvRemoteScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 24.dp + contentBottomPadding),
-            shape = RoundedCornerShape(28.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-            border = BorderStroke(1.dp, colors.outlineVariant),
+                .padding(start = 16.dp, top = 6.dp, end = 16.dp, bottom = cardBottomPadding),
+            shape = RoundedCornerShape(32.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = colors.surface,
+                contentColor = colors.onSurface
+            ),
+            border = BorderStroke(1.dp, colors.outlineVariant.copy(alpha = 0.4f)),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 20.dp)
-                    .padding(top = 24.dp, bottom = 20.dp),
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 14.dp, bottom = 14.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 TvRemoteTopRow(
@@ -85,13 +94,12 @@ fun TvRemoteScreen(
                 TvRemoteDpad(
                     colors = colors,
                     enabled = enabled,
-                    modifier = Modifier
-                        .padding(top = 20.dp)
-                        .size(212.dp),
+                    modifier = Modifier.padding(top = 12.dp),
+                    size = 196.dp,
                     onAction = ::runAction
                 )
                 RemoteTwoButtonRow(
-                    modifier = Modifier.padding(top = 20.dp),
+                    modifier = Modifier.padding(top = 14.dp),
                     colors = colors,
                     enabled = enabled,
                     left = RemoteButtonSpec(
@@ -112,7 +120,7 @@ fun TvRemoteScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 18.dp),
+                        .padding(top = 12.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Column(
@@ -130,7 +138,7 @@ fun TvRemoteScreen(
                             colors = colors,
                             enabled = enabled
                         )
-                        Spacer(Modifier.height(18.dp))
+                        Spacer(Modifier.height(12.dp))
                         RemoteCapsuleButton(
                             spec = RemoteButtonSpec(
                                 label = stringResource(R.string.tvremote_mute),
@@ -149,7 +157,7 @@ fun TvRemoteScreen(
                 MediaControlRow(
                     colors = colors,
                     enabled = enabled,
-                    modifier = Modifier.padding(top = 20.dp),
+                    modifier = Modifier.padding(top = 14.dp),
                     onAction = ::runAction
                 )
             }

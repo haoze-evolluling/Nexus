@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.Color
 internal data class TvRemoteColors(
     val surface: Color,
     val controlSurface: Color,
+    val controlSurfaceHigh: Color = controlSurface,
     val outlineVariant: Color,
     val primary: Color,
     val onSurface: Color,
@@ -19,25 +20,43 @@ internal data class TvRemoteColors(
     val onTertiaryContainer: Color,
     val error: Color,
     val errorContainer: Color,
+    val onErrorContainer: Color = error,
     val dpadBorder: Color
 ) {
     val pressedStateLayer: Color
-        get() = primary.copy(alpha = 0.12f)
+        get() = primary.copy(alpha = 0.14f)
 }
 
 @Composable
 internal fun rememberTvRemoteColors(): TvRemoteColors {
-    val isDark = when (ThemeController.nightModeIndex) {
-        1 -> false
-        2 -> true
-        else -> isSystemInDarkTheme()
+    val colorScheme = androidx.compose.material3.MaterialTheme.colorScheme
+    return androidx.compose.runtime.remember(colorScheme) {
+        TvRemoteColors(
+            surface = colorScheme.surfaceContainerLow,
+            controlSurface = colorScheme.surfaceContainer,
+            controlSurfaceHigh = colorScheme.surfaceContainerHigh,
+            outlineVariant = colorScheme.outlineVariant,
+            primary = colorScheme.primary,
+            onSurface = colorScheme.onSurface,
+            onSurfaceVariant = colorScheme.onSurfaceVariant,
+            primaryContainer = colorScheme.primaryContainer,
+            onPrimaryContainer = colorScheme.onPrimaryContainer,
+            secondaryContainer = colorScheme.secondaryContainer,
+            onSecondaryContainer = colorScheme.onSecondaryContainer,
+            tertiaryContainer = colorScheme.tertiaryContainer,
+            onTertiaryContainer = colorScheme.onTertiaryContainer,
+            error = colorScheme.error,
+            errorContainer = colorScheme.errorContainer,
+            onErrorContainer = colorScheme.onErrorContainer,
+            dpadBorder = colorScheme.outlineVariant.copy(alpha = 0.6f)
+        )
     }
-    return if (isDark) DarkTvRemoteColors else LightTvRemoteColors
 }
 
 internal val LightTvRemoteColors = TvRemoteColors(
     surface = Color(0xFFF8F9FA),
     controlSurface = Color.White,
+    controlSurfaceHigh = Color(0xFFF1F3F4),
     outlineVariant = Color(0xFFC4C7C5),
     primary = Color(0xFF0B57D0),
     onSurface = Color(0xFF1F1F1F),
@@ -50,12 +69,14 @@ internal val LightTvRemoteColors = TvRemoteColors(
     onTertiaryContainer = Color(0xFF003355),
     error = Color(0xFFB3261E),
     errorContainer = Color(0xFFF9DEDC),
+    onErrorContainer = Color(0xFF410E0B),
     dpadBorder = Color(0xFF747775)
 )
 
 internal val DarkTvRemoteColors = TvRemoteColors(
     surface = Color(0xFF111315),
     controlSurface = Color(0xFF24292E),
+    controlSurfaceHigh = Color(0xFF2E343A),
     outlineVariant = Color(0xFF444746),
     primary = Color(0xFFA8C7FA),
     onSurface = Color(0xFFE2E2E6),
@@ -68,5 +89,6 @@ internal val DarkTvRemoteColors = TvRemoteColors(
     onTertiaryContainer = Color(0xFFC9E6FF),
     error = Color(0xFFF2B8B5),
     errorContainer = Color(0xFF8C1D18),
+    onErrorContainer = Color(0xFFF9DEDC),
     dpadBorder = Color(0xFF8E918F)
 )

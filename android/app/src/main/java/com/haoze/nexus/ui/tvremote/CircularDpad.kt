@@ -1,4 +1,4 @@
-﻿package com.haoze.nexus.ui.tvremote
+package com.haoze.nexus.ui.tvremote
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -81,15 +81,16 @@ fun CircularDpad(
     val currentOnConfirm by rememberUpdatedState(onConfirm)
 
     val density = LocalDensity.current
-    val strokeWidthPx = with(density) { 1.5.dp.toPx() }
+    val strokeWidthPx = with(density) { 1.dp.toPx() }
     val iconSizePx = with(density) { 24.dp.toPx() }
     val iconSize = Size(iconSizePx, iconSizePx)
 
     val textStyle = remember(textColor) {
         TextStyle(
             color = textColor,
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Normal
+            fontSize = 20.sp,
+            fontWeight = FontWeight.SemiBold,
+            letterSpacing = 0.5.sp
         )
     }
 
