@@ -132,11 +132,17 @@ enum class TvRemoteAction {
 fun NexusApp(
     isConnected: Boolean,
     connectedDeviceName: String?,
+    bottomBarItems: List<BottomBarDestination>,
+    inputProfile: com.haoze.nexus.bluetooth.HidProfile,
+    onInputProfileChanged: (com.haoze.nexus.bluetooth.HidProfile) -> Unit,
     onNavigate: (AppPage) -> Unit,
     onNavigateRoute: (String) -> Unit,
     onOpenKeyboard: () -> Unit,
     onOpenTouchpad: () -> Unit,
     onOpenGamepad: () -> Unit,
+    onOpenTvRemote: () -> Unit,
+    onOpenAudioReceiver: () -> Unit,
+    onOpenAgent: () -> Unit,
     onShowDeviceList: () -> Unit,
     showDeviceList: Boolean,
     pairedDevices: List<BluetoothDevice>,
@@ -147,13 +153,36 @@ fun NexusApp(
     onDismissDeviceList: () -> Unit,
     onConnectDevice: (BluetoothDevice) -> Unit,
     onDisconnectDevice: () -> Unit,
-    onConnectionTimeout: () -> Unit
+    onConnectionTimeout: () -> Unit,
+    // Audio receiver
+    audioDiscovery: com.haoze.nexus.audio.PcDiscovery,
+    audioConnector: com.haoze.nexus.audio.PcConnector,
+    audioRepository: com.haoze.nexus.audio.SettingsRepository,
+    audioTrustRepository: com.haoze.nexus.audio.PcTrustRepository,
+    audioSelfId: String,
+    audioSelfName: String,
+    audioReceiverRunning: Boolean,
+    onAudioConnect: (com.haoze.nexus.audio.PcDevice) -> Unit,
+    onAudioDisconnect: (com.haoze.nexus.audio.PcDevice) -> Unit,
+    // Core command & Macros
+    onCoreCommand: (CoreCommand) -> Unit,
+    macros: List<Macro>,
+    onMacroClick: (Macro) -> Unit,
+    onMacroLongClick: (Macro) -> Unit,
+    onAddMacro: () -> Unit,
+    onTvRemoteAction: (TvRemoteAction) -> Unit
 ) {
-    val pagerState = rememberPagerState(initialPage = 0) { 2 }
+    val pagerState = rememberPagerState(initialPage = 0) { bottomBarItems.size }
     val coroutineScope = rememberCoroutineScope()
     var showConnectionTimeout by remember { mutableStateOf(false) }
 
-    BackHandler(enabled = pagerState.currentPage == 1) {
+    LaunchedEffect(bottomBarItems.size) {
+        if (pagerState.currentPage >= bottomBarItems.size) {
+            pagerState.scrollToPage(0)
+        }
+    }
+
+    BackHandler(enabled = pagerState.currentPage != 0) {
         coroutineScope.launch {
             pagerState.animateScrollToPage(
                 page = 0,
@@ -162,75 +191,151 @@ fun NexusApp(
         }
     }
 
-    Scaffold(
-        containerColor = Color.Transparent,
-        contentColor = MaterialTheme.colorScheme.onBackground,
-        topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
-                    scrolledContainerColor = Color.Transparent
-                ),
-                title = {
-                    Text(
-                        if (pagerState.currentPage == 0) stringResource(R.string.tab_claude)
-                        else stringResource(R.string.home_feature_hub)
-                    )
-                }
-            )
-        }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = innerPadding.calculateTopPadding())
-        ) {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxSize()
-            ) { page ->
-                if (page == 0) {
-                    HomeConnectionPage(
+    Box(modifier = Modifier.fillMaxSize()) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize(),
+            beyondViewportPageCount = (bottomBarItems.size - 1).coerceAtLeast(1)
+        ) { page ->
+            when (bottomBarItems.getOrNull(page)) {
+                BottomBarDestination.HOME -> {
+                    HomeScreen(
                         isConnected = isConnected,
                         connectedDeviceName = connectedDeviceName,
-                        onShowDeviceList = onShowDeviceList
-                    )
-                } else {
-                    val context = LocalContext.current
-                    FeatureHubScreen(
+                        connectingDeviceAddress = connectingDeviceAddress,
+                        inputProfile = inputProfile,
+                        onInputProfileChanged = onInputProfileChanged,
+                        onShowDeviceList = onShowDeviceList,
+                        onDisconnectDevice = onDisconnectDevice,
                         onOpenKeyboard = onOpenKeyboard,
                         onOpenTouchpad = onOpenTouchpad,
                         onOpenGamepad = onOpenGamepad,
-                        onOpenAudioReceiver = { context.startActivity(Intent(context, com.haoze.nexus.ui.audio.AudioReceiverActivity::class.java)) },
-                        onNavigateAgent = { onNavigate(AppPage.AGENT) },
-                        onNavigateTvRemote = { onNavigate(AppPage.TV_REMOTE) },
-                        onNavigateSettings = { onNavigate(AppPage.SETTINGS) },
-                        onNavigateAbout = { onNavigateRoute(com.haoze.nexus.ui.Routes.ABOUT) },
-                        onNavigateSponsor = { onNavigateRoute(com.haoze.nexus.ui.Routes.SPONSOR) },
-                        onNavigateSponsorList = { onNavigateRoute(com.haoze.nexus.ui.Routes.SPONSOR_LIST) }
+                        onOpenTvRemote = {
+                            val tvRemoteIndex = bottomBarItems.indexOf(BottomBarDestination.TV_REMOTE)
+                            if (tvRemoteIndex >= 0) {
+                                coroutineScope.launch { pagerState.animateScrollToPage(tvRemoteIndex) }
+                            } else {
+                                onOpenTvRemote()
+                            }
+                        },
+                        onOpenAudioReceiver = {
+                            val audioIndex = bottomBarItems.indexOf(BottomBarDestination.AUDIO_RECEIVER)
+                            if (audioIndex >= 0) {
+                                coroutineScope.launch { pagerState.animateScrollToPage(audioIndex) }
+                            } else {
+                                onOpenAudioReceiver()
+                            }
+                        },
+                        onOpenAgent = {
+                            val agentIndex = bottomBarItems.indexOf(BottomBarDestination.AGENT)
+                            if (agentIndex >= 0) {
+                                coroutineScope.launch { pagerState.animateScrollToPage(agentIndex) }
+                            } else {
+                                onOpenAgent()
+                            }
+                        },
+                        onOpenSettings = {
+                            val settingsIndex = bottomBarItems.indexOf(BottomBarDestination.SETTINGS)
+                            if (settingsIndex >= 0) {
+                                coroutineScope.launch { pagerState.animateScrollToPage(settingsIndex) }
+                            } else {
+                                onNavigate(AppPage.SETTINGS)
+                            }
+                        },
+                        onOpenBottomBarCustomization = {
+                            onNavigateRoute(com.haoze.nexus.ui.Routes.BOTTOM_BAR_CUSTOMIZATION)
+                        },
+                        onOpenAbout = { onNavigateRoute(com.haoze.nexus.ui.Routes.ABOUT) },
+                        onOpenSponsor = { onNavigateRoute(com.haoze.nexus.ui.Routes.SPONSOR) },
+                        onOpenSponsorList = { onNavigateRoute(com.haoze.nexus.ui.Routes.SPONSOR_LIST) },
+                        onCoreCommand = onCoreCommand,
+                        macros = macros,
+                        onMacroClick = onMacroClick
                     )
                 }
+                BottomBarDestination.AUDIO_RECEIVER -> {
+                    com.haoze.nexus.ui.audio.AudioReceiverScreen(
+                        discovery = audioDiscovery,
+                        connector = audioConnector,
+                        repository = audioRepository,
+                        trustRepository = audioTrustRepository,
+                        selfId = audioSelfId,
+                        selfName = audioSelfName,
+                        receiverRunning = audioReceiverRunning,
+                        onConnect = onAudioConnect,
+                        onDisconnect = onAudioDisconnect,
+                        onBack = {
+                            coroutineScope.launch { pagerState.animateScrollToPage(0) }
+                        },
+                        showBackIcon = false,
+                        contentBottomPadding = 108.dp
+                    )
+                }
+                BottomBarDestination.AGENT -> {
+                    AgentScreen(
+                        isConnected = isConnected,
+                        connectedDeviceName = connectedDeviceName,
+                        macros = macros,
+                        onBack = {
+                            coroutineScope.launch { pagerState.animateScrollToPage(0) }
+                        },
+                        onCoreCommand = onCoreCommand,
+                        onMacroClick = onMacroClick,
+                        onMacroLongClick = onMacroLongClick,
+                        onAddMacro = onAddMacro,
+                        showBackIcon = false,
+                        contentBottomPadding = 108.dp
+                    )
+                }
+                BottomBarDestination.TV_REMOTE -> {
+                    TvRemoteScreen(
+                        enabled = isConnected,
+                        onBack = {
+                            coroutineScope.launch { pagerState.animateScrollToPage(0) }
+                        },
+                        onAction = onTvRemoteAction,
+                        showBackIcon = false,
+                        contentBottomPadding = 108.dp
+                    )
+                }
+                BottomBarDestination.SETTINGS -> {
+                    SettingsScreen(
+                        onBack = {
+                            coroutineScope.launch { pagerState.animateScrollToPage(0) }
+                        },
+                        onNavigateToRoute = onNavigateRoute,
+                        inputProfile = inputProfile,
+                        onInputProfileChanged = { profile ->
+                            onInputProfileChanged(profile)
+                            true
+                        },
+                        showBackIcon = false,
+                        contentBottomPadding = 108.dp
+                    )
+                }
+                null -> Unit
             }
-
-            FloatingNavigationBar(
-                currentPage = pagerState.currentPage,
-                onPageSelected = { targetPage ->
-                    if (pagerState.currentPage != targetPage) {
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(
-                                page = targetPage,
-                                animationSpec = tween(durationMillis = 280)
-                            )
-                        }
-                    }
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .navigationBarsPadding()
-                    .padding(bottom = 16.dp),
-                pagerProgress = { pagerState.currentPage + pagerState.currentPageOffsetFraction }
-            )
         }
+
+        FloatingNavigationBar(
+            selectedPage = pagerState.currentPage,
+            onPageSelected = { targetPage ->
+                if (pagerState.currentPage != targetPage) {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(
+                            page = targetPage,
+                            animationSpec = tween(durationMillis = 280)
+                        )
+                    }
+                }
+            },
+            items = bottomBarItems,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+                .padding(bottom = 16.dp),
+            pagerProgress = { pagerState.currentPage + pagerState.currentPageOffsetFraction }
+        )
     }
 
     if (showDeviceList) {
@@ -488,257 +593,6 @@ fun MacroEditorAlertDialog(macro: Macro?, onDismiss: () -> Unit, onSave: (String
 }
 
 @Composable
-private fun HomeConnectionPage(
-    isConnected: Boolean,
-    connectedDeviceName: String?,
-    onShowDeviceList: () -> Unit
-) {
-    val glowColor by animateColorAsState(
-        targetValue = if (isConnected) {
-            MaterialTheme.colorScheme.primary.copy(alpha = 0.28f)
-        } else {
-            MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
-        },
-        animationSpec = tween(250),
-        label = "BluetoothControlGlowColor"
-    )
-    val haloColor by animateColorAsState(
-        targetValue = if (isConnected) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f) else Color.Transparent,
-        animationSpec = tween(250),
-        label = "BluetoothControlHaloColor"
-    )
-    val containerColor by animateColorAsState(
-        targetValue = if (isConnected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-        animationSpec = tween(250),
-        label = "BluetoothControlContainerColor"
-    )
-    val contentColor by animateColorAsState(
-        targetValue = if (isConnected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
-        animationSpec = tween(250),
-        label = "BluetoothControlContentColor"
-    )
-    val haloSize by animateDpAsState(if (isConnected) 148.dp else 124.dp, tween(250), label = "BluetoothControlHaloSize")
-    val glowSize by animateDpAsState(if (isConnected) 128.dp else 108.dp, tween(250), label = "BluetoothControlGlowSize")
-    val buttonSize by animateDpAsState(if (isConnected) 92.dp else 84.dp, tween(250), label = "BluetoothControlButtonSize")
-    val statusText = stringResource(
-        if (isConnected) R.string.status_connected_label else R.string.status_not_connected
-    )
-    val hintText = if (isConnected) {
-        connectedDeviceName ?: stringResource(R.string.home_connection_connected_hint)
-    } else {
-        stringResource(R.string.home_connection_disconnected_hint)
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 24.dp)
-            .padding(bottom = 88.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .size(156.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(haloSize)
-                    .background(haloColor, CircleShape)
-            )
-            Box(
-                modifier = Modifier
-                    .size(glowSize)
-                    .background(glowColor, CircleShape)
-            )
-            Box(
-                modifier = Modifier
-                    .size(buttonSize)
-                    .background(containerColor, CircleShape)
-                    .clip(CircleShape)
-                    .clickable(onClick = onShowDeviceList),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_connect),
-                    contentDescription = stringResource(
-                        if (isConnected) R.string.home_connection_action_connected
-                        else R.string.home_connection_action_disconnected
-                    ),
-                    tint = contentColor,
-                    modifier = Modifier.size(42.dp)
-                )
-            }
-        }
-        Text(
-            text = statusText,
-            modifier = Modifier.padding(top = 20.dp),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Text(
-            text = hintText,
-            modifier = Modifier.padding(top = 8.dp),
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
-        )
-        HomeDeviceSelector(
-            isConnected = isConnected,
-            connectedDeviceName = connectedDeviceName,
-            onClick = onShowDeviceList,
-            modifier = Modifier.padding(top = 24.dp)
-        )
-    }
-}
-
-@Composable
-private fun HomeDeviceSelector(
-    isConnected: Boolean,
-    connectedDeviceName: String?,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val deviceName = if (isConnected && !connectedDeviceName.isNullOrBlank()) {
-        connectedDeviceName
-    } else {
-        stringResource(R.string.home_select_device)
-    }
-    Box(modifier = modifier.fillMaxWidth()) {
-        OutlinedTextField(
-            value = deviceName,
-            onValueChange = {},
-            readOnly = true,
-            singleLine = true,
-            label = { Text(stringResource(R.string.home_device_selector_label)) },
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = stringResource(R.string.home_connection_action_disconnected)
-                )
-            },
-            shape = SettingsCornerShape,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .clip(SettingsCornerShape)
-                .clickable(onClick = onClick)
-        )
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun FeatureHubScreen(
-    onOpenKeyboard: () -> Unit,
-    onOpenTouchpad: () -> Unit,
-    onOpenGamepad: () -> Unit,
-    onOpenAudioReceiver: () -> Unit,
-    onNavigateAgent: () -> Unit,
-    onNavigateTvRemote: () -> Unit,
-    onNavigateSettings: () -> Unit,
-    onNavigateAbout: () -> Unit,
-    onNavigateSponsor: () -> Unit,
-    onNavigateSponsorList: () -> Unit
-) {
-    val inputItems = listOf(
-        FeatureHubItem(stringResource(R.string.home_keyboard_title), Icons.Default.Keyboard, onOpenKeyboard),
-        FeatureHubItem(stringResource(R.string.home_touchpad_title), Icons.Default.Mouse, onOpenTouchpad),
-        FeatureHubItem(stringResource(R.string.home_gamepad_title), Icons.Default.SportsEsports, onOpenGamepad),
-        FeatureHubItem(stringResource(R.string.home_tvremote_title), Icons.Default.SettingsRemote, onNavigateTvRemote),
-        FeatureHubItem(stringResource(R.string.home_audio_stream_title), Icons.Default.GraphicEq, onOpenAudioReceiver)
-    )
-    val systemItems = listOf(
-        FeatureHubItem(stringResource(R.string.home_agent_title), Icons.Default.Terminal, onNavigateAgent),
-        FeatureHubItem(stringResource(R.string.home_settings_title), Icons.Default.Settings, onNavigateSettings)
-    )
-    val aboutItems = listOf(
-        FeatureHubItem(stringResource(R.string.home_about_title), Icons.Default.Info, onNavigateAbout),
-        FeatureHubItem(stringResource(R.string.home_sponsor_title), Icons.Default.Favorite, onNavigateSponsor),
-        FeatureHubItem(stringResource(R.string.home_sponsor_list_title), Icons.Filled.WorkspacePremium, onNavigateSponsorList)
-    )
-    val categories = listOf(
-        FeatureHubCategory(stringResource(R.string.home_input_controls), inputItems),
-        FeatureHubCategory(stringResource(R.string.home_shortcuts_and_system), systemItems),
-        FeatureHubCategory(stringResource(R.string.home_about_support), aboutItems)
-    )
-
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 24.dp, top = 20.dp, end = 24.dp, bottom = 108.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        categories.forEach { category ->
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Text(
-                    text = category.title,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            items(category.items.size) { index ->
-                val item = category.items[index]
-                Card(
-                    shape = SettingsCornerShape,
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                        contentColor = MaterialTheme.colorScheme.onSurface
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(SettingsCornerShape)
-                        .bouncyCardClickable(
-                            onClick = item.onClick,
-                            onLongClick = item.onLongClick
-                        )
-                        .heightIn(min = 80.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        Icon(
-                            imageVector = item.icon,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text(
-                            text = item.title,
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-private data class FeatureHubItem(
-    val title: String,
-    val icon: ImageVector,
-    val onClick: () -> Unit,
-    val onLongClick: (() -> Unit)? = null
-)
-
-private data class FeatureHubCategory(
-    val title: String,
-    val items: List<FeatureHubItem>
-)
-
-@Composable
 fun AgentScreen(
     isConnected: Boolean,
     connectedDeviceName: String?,
@@ -747,16 +601,20 @@ fun AgentScreen(
     onCoreCommand: (CoreCommand) -> Unit,
     onMacroClick: (Macro) -> Unit,
     onMacroLongClick: (Macro) -> Unit,
-    onAddMacro: () -> Unit
+    onAddMacro: () -> Unit,
+    showBackIcon: Boolean = true,
+    contentBottomPadding: androidx.compose.ui.unit.Dp = 0.dp
 ) {
     SettingsScaffold(
         title = stringResource(R.string.home_agent_title),
-        onBack = onBack
+        onBack = onBack,
+        showBackIcon = showBackIcon
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
+            contentPadding = PaddingValues(bottom = 16.dp + contentBottomPadding),
             verticalArrangement = Arrangement.spacedBy(SettingsSectionSpacing)
         ) {
             item { SettingsGroupTitle(stringResource(R.string.home_connection_status)) }

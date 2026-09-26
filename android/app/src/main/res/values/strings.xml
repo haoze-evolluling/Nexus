@@ -294,4 +294,46 @@
   <string name="lang_system">跟随系统</string>
   <string name="lang_zh">简体中文</string>
   <string name="lang_en">English</string>
+
+  <!-- 首页重构与底栏自定义 -->
+  <string name="tab_home">首页</string>
+  <string name="tab_tv_remote">遥控器</string>
+  <string name="bottom_bar_customization">底栏自定义</string>
+  <string name="bottom_bar_customization_subtitle">自由调整底栏功能项与排列顺序</string>
+  <string name="bottom_bar_customization_desc">底栏按钮数量限制在 2～4 个。您可在此自由添加、移除或调整底栏按钮的显示顺序。</string>
+  <string name="bottom_bar_selected_title">已选底栏按钮</string>
+  <string name="bottom_bar_available_title">可添加的页面</string>
+  <string name="bottom_bar_preview_title">当前底栏预览</string>
+  <string name="bottom_bar_preview_hint">可点击上方底栏图标测试切换效果与高光</string>
+  <string name="bottom_bar_all_added">所有页面均已添加到底栏</string>
+  <string name="bottom_bar_reset">恢复默认</string>
+  <string name="bottom_bar_reset_toast">已恢复默认底栏配置</string>
+  <string name="bottom_bar_min_toast">底栏至少保留 2 个按钮</string>
+  <string name="bottom_bar_max_toast">底栏最多添加 4 个按钮</string>
+  <string name="bottom_bar_move_up">向上移动</string>
+  <string name="bottom_bar_move_down">向下移动</string>
+  <string name="bottom_bar_remove">移除</string>
+  <string name="bottom_bar_add">添加</string>
+  <string name="bottom_bar_item_unit">项</string>
+  <string name="bottom_bar_desc_home">设备连接与外设控制总览</string>
+  <string name="bottom_bar_desc_audio">超低延迟接收电脑音频串流</string>
+  <string name="bottom_bar_desc_agent">终端快捷指令与核心控制命令</string>
+  <string name="bottom_bar_desc_tv_remote">蓝牙 HID 电视与多媒体遥控器</string>
+  <string name="bottom_bar_desc_settings">系统常规偏好与其它高级设置</string>
+  <string name="home_peripherals_title">外设与控制</string>
+  <string name="home_quick_commands_title">快捷指令与终端</string>
+  <string name="home_all_macros">全部宏</string>
+  <string name="home_quick_preferences_title">快捷工具与偏好</string>
+  <string name="home_device_profile_label">设备模式</string>
+  <string name="home_device_connected_desc">蓝牙 HID 连接正常 · 外设随时就绪</string>
+  <string name="home_device_disconnected_desc">轻触快速连接常用设备或扫描新设备</string>
+  <string name="home_quick_reconnect">快速重连</string>
+  <string name="home_tag_keyboard">机械音效</string>
+  <string name="home_tag_touchpad">多指手势</string>
+  <string name="home_tag_gamepad">震动反馈</string>
+  <string name="home_tag_tvremote">多媒体</string>
+  <string name="home_tag_audio">实时串流</string>
+  <string name="home_header_slogan">全能无线外设中枢</string>
+  <string name="home_manage_device">管理</string>
+  <string name="home_disconnect_device">断开</string>
 </resources>

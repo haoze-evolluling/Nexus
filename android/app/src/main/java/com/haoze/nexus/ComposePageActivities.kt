@@ -19,6 +19,7 @@ import com.haoze.nexus.macro.Macro
 import com.haoze.nexus.macro.MacroRepository
 import com.haoze.nexus.ui.Routes
 import com.haoze.nexus.ui.compose.AboutSettingsScreen
+import com.haoze.nexus.ui.compose.BottomBarCustomizationScreen
 import com.haoze.nexus.ui.compose.AgentScreen
 import com.haoze.nexus.ui.compose.CoreCommand
 import com.haoze.nexus.ui.compose.ConnectionSettingsScreen
@@ -239,6 +240,7 @@ class SettingsActivity : ComposePageActivity() {
                 onResetMacros = onResetMacros
             )
             Routes.APPEARANCE_SETTINGS -> AppearanceSettingsScreen(onBack, onNavigate)
+            Routes.BOTTOM_BAR_CUSTOMIZATION -> BottomBarCustomizationScreen(onBack)
             Routes.DAY_NIGHT_MODE -> DayNightModeScreen(onBack)
             Routes.THEME_COLOR_SETTINGS -> ThemeColorSettingsScreen(onBack, onThemeColorStyleChanged)
             Routes.INPUT_SETTINGS -> InputSettingsScreen(onBack)

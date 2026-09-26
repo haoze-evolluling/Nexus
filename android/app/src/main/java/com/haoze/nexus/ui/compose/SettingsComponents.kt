@@ -1,4 +1,4 @@
-﻿package com.haoze.nexus.ui.compose
+package com.haoze.nexus.ui.compose
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -106,6 +106,7 @@ fun SettingsScaffold(
     title: String,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+    showBackIcon: Boolean = true,
     titleTrailing: @Composable RowScope.() -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     belowTopBar: @Composable ColumnScope.() -> Unit = {},
@@ -132,11 +133,13 @@ fun SettingsScaffold(
                         }
                     },
                     navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.back)
-                            )
+                        if (showBackIcon) {
+                            IconButton(onClick = onBack) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = stringResource(R.string.back)
+                                )
+                            }
                         }
                     },
                     actions = actions

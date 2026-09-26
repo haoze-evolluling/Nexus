@@ -1,4 +1,4 @@
-﻿package com.haoze.nexus.ui.compose
+package com.haoze.nexus.ui.compose
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseOut
@@ -18,9 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,6 +27,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -56,7 +54,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -66,17 +66,16 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastCoerceIn
 import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.fastRoundToInt
-import com.haoze.nexus.R
 import com.haoze.nexus.ui.component.liquid.DampedDragAnimation
 import com.haoze.nexus.ui.component.liquid.InnerShadow
 import com.haoze.nexus.ui.component.liquid.InteractiveHighlight
 import com.haoze.nexus.ui.component.liquid.IosIndicatorSpecular
 import com.haoze.nexus.ui.component.liquid.drawSpecularHighlight
 import com.haoze.nexus.ui.component.liquid.innerShadow
+import com.haoze.nexus.ui.component.liquid.rememberDeviceTilt
 import com.haoze.nexus.ui.component.liquid.rememberGravityRotatedHighlight
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.sign
@@ -85,11 +84,12 @@ val LocalFloatingBottomBarTabScale = staticCompositionLocalOf { { 1f } }
 
 @Composable
 fun FloatingNavigationBar(
-    currentPage: Int,
+    selectedPage: Int,
     onPageSelected: (Int) -> Unit,
+    items: List<BottomBarDestination>,
     modifier: Modifier = Modifier,
+    pagerProgress: (() -> Float)? = null,
     isGlassEnabled: Boolean = true,
-    pagerProgress: (() -> Float)? = null
 ) {
     val isInDark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
     val pillShape = remember { CircleShape }
@@ -105,7 +105,15 @@ fun FloatingNavigationBar(
     val density = LocalDensity.current
     val isLtr = LocalLayoutDirection.current == LayoutDirection.Ltr
     val animationScope = rememberCoroutineScope()
-    val tabsCount = 2
+    val tabsCount = items.size.coerceIn(BottomBarDestination.MIN_COUNT, BottomBarDestination.MAX_COUNT)
+
+    val navSectionWidthDp = when (tabsCount) {
+        2 -> 204.dp
+        3 -> 276.dp
+        4 -> 340.dp
+        else -> 204.dp
+    }
+    val barHeightDp = 64.dp
 
     var tabWidthPx by remember { mutableFloatStateOf(0f) }
     var totalWidthPx by remember { mutableFloatStateOf(0f) }
@@ -124,12 +132,10 @@ fun FloatingNavigationBar(
         }
     }
 
-    var currentIndex by remember(currentPage) { mutableIntStateOf(currentPage) }
-
     val dampedDragAnimation = remember(animationScope, tabsCount, density, isLtr) {
         DampedDragAnimation(
             animationScope = animationScope,
-            initialValue = currentPage.toFloat(),
+            initialValue = selectedPage.coerceIn(0, tabsCount - 1).toFloat(),
             valueRange = 0f..(tabsCount - 1).toFloat(),
             visibilityThreshold = 0.001f,
             initialScale = 1f,
@@ -149,18 +155,9 @@ fun FloatingNavigationBar(
                 }
         }
     } else {
-        LaunchedEffect(currentPage) {
+        LaunchedEffect(selectedPage) {
             if (!isUserDragging) {
-                currentIndex = currentPage
-                dampedDragAnimation.animateToValue(currentPage.toFloat())
-            }
-        }
-    }
-
-    LaunchedEffect(dampedDragAnimation) {
-        snapshotFlow { currentIndex }.drop(1).collectLatest { index ->
-            if (!isUserDragging) {
-                dampedDragAnimation.animateToValue(index.toFloat())
+                dampedDragAnimation.animateToValue(selectedPage.coerceIn(0, tabsCount - 1).toFloat())
             }
         }
     }
@@ -177,18 +174,15 @@ fun FloatingNavigationBar(
         )
     }
 
+    val deviceTilt = rememberDeviceTilt()
     val baseHighlight = rememberGravityRotatedHighlight(IosIndicatorSpecular, extraDegrees = -45f)
     val pillHighlight = rememberGravityRotatedHighlight(IosIndicatorSpecular, extraDegrees = 90f)
 
-    val animValue = dampedDragAnimation.value
-    val tab0Weight = (1f - animValue).fastCoerceIn(0f, 1f)
-    val tab1Weight = animValue.fastCoerceIn(0f, 1f)
-
     Box(
         modifier = modifier
-            .width(204.dp)
-            .height(64.dp)
-            .pointerInput(tabWidthPx, totalWidthPx, isLtr) {
+            .width(navSectionWidthDp)
+            .height(barHeightDp)
+            .pointerInput(tabWidthPx, totalWidthPx, isLtr, tabsCount) {
                 awaitEachGesture {
                     val down = awaitFirstDown(requireUnconsumed = false)
                     isUserDragging = true
@@ -235,17 +229,16 @@ fun FloatingNavigationBar(
                             val upX = change.position.x
                             val targetIndex = if (!hasMoved) {
                                 // Tap gesture: pick tab by touch position
-                                if (isLtr) {
-                                    if (upX < totalWidthPx / 2f) 0 else 1
-                                } else {
-                                    if (upX < totalWidthPx / 2f) 1 else 0
-                                }.fastCoerceIn(0, tabsCount - 1)
+                                val contentStartX = with(density) { 4.dp.toPx() }
+                                val contentWidthPx = (totalWidthPx - with(density) { 8.dp.toPx() }).coerceAtLeast(0f)
+                                val relativeX = (upX - contentStartX).coerceIn(0f, contentWidthPx.coerceAtLeast(1f))
+                                val tappedIndex = if (tabWidthPx > 0f) (relativeX / tabWidthPx).toInt() else 0
+                                (if (isLtr) tappedIndex else (tabsCount - 1 - tappedIndex)).fastCoerceIn(0, tabsCount - 1)
                             } else {
                                 // Drag gesture: settle to closest tab
                                 dampedDragAnimation.targetValue.fastRoundToInt().fastCoerceIn(0, tabsCount - 1)
                             }
 
-                            currentIndex = targetIndex
                             dampedDragAnimation.animateToValue(targetIndex.toFloat())
                             onPageSelected(targetIndex)
 
@@ -393,34 +386,58 @@ fun FloatingNavigationBar(
                 .padding(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            FloatingBottomBarTab(
-                weight = tab0Weight,
-                pressProgress = dampedDragAnimation.pressProgress,
-                icon = Icons.Default.Home,
-                label = stringResource(R.string.tab_claude),
-                accentColor = if (isGlassEnabled) MaterialTheme.colorScheme.onPrimaryContainer else accentColor,
-                contentColor = tabContentColor
-            )
-            FloatingBottomBarTab(
-                weight = tab1Weight,
-                pressProgress = dampedDragAnimation.pressProgress,
-                icon = Icons.Default.Apps,
-                label = stringResource(R.string.home_feature_hub),
-                accentColor = if (isGlassEnabled) MaterialTheme.colorScheme.onPrimaryContainer else accentColor,
-                contentColor = tabContentColor
-            )
+            items.forEachIndexed { index, destination ->
+                val tabWeight = (1f - abs(dampedDragAnimation.value - index)).fastCoerceIn(0f, 1f)
+                FloatingBottomBarTab(
+                    index = index,
+                    isSelected = selectedPage == index,
+                    weight = tabWeight,
+                    pressProgress = dampedDragAnimation.pressProgress,
+                    icon = destination.icon,
+                    label = stringResource(destination.tabLabelRes),
+                    accentColor = if (isGlassEnabled) MaterialTheme.colorScheme.onPrimaryContainer else accentColor,
+                    contentColor = tabContentColor,
+                    onSelect = {
+                        if (selectedPage != index) {
+                            dampedDragAnimation.animateToValue(index.toFloat())
+                        }
+                        onPageSelected(index)
+                    }
+                )
+            }
         }
     }
 }
 
 @Composable
+fun FloatingNavigationBar(
+    currentPage: Int,
+    onPageSelected: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    isGlassEnabled: Boolean = true,
+    pagerProgress: (() -> Float)? = null
+) {
+    FloatingNavigationBar(
+        selectedPage = currentPage,
+        onPageSelected = onPageSelected,
+        items = BottomBarDestination.DEFAULT_DESTINATIONS,
+        modifier = modifier,
+        pagerProgress = pagerProgress,
+        isGlassEnabled = isGlassEnabled
+    )
+}
+
+@Composable
 private fun RowScope.FloatingBottomBarTab(
+    index: Int,
+    isSelected: Boolean,
     weight: Float,
     pressProgress: Float,
     icon: ImageVector,
     label: String,
     accentColor: Color,
     contentColor: Color,
+    onSelect: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val dynamicColor = lerp(contentColor, accentColor, weight)
@@ -428,7 +445,11 @@ private fun RowScope.FloatingBottomBarTab(
 
     Column(
         modifier = modifier
-            .semantics { role = Role.Tab }
+            .semantics {
+                role = Role.Tab
+                selected = isSelected
+                onClick(label = label) { onSelect(); true }
+            }
             .fillMaxHeight()
             .weight(1f)
             .graphicsLayer {

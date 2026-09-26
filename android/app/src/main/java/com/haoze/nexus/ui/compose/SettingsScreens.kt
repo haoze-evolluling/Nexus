@@ -1,4 +1,4 @@
-﻿package com.haoze.nexus.ui.compose
+package com.haoze.nexus.ui.compose
 
 import android.content.Context
 import android.content.Intent
@@ -74,7 +74,9 @@ fun SettingsScreen(
     onBooleanSettingChanged: (String, Boolean) -> Unit = { _, _ -> },
     inputProfile: HidProfile = HidProfile.KEYBOARD_MOUSE,
     onInputProfileChanged: (HidProfile) -> Boolean = { true },
-    onResetMacros: () -> Unit = {}
+    onResetMacros: () -> Unit = {},
+    showBackIcon: Boolean = true,
+    contentBottomPadding: androidx.compose.ui.unit.Dp = 0.dp
 ) {
     val context = LocalContext.current
     val prefs = remember { settingsPrefs(context) }
@@ -115,13 +117,14 @@ fun SettingsScreen(
 
     SettingsScaffold(
         title = stringResource(R.string.home_settings_title),
-        onBack = onBack
+        onBack = onBack,
+        showBackIcon = showBackIcon
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            contentPadding = PaddingValues(top = 8.dp, bottom = 32.dp),
+            contentPadding = PaddingValues(top = 8.dp, bottom = 32.dp + contentBottomPadding),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // ==========================================
@@ -164,6 +167,15 @@ fun SettingsScreen(
                             onThemeColorStyleChanged(style)
                         }
                     )
+
+                    if (onNavigateToRoute != null) {
+                        SettingsItemDivider()
+                        SettingsActionItem(
+                            title = stringResource(R.string.bottom_bar_customization),
+                            subtitle = stringResource(R.string.bottom_bar_customization_subtitle),
+                            onClick = { onNavigateToRoute(Routes.BOTTOM_BAR_CUSTOMIZATION) }
+                        )
+                    }
                 }
             }
 
@@ -580,6 +592,18 @@ fun AppearanceSettingsScreen(
                     )
                 }
             }
+            item {
+                SettingsSectionHeader(stringResource(R.string.bottom_bar_customization), icon = Icons.Default.Palette)
+            }
+            item {
+                SettingsCard {
+                    SettingsActionItem(
+                        title = stringResource(R.string.bottom_bar_customization),
+                        subtitle = stringResource(R.string.bottom_bar_customization_subtitle),
+                        onClick = { onNavigateToRoute(Routes.BOTTOM_BAR_CUSTOMIZATION) }
+                    )
+                }
+            }
         }
     }
 }
@@ -850,27 +874,27 @@ fun DataSettingsScreen(
 // ==========================================
 
 @Composable
-private fun settingsPrefs(): SharedPreferences =
+internal fun settingsPrefs(): SharedPreferences =
     LocalContext.current.getSharedPreferences("settings_prefs", Context.MODE_PRIVATE)
 
-private fun settingsPrefs(context: Context): SharedPreferences =
+internal fun settingsPrefs(context: Context): SharedPreferences =
     context.getSharedPreferences("settings_prefs", Context.MODE_PRIVATE)
 
 @Composable
-private fun rememberBooleanSetting(
+internal fun rememberBooleanSetting(
     prefs: SharedPreferences,
     key: String,
     defaultValue: Boolean
 ) = remember(key) { mutableStateOf(prefs.getBoolean(key, defaultValue)) }
 
 @Composable
-private fun rememberIntSetting(
+internal fun rememberIntSetting(
     prefs: SharedPreferences,
     key: String,
     defaultValue: Int
 ) = remember(key) { mutableIntStateOf(prefs.getInt(key, defaultValue)) }
 
-private fun saveBoolean(
+internal fun saveBoolean(
     prefs: SharedPreferences,
     key: String,
     value: Boolean,

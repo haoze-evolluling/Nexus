@@ -210,7 +210,9 @@ fun AudioReceiverScreen(
     receiverRunning: Boolean,
     onConnect: (PcDevice) -> Unit,
     onDisconnect: (PcDevice) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    showBackIcon: Boolean = true,
+    contentBottomPadding: androidx.compose.ui.unit.Dp = 0.dp
 ) {
     val devices by discovery.devices.collectAsState()
     val androidDevices by discovery.androidDevices.collectAsState()
@@ -241,11 +243,13 @@ fun AudioReceiverScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
+                    if (showBackIcon) {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
+                        }
+                        Spacer(Modifier.width(4.dp))
                     }
-                    Spacer(Modifier.width(4.dp))
-                    Column {
+                    Column(modifier = if (!showBackIcon) Modifier.padding(start = 8.dp) else Modifier) {
                         Text(stringResource(R.string.home_audio_stream_title), style = MaterialTheme.typography.titleLarge)
                         Text(
                             when {
@@ -279,12 +283,12 @@ fun AudioReceiverScreen(
                 }
                 val visibleAndroidDevices = androidDevices.filter { it.deviceId != selfId }
                 if (devices.isEmpty() && visibleAndroidDevices.isEmpty()) {
-                    EmptyDevices(Modifier.weight(1f))
+                    EmptyDevices(Modifier.weight(1f).padding(bottom = contentBottomPadding))
                 } else {
                     LazyColumn(
                         Modifier.fillMaxSize().navigationBarsPadding(),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
-                        contentPadding = PaddingValues(bottom = 16.dp),
+                        contentPadding = PaddingValues(bottom = 16.dp + contentBottomPadding),
                     ) {
                         if (devices.isNotEmpty()) item {
                             Row(

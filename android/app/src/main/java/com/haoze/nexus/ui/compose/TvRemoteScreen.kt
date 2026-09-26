@@ -1,4 +1,4 @@
-﻿package com.haoze.nexus.ui.compose
+package com.haoze.nexus.ui.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -56,7 +56,9 @@ import kotlinx.coroutines.launch
 fun TvRemoteScreen(
     enabled: Boolean,
     onBack: () -> Unit,
-    onAction: (TvRemoteAction) -> Unit
+    onAction: (TvRemoteAction) -> Unit,
+    showBackIcon: Boolean = true,
+    contentBottomPadding: androidx.compose.ui.unit.Dp = 0.dp
 ) {
     val colors = rememberTvRemoteColors()
     val scope = rememberCoroutineScope()
@@ -74,13 +76,14 @@ fun TvRemoteScreen(
 
     SettingsScaffold(
         title = stringResource(R.string.home_tvremote_title),
-        onBack = onBack
+        onBack = onBack,
+        showBackIcon = showBackIcon
     ) { innerPadding ->
         Card(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 24.dp),
+                .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 24.dp + contentBottomPadding),
             shape = RoundedCornerShape(28.dp),
             colors = CardDefaults.cardColors(containerColor = Color.Transparent),
             border = androidx.compose.foundation.BorderStroke(1.dp, colors.outlineVariant),

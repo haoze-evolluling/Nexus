@@ -107,4 +107,46 @@
     <string name="lang_system">Follow system</string>
     <string name="lang_zh">简体中文</string>
     <string name="lang_en">English</string>
+
+    <!-- Home refactor & bottom bar customization -->
+    <string name="tab_home">Home</string>
+    <string name="tab_tv_remote">Remote</string>
+    <string name="bottom_bar_customization">Bottom Bar Customization</string>
+    <string name="bottom_bar_customization_subtitle">Customize destinations and display order</string>
+    <string name="bottom_bar_customization_desc">Keep 2 to 4 items on the bottom bar. Freely add, remove, or reorder them.</string>
+    <string name="bottom_bar_selected_title">Selected Items</string>
+    <string name="bottom_bar_available_title">Available Pages</string>
+    <string name="bottom_bar_preview_title">Bottom Bar Preview</string>
+    <string name="bottom_bar_preview_hint">Tap tabs in the preview above to test transitions and highlights</string>
+    <string name="bottom_bar_all_added">All available pages are on the bottom bar</string>
+    <string name="bottom_bar_reset">Reset</string>
+    <string name="bottom_bar_reset_toast">Reset to default bottom bar configuration</string>
+    <string name="bottom_bar_min_toast">Keep at least 2 items on the bottom bar</string>
+    <string name="bottom_bar_max_toast">At most 4 items can be placed on the bottom bar</string>
+    <string name="bottom_bar_move_up">Move Up</string>
+    <string name="bottom_bar_move_down">Move Down</string>
+    <string name="bottom_bar_remove">Remove</string>
+    <string name="bottom_bar_add">Add</string>
+    <string name="bottom_bar_item_unit">items</string>
+    <string name="bottom_bar_desc_home">Connection status &amp; peripherals overview</string>
+    <string name="bottom_bar_desc_audio">Low-latency PC audio receiver</string>
+    <string name="bottom_bar_desc_agent">Terminal quick commands and macros</string>
+    <string name="bottom_bar_desc_tv_remote">Bluetooth HID TV &amp; multimedia remote</string>
+    <string name="bottom_bar_desc_settings">Preferences, touch, feedback &amp; appearance</string>
+    <string name="home_peripherals_title">Peripherals &amp; Controls</string>
+    <string name="home_quick_commands_title">Quick Commands &amp; Terminal</string>
+    <string name="home_all_macros">All Macros</string>
+    <string name="home_quick_preferences_title">Preferences &amp; Tools</string>
+    <string name="home_device_profile_label">Device Mode</string>
+    <string name="home_device_connected_desc">Bluetooth HID connected · Peripherals ready</string>
+    <string name="home_device_disconnected_desc">Tap to connect recent devices or scan new</string>
+    <string name="home_quick_reconnect">Reconnect</string>
+    <string name="home_tag_keyboard">Mechanical Sound</string>
+    <string name="home_tag_touchpad">Multi-touch</string>
+    <string name="home_tag_gamepad">Haptic Rumble</string>
+    <string name="home_tag_tvremote">Multimedia</string>
+    <string name="home_tag_audio">Low Latency</string>
+    <string name="home_header_slogan">All-in-one Wireless Peripheral Companion</string>
+    <string name="home_manage_device">Manage</string>
+    <string name="home_disconnect_device">Disconnect</string>
 </resources>
