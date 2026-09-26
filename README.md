@@ -204,7 +204,7 @@ To build both the signed Android APK and the Windows desktop binaries into a sin
 ```
 
 Once completed, all artifacts will be copied automatically to the `output/` directory:
-- `Nexus-debug-v1.0.3.apk` (and `Nexus-debug.apk`): Android package signed with release keystore.
+- `Nexus-debug-v1.1.0.apk` (and `Nexus-debug.apk`): Android package signed with release keystore.
 - `Nexus.exe`: Standalone portable Windows executable.
 - `Nexus-amd64-installer.exe`: Windows desktop setup installer.
 
