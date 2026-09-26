@@ -1,4 +1,4 @@
-﻿package com.haoze.nexus.bluetooth
+package com.haoze.nexus.bluetooth
 
 /**
  * Inline class wrapping a 16-byte HID gamepad report.
@@ -11,9 +11,9 @@
  * [4..5]   X  - 左摇杆 X
  * [6..7]   Y  - 左摇杆 Y
  * [8..9]   Z  - 右摇杆 X
- * [10..11] Rz - 右摇杆 Y
- * [12..13] Rx - 左扳机 LT
- * [14..15] Ry - 右扳机 RT
+ * [10..11] Rx - 右摇杆 Y
+ * [12..13] Ry - 左扳机 LT
+ * [14..15] Rz - 右扳机 RT
  * ```
  * 摇杆为无符号 16 位（0..65535，32768 = 中位），扳机为 0（松开）..65535（完全按下）。
  * Report ID = 4（1 = 键盘，2 = 鼠标，3 = 消费者控制）。
@@ -61,17 +61,17 @@ value class GamepadReport(
         get() = readAxis(8)
         set(value) { writeAxis(8, value) }
 
-    /** 右摇杆 Y → Usage(Rz)。 */
+    /** 右摇杆 Y → Usage(Rx)。 */
     var rightY: Int
         get() = readAxis(10)
         set(value) { writeAxis(10, value) }
 
-    /** 左扳机 LT → Usage(Rx)，0 = 松开。 */
+    /** 左扳机 LT → Usage(Ry)，0 = 松开。 */
     var leftTrigger: Int
         get() = readAxis(12)
         set(value) { writeAxis(12, value) }
 
-    /** 右扳机 RT → Usage(Ry)，0 = 松开。 */
+    /** 右扳机 RT → Usage(Rz)，0 = 松开。 */
     var rightTrigger: Int
         get() = readAxis(14)
         set(value) { writeAxis(14, value) }

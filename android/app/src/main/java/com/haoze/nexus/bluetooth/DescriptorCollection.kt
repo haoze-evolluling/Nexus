@@ -1,4 +1,4 @@
-﻿package com.haoze.nexus.bluetooth
+package com.haoze.nexus.bluetooth
 
 /**
  * HID 报告描述符集合。
@@ -141,16 +141,12 @@ object DescriptorCollection {
 
     // ---- 游戏手柄 TLC（Report ID 4）----
     //
-    // 采用与 Xbox 360 / DualShock 4 一致的布局，这是 DirectInput、SDL、
-    // 浏览器 Gamepad API 以及绝大多数 PC 游戏唯一可靠的识别方式：
+    // 采用通用 6 轴标准布局（DirectInput、SDL、浏览器 Gamepad API、Android）：
     //   - Usage(Gamepad) 顶层集合
     //   - 16 个数字按键
     //   - Hat Switch（十字键，0..8 + Null State，带物理量 0..315 度）
-    //   - 4 个主轴 X / Y（左摇杆）、Z / Rz（右摇杆）
-    //   - 2 个模拟扳机 Rx / Ry（LT / RT）
-    //
-    // 旧版用 X / Y / Rx / Ry 表示双摇杆。DirectInput 与主流游戏只读 X/Y/Z/Rz，
-    // Rx/Ry 被当成第 5/6 轴而忽略，直接导致"摇杆没反应 / 不被当成完整手柄"。
+    //   - 4 个主轴 X / Y（左摇杆）、Z / Rx（右摇杆，严格占据 Axis 0..3）
+    //   - 2 个模拟扳机 Ry / Rz（LT / RT，分别占据 Axis 4..5）
     private val GAMEPAD_TLC = descriptor(
         0x05, 0x01,                    // Usage Page (Generic Desktop)
         0x09, 0x05,                    // Usage (Gamepad)
@@ -183,21 +179,21 @@ object DescriptorCollection {
         0x95, 0x01,                    //         Report Count (1)
         0x81, 0x01,                    //         Input (Constant) - 填充位
 
-        // 4 个主轴：X / Y = 左摇杆，Z / Rz = 右摇杆（8 字节）
+        // 4 个主轴：X / Y = 左摇杆，Z / Rx = 右摇杆（8 字节）
         0x05, 0x01,                    //     Usage Page (Generic Desktop)
         0x09, 0x30,                    //         Usage (X)  - 左摇杆 X
         0x09, 0x31,                    //         Usage (Y)  - 左摇杆 Y
         0x09, 0x32,                    //         Usage (Z)  - 右摇杆 X
-        0x09, 0x35,                    //         Usage (Rz) - 右摇杆 Y
+        0x09, 0x33,                    //         Usage (Rx) - 右摇杆 Y
         0x15, 0x00,                    //         Logical Minimum (0)
         0x27, 0xFF, 0xFF, 0x00, 0x00,  //         Logical Maximum (65535)
         0x75, 0x10,                    //         Report Size (16)
         0x95, 0x04,                    //         Report Count (4)
         0x81, 0x02,                    //         Input (Data, Variable, Absolute)
 
-        // 2 个模拟扳机：Rx = LT，Ry = RT（4 字节）
-        0x09, 0x33,                    //         Usage (Rx) - 左扳机
-        0x09, 0x34,                    //         Usage (Ry) - 右扳机
+        // 2 个模拟扳机：Ry = LT，Rz = RT（4 字节）
+        0x09, 0x34,                    //         Usage (Ry) - 左扳机
+        0x09, 0x35,                    //         Usage (Rz) - 右扳机
         0x15, 0x00,                    //         Logical Minimum (0)
         0x27, 0xFF, 0xFF, 0x00, 0x00,  //         Logical Maximum (65535)
         0x75, 0x10,                    //         Report Size (16)

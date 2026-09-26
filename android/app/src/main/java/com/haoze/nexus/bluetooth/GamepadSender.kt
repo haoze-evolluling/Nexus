@@ -1,4 +1,4 @@
-﻿package com.haoze.nexus.bluetooth
+package com.haoze.nexus.bluetooth
 
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothHidDevice
@@ -8,7 +8,7 @@ import android.util.Log
  * Sends HID gamepad reports via Bluetooth.
  * Shares the same hidDevice connection as KeyboardSender.
  * Report layout matches the gamepad descriptor (Report ID 4):
- * 16 buttons + 1-byte Hat switch + 4 unsigned 16-bit axes (X, Y, Z, Rz) + 2 triggers (Rx, Ry).
+ * 16 buttons + 1-byte Hat switch + 4 unsigned 16-bit axes (X, Y, Z, Rx) + 2 triggers (Ry, Rz).
  */
 class GamepadSender(
     val hidDevice: BluetoothHidDevice,
@@ -45,7 +45,7 @@ class GamepadSender(
         report.rightX = axisToUnsigned(rightXFloat)
         report.rightY = axisToUnsigned(rightYFloat)
 
-        // UI 上 LT / RT 是数字按钮（bit 8 / 9），但描述符同时暴露了 Rx / Ry 模拟扳机轴。
+        // UI 上 LT / RT 是数字按钮（bit 8 / 9），但描述符同时暴露了 Ry / Rz 模拟扳机轴。
         // 把按钮态同步到扳机轴，DirectInput / SDL / 浏览器 Gamepad API
         // 才能看到完整的 6 轴 + POV，否则会被当成"轴不全"的残缺手柄而拒绝识别。
         report.leftTrigger = if (isPressed(buttonMask, GamepadReport.BUTTON_LT)) GamepadReport.TRIGGER_MAX else GamepadReport.TRIGGER_RELEASED
