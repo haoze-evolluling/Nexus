@@ -148,12 +148,6 @@ class HidConnectionCoordinator(
             return
         }
 
-        try {
-            hd.unregisterApp()
-        } catch (e: Exception) {
-            Log.w(TAG, "Failed to unregister stale app: ${e.message}")
-        }
-
         val appName = context.getString(R.string.app_name)
         val sdpSettings = activeProfile.buildSdpSettings(appName)
         Log.d(TAG, "Registering HID app as ${activeProfile.name} (descriptor ${sdpSettings.descriptors.size} bytes)")
@@ -162,10 +156,21 @@ class HidConnectionCoordinator(
         val callback = createHidCallback()
 
         state = HidState.Registering
-        val registerStarted = hd.registerApp(sdpSettings, null, null, executor, callback)
+        val registerStarted = try {
+            hd.registerApp(sdpSettings, null, null, executor, callback)
+        } catch (e: Exception) {
+            Log.w(TAG, "Exception during registerApp: ${e.message}")
+            false
+        }
         Log.d(TAG, "HID app registration started: $registerStarted")
         if (!registerStarted) {
             state = HidState.Unregistered
+            Log.w(TAG, "HID app registration failed to start, unregistering stale app before retry")
+            try {
+                hd.unregisterApp()
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to unregister stale app: ${e.message}")
+            }
             scheduleRegistrationRetry()
         }
     }
@@ -191,8 +196,12 @@ class HidConnectionCoordinator(
                         }
                     }
                 } else {
+                    val wasRegistering = state is HidState.Registering
                     state = HidState.Unregistered
-                    scheduleRegistrationRetry()
+                    eventManager.notifyRegistrationStateChanged(false)
+                    if (wasRegistering) {
+                        scheduleRegistrationRetry()
+                    }
                 }
             }
 
@@ -268,7 +277,10 @@ class HidConnectionCoordinator(
         reconnectManager.scheduleRegistrationRetry(
             handler = mainHandler,
             onRetry = { registerHidDevice() },
-            onExhausted = { eventManager.notifyRegistrationStateChanged(false) }
+            onExhausted = {
+                eventManager.notifyRegistrationStateChanged(false)
+                eventManager.notifyRegistrationFailed()
+            }
         )
     }
 

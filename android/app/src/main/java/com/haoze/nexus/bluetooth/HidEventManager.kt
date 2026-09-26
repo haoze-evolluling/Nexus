@@ -9,6 +9,8 @@ import java.util.concurrent.CopyOnWriteArraySet
 class HidEventManager {
     private val connectionStateListeners = CopyOnWriteArraySet<(Boolean, String?) -> Unit>()
     private val registrationStateListeners = CopyOnWriteArraySet<(Boolean) -> Unit>()
+    private val hidSupportedListeners = CopyOnWriteArraySet<(Boolean) -> Unit>()
+    private val registrationFailedListeners = CopyOnWriteArraySet<() -> Unit>()
     private val sendErrorListeners = CopyOnWriteArraySet<(String) -> Unit>()
     private val profileListeners = CopyOnWriteArraySet<(HidProfile) -> Unit>()
 
@@ -26,6 +28,22 @@ class HidEventManager {
 
     fun removeOnRegistrationStateChangedListener(listener: (Boolean) -> Unit) {
         registrationStateListeners.remove(listener)
+    }
+
+    fun addOnHidSupportedListener(listener: (Boolean) -> Unit) {
+        hidSupportedListeners.add(listener)
+    }
+
+    fun removeOnHidSupportedListener(listener: (Boolean) -> Unit) {
+        hidSupportedListeners.remove(listener)
+    }
+
+    fun addOnRegistrationFailedListener(listener: () -> Unit) {
+        registrationFailedListeners.add(listener)
+    }
+
+    fun removeOnRegistrationFailedListener(listener: () -> Unit) {
+        registrationFailedListeners.remove(listener)
     }
 
     fun addOnSendErrorListener(listener: (String) -> Unit) {
@@ -52,6 +70,14 @@ class HidEventManager {
         registrationStateListeners.forEach { it(isRegistered) }
     }
 
+    fun notifyHidSupported(isSupported: Boolean) {
+        hidSupportedListeners.forEach { it(isSupported) }
+    }
+
+    fun notifyRegistrationFailed() {
+        registrationFailedListeners.forEach { it() }
+    }
+
     fun notifySendError(message: String) {
         sendErrorListeners.forEach { it(message) }
     }
@@ -63,6 +89,8 @@ class HidEventManager {
     fun clear() {
         connectionStateListeners.clear()
         registrationStateListeners.clear()
+        hidSupportedListeners.clear()
+        registrationFailedListeners.clear()
         sendErrorListeners.clear()
         profileListeners.clear()
     }

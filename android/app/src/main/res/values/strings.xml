@@ -35,6 +35,7 @@
   <string name="dialog_delete_macro_message">确定要删除这个宏吗？</string>
   <!-- Toast messages -->
   <string name="toast_bluetooth_not_supported">此设备不支持蓝牙 HID</string>
+  <string name="toast_hid_registration_failed">蓝牙 HID 注册失败，请尝试重启蓝牙</string>
   <string name="toast_permission_denied">蓝牙权限被拒绝</string>
   <string name="toast_macro_added">宏已添加</string>
   <string name="toast_macro_updated">宏已更新</string>

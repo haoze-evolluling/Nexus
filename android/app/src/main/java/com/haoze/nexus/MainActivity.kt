@@ -278,9 +278,15 @@ class MainActivity : AppLocalizedActivity() {
             connectedDeviceNameState = it
         }
 
-        bluetoothViewModel.registrationState.observe(this) { isRegistered ->
-            if (!isRegistered) {
+        bluetoothViewModel.hidSupported.observe(this) { isSupported ->
+            if (!isSupported) {
                 Toast.makeText(this, R.string.toast_bluetooth_not_supported, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        bluetoothViewModel.registrationFailed.observe(this) { failed ->
+            if (failed) {
+                Toast.makeText(this, R.string.toast_hid_registration_failed, Toast.LENGTH_SHORT).show()
             }
         }
 

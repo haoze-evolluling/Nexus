@@ -31,6 +31,7 @@
     <string name="dialog_delete_macro">Delete Macro</string>
     <string name="dialog_delete_macro_message">Are you sure you want to delete this macro?</string>
     <string name="toast_bluetooth_not_supported">This device does not support Bluetooth HID</string>
+    <string name="toast_hid_registration_failed">Bluetooth HID registration failed, please try restarting Bluetooth</string>
     <string name="toast_permission_denied">Bluetooth permission denied</string>
     <string name="toast_macro_added">Macro added</string>
     <string name="toast_macro_updated">Macro updated</string>

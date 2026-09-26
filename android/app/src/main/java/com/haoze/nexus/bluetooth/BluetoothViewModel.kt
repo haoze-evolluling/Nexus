@@ -1,4 +1,4 @@
-﻿package com.haoze.nexus.bluetooth
+package com.haoze.nexus.bluetooth
 
 import android.app.Application
 import android.content.ComponentName
@@ -43,6 +43,12 @@ class BluetoothViewModel(application: Application) : AndroidViewModel(applicatio
     private val _registrationState = MutableLiveData(true)
     val registrationState: LiveData<Boolean> = _registrationState
 
+    private val _hidSupported = MutableLiveData(true)
+    val hidSupported: LiveData<Boolean> = _hidSupported
+
+    private val _registrationFailed = MutableLiveData(false)
+    val registrationFailed: LiveData<Boolean> = _registrationFailed
+
     private val _inputProfile = MutableLiveData(HidProfile.DEFAULT)
     val inputProfile: LiveData<HidProfile> = _inputProfile
 
@@ -55,6 +61,8 @@ class BluetoothViewModel(application: Application) : AndroidViewModel(applicatio
     private var isBound = false
     private val connectionStateListener: (Boolean, String?) -> Unit = ::updateConnectionState
     private val registrationStateListener: (Boolean) -> Unit = { _registrationState.postValue(it) }
+    private val hidSupportedListener: (Boolean) -> Unit = { _hidSupported.postValue(it) }
+    private val registrationFailedListener: () -> Unit = { _registrationFailed.postValue(true) }
     private val sendErrorListener: (String) -> Unit = { _sendError.postValue(it) }
     private val profileListener: (HidProfile) -> Unit = { _inputProfile.postValue(it) }
 
@@ -64,9 +72,9 @@ class BluetoothViewModel(application: Application) : AndroidViewModel(applicatio
             hidService = binder.getService()
             isBound = true
             setupServiceCallbacks()
-            // Sync connection state only; registration state will be driven
-            // by the Service callback once registerHidDevice() completes.
             val svc = hidService ?: return
+            _hidSupported.postValue(svc.isHidSupported())
+            _registrationState.postValue(svc.isRegistered())
             _inputProfile.postValue(svc.getInputProfile())
             updateConnectionState(svc.isConnected(), svc.getConnectedDeviceName())
         }
@@ -96,6 +104,8 @@ class BluetoothViewModel(application: Application) : AndroidViewModel(applicatio
     private fun setupServiceCallbacks() {
         hidService?.addOnConnectionStateChangedListener(connectionStateListener)
         hidService?.addOnRegistrationStateChangedListener(registrationStateListener)
+        hidService?.addOnHidSupportedListener(hidSupportedListener)
+        hidService?.addOnRegistrationFailedListener(registrationFailedListener)
         hidService?.addOnSendErrorListener(sendErrorListener)
         hidService?.addOnProfileChangedListener(profileListener)
     }
@@ -164,6 +174,8 @@ class BluetoothViewModel(application: Application) : AndroidViewModel(applicatio
         super.onCleared()
         hidService?.removeOnConnectionStateChangedListener(connectionStateListener)
         hidService?.removeOnRegistrationStateChangedListener(registrationStateListener)
+        hidService?.removeOnHidSupportedListener(hidSupportedListener)
+        hidService?.removeOnRegistrationFailedListener(registrationFailedListener)
         hidService?.removeOnSendErrorListener(sendErrorListener)
         hidService?.removeOnProfileChangedListener(profileListener)
         if (isBound) {
