@@ -408,4 +408,22 @@
     <string name="sponsor_list_banner_text">Thank you to every friend supporting the Nexus project! Sorted by newest first by default; every contribution is deeply appreciated regardless of amount.</string>
     <string name="sponsor_list_empty">No sponsors yet. We look forward to seeing your name here!</string>
     <string name="sponsor_list_avatar_cd">Member Avatar</string>
+
+    <!-- Crash Logs -->
+    <string name="crash_section_title">Crash Logs</string>
+    <string name="crash_export_title">Export Crash Logs</string>
+    <string name="crash_export_subtitle_count">%1$d crash log(s) recorded, tap to export</string>
+    <string name="crash_export_subtitle_empty">No crash records</string>
+    <string name="crash_export_no_logs">No crash logs currently available</string>
+    <string name="crash_export_no_content">Crash log content is empty</string>
+    <string name="crash_export_open_error">Unable to open export target file</string>
+    <string name="crash_export_success">Crash logs exported successfully</string>
+    <string name="crash_export_failed">Export failed: %1$s</string>
+    <string name="crash_clear_title">Clear Crash Logs</string>
+    <string name="crash_clear_subtitle">Delete all locally recorded crash files</string>
+    <string name="crash_clear_dialog_title">Clear Crash Logs</string>
+    <string name="crash_clear_dialog_message">Are you sure you want to clear all recorded crash logs?</string>
+    <string name="crash_clear_success">Crash logs cleared</string>
+    <string name="crash_section_info">Diagnostic details and key logs are automatically saved locally upon uncaught exceptions. Export them to share feedback with developers.</string>
+    <string name="crash_auto_export_notice">The app experienced consecutive abnormal exits. Crash logs have been automatically backed up to Downloads.</string>
 </resources>

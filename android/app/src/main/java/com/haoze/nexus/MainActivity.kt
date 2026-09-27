@@ -106,6 +106,10 @@ class MainActivity : AppLocalizedActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        if (com.haoze.nexus.crash.CrashLogManager.consumePendingAutoExportNotice(this)) {
+            Toast.makeText(this, R.string.crash_auto_export_notice, Toast.LENGTH_LONG).show()
+        }
+
         bottomBarItemsState = BottomBarPreferences.getBottomBarDestinations(this)
         macrosState = macroRepository.getAllMacros()
 

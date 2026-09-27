@@ -459,4 +459,22 @@
   <string name="sponsor_list_banner_text">感谢每一位支持 Nexus 项目的朋友！默认按时间倒序排列，可通过右上角按钮切换为正序；金额无论多少，每一份心意都同样珍贵。</string>
   <string name="sponsor_list_empty">暂时还没有赞助者记录，期待你的名字出现在这里！</string>
   <string name="sponsor_list_avatar_cd">成员头像</string>
+
+  <!-- 崩溃日志 -->
+  <string name="crash_section_title">崩溃日志</string>
+  <string name="crash_export_title">导出崩溃日志</string>
+  <string name="crash_export_subtitle_count">已记录 %1$d 份崩溃日志，点击导出文件</string>
+  <string name="crash_export_subtitle_empty">当前无崩溃记录</string>
+  <string name="crash_export_no_logs">当前暂无崩溃日志</string>
+  <string name="crash_export_no_content">当前无崩溃日志内容</string>
+  <string name="crash_export_open_error">无法打开导出文件</string>
+  <string name="crash_export_success">崩溃日志已导出</string>
+  <string name="crash_export_failed">导出失败：%1$s</string>
+  <string name="crash_clear_title">清空崩溃日志</string>
+  <string name="crash_clear_subtitle">删除本地所有已记录的崩溃文件</string>
+  <string name="crash_clear_dialog_title">清空崩溃日志</string>
+  <string name="crash_clear_dialog_message">确认清空所有已保存的崩溃日志吗？</string>
+  <string name="crash_clear_success">已清空崩溃日志</string>
+  <string name="crash_section_info">发生未捕获异常时自动保存诊断信息与关键日志，仅保存在设备本地，导出后可反馈给开发者。</string>
+  <string name="crash_auto_export_notice">软件连续异常退出，崩溃日志已自动备份至系统“下载”目录</string>
 </resources>

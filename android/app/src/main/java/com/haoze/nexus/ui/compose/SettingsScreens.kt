@@ -29,6 +29,7 @@ import com.haoze.nexus.ui.Routes
 import com.haoze.nexus.ui.compose.settings.AboutSettingsCard
 import com.haoze.nexus.ui.compose.settings.AppearanceSettingsCard
 import com.haoze.nexus.ui.compose.settings.ConnectionSettingsCard
+import com.haoze.nexus.ui.compose.settings.CrashLogSettingsCard
 import com.haoze.nexus.ui.compose.settings.DataSettingsCard
 import com.haoze.nexus.ui.compose.settings.FeedbackSettingsCard
 import com.haoze.nexus.ui.compose.settings.InputSettingsCard
@@ -234,6 +235,9 @@ fun SettingsScreen(
                 DataSettingsCard(
                     onResetMacrosClick = { showResetMacrosConfirm = true }
                 )
+            }
+            item {
+                CrashLogSettingsCard()
             }
 
             // ==========================================

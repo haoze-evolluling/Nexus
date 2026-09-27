@@ -18,6 +18,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.haoze.nexus.R
 
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import com.haoze.nexus.ui.compose.settings.CrashLogSettingsCard
+
 // ==========================================
 // 数据与存储设置界面
 // ==========================================
@@ -48,6 +52,10 @@ fun DataSettingsScreen(
                     onClick = { showConfirm = true }
                 )
             }
+
+            Spacer(Modifier.height(16.dp))
+
+            CrashLogSettingsCard()
         }
     }
 
