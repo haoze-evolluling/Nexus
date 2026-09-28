@@ -74,7 +74,11 @@ class AudioReceiverService : Service() {
             notificationManager.createForegroundNotification(null)
         )
         val initialSettings = runBlocking { SettingsRepository(this@AudioReceiverService).settings.first() }
-        nsdRegistrar.register(initialSettings)
+        try {
+            nsdRegistrar.register(initialSettings)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to register NSD service: ${e.message}", e)
+        }
 
         if (worker?.isAlive != true) {
             worker = thread(name = "nexus-udp") { receiveLoop() }

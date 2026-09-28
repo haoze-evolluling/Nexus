@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.haoze.nexus.R
 import com.haoze.nexus.audio.ActivePc
+import com.haoze.nexus.audio.AudioPermissions
 import com.haoze.nexus.audio.AudioReceiverService
 import com.haoze.nexus.audio.ConnectionBus
 import com.haoze.nexus.audio.ConnectionEvent
@@ -34,7 +35,12 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class AudioReceiverActivity : com.haoze.nexus.AppLocalizedActivity() {
-    private val notificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { startReceiver() }
+    private val audioPermissionsLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) {
+        startReceiver()
+        discovery.start()
+    }
     private val discovery by lazy { PcDiscovery(this) }
     private val connector = PcConnector()
     private val repository by lazy { SettingsRepository(applicationContext) }
@@ -77,8 +83,9 @@ class AudioReceiverActivity : com.haoze.nexus.AppLocalizedActivity() {
     }
 
     private fun ensureReceiverRunning() {
-        if (Build.VERSION.SDK_INT >= 33 && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        val missing = AudioPermissions.getMissingAudioPermissions(this)
+        if (missing.isNotEmpty()) {
+            audioPermissionsLauncher.launch(missing)
             return
         }
         startReceiver()

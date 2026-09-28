@@ -59,7 +59,15 @@ class AudioNsdRegistrar(private val context: Context) {
             }
         }
 
-        nsd?.registerService(info, NsdManager.PROTOCOL_DNS_SD, registration)
+        try {
+            nsd?.registerService(info, NsdManager.PROTOCOL_DNS_SD, registration)
+        } catch (e: SecurityException) {
+            Log.e(TAG, "SecurityException registering NSD service (missing local network permission?): ${e.message}", e)
+            registration = null
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to register NSD service: ${e.message}", e)
+            registration = null
+        }
     }
 
     fun unregister() {

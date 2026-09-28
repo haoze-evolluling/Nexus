@@ -75,7 +75,15 @@ class PcDiscovery(context: Context) {
             }
         }
         listener = discoveryListener
-        nsd.discoverServices(SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, discoveryListener)
+        try {
+            nsd.discoverServices(SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, discoveryListener)
+        } catch (e: SecurityException) {
+            Log.e(TAG, "SecurityException starting service discovery (missing local network permission?): ${e.message}", e)
+            listener = null
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start service discovery: ${e.message}", e)
+            listener = null
+        }
     }
 
     fun stop() {
@@ -103,16 +111,21 @@ class PcDiscovery(context: Context) {
                 resolveQueue.removeFirst()
             }
             val latch = java.util.concurrent.CountDownLatch(1)
-            nsd.resolveService(next, object : NsdManager.ResolveListener {
-                override fun onResolveFailed(info: NsdServiceInfo, errorCode: Int) {
-                    Log.w(TAG, "resolve failed for ${info.serviceName}: $errorCode")
-                    latch.countDown()
-                }
-                override fun onServiceResolved(info: NsdServiceInfo) {
-                    onPcResolved(info)
-                    latch.countDown()
-                }
-            })
+            try {
+                nsd.resolveService(next, object : NsdManager.ResolveListener {
+                    override fun onResolveFailed(info: NsdServiceInfo, errorCode: Int) {
+                        Log.w(TAG, "resolve failed for ${info.serviceName}: $errorCode")
+                        latch.countDown()
+                    }
+                    override fun onServiceResolved(info: NsdServiceInfo) {
+                        onPcResolved(info)
+                        latch.countDown()
+                    }
+                })
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to resolve service ${next.serviceName}: ${e.message}", e)
+                latch.countDown()
+            }
             latch.await()
         }
     }

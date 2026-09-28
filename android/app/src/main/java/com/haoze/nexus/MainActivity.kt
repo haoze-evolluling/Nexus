@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.haoze.nexus.audio.ActivePc
+import com.haoze.nexus.audio.AudioPermissions
 import com.haoze.nexus.audio.AudioReceiverService
 import com.haoze.nexus.audio.ConnectionBus
 import com.haoze.nexus.audio.ConnectionEvent
@@ -66,8 +67,13 @@ class MainActivity : AppLocalizedActivity() {
     private var bottomBarItemsState by mutableStateOf<List<BottomBarDestination>>(BottomBarDestination.DEFAULT_DESTINATIONS)
 
     // Audio receiver state
-    private val audioNotificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+    private val audioPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) {
         startAudioReceiver()
+        if (bottomBarItemsState.contains(BottomBarDestination.AUDIO_RECEIVER)) {
+            audioDiscovery.start()
+        }
     }
     private val audioDiscovery by lazy { PcDiscovery(this) }
     private val audioConnector = PcConnector()
@@ -382,8 +388,9 @@ class MainActivity : AppLocalizedActivity() {
 
     // Audio receiver lifecycle & connection
     private fun ensureAudioReceiverRunning() {
-        if (Build.VERSION.SDK_INT >= 33 && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            audioNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        val missing = AudioPermissions.getMissingAudioPermissions(this)
+        if (missing.isNotEmpty()) {
+            audioPermissionLauncher.launch(missing)
             return
         }
         startAudioReceiver()
