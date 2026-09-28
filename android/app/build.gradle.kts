@@ -45,8 +45,8 @@ android {
         applicationId = "com.haoze.nexus"
         minSdk = 28
         targetSdk = 37
-        versionCode = 6
-        versionName = "1.1.1"
+        versionCode = 7
+        versionName = "1.1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
