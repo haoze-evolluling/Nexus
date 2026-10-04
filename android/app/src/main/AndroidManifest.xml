@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Bluetooth permissions -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- 游戏手柄页 triggerVibration 使用 Vibrator 服务（Bluke 原版同样声明了此权限） -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <!-- Android 17 (API 37) Local network discovery & communication permission -->
+    <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
+
+    <uses-feature android:name="android.hardware.bluetooth" android:required="true" />
+    <uses-feature android:name="android.hardware.sensor.gyroscope" android:required="false" />
+
+    <application
+        android:name=".NexusApplication"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:localeConfig="@xml/locales_config"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Nexus">
+
+        <!-- Main activity: launcher entry, keyboard UI -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|uiMode"
+            android:windowLayoutInDisplayCutoutMode="shortEdges"
+            android:theme="@style/Theme.Nexus.Splash">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".KeyboardActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize|uiMode"
+            android:windowLayoutInDisplayCutoutMode="shortEdges" />
+
+        <activity
+            android:name=".TouchpadActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize|uiMode"
+            android:windowLayoutInDisplayCutoutMode="shortEdges" />
+
+        <activity
+            android:name=".GamepadActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize|uiMode"
+            android:windowLayoutInDisplayCutoutMode="shortEdges" />
+
+        <activity android:name=".TvRemoteActivity" android:screenOrientation="portrait" />
+        <activity android:name=".AgentActivity" android:screenOrientation="portrait" />
+        <activity android:name=".SettingsActivity" android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.audio.AudioReceiverActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|uiMode"
+            android:windowLayoutInDisplayCutoutMode="shortEdges" />
+
+        <!-- Bluetooth HID Service -->
+        <service
+            android:name=".bluetooth.BluetoothHidService"
+            android:foregroundServiceType="connectedDevice"
+            android:exported="false" />
+
+        <!-- Audio Receiver Foreground Service -->
+        <service
+            android:name=".audio.AudioReceiverService"
+            android:foregroundServiceType="mediaPlayback"
+            android:exported="false" />
+
+        <!-- Bluetooth Quick Settings Tile -->
+        <service
+            android:name=".bluetooth.BluetoothTileService"
+            android:icon="@drawable/ic_launcher_foreground"
+            android:label="@string/tile_disconnected"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+    </application>
+
+</manifest>

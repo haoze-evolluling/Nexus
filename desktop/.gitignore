@@ -1,0 +1,36 @@
+# Wails and Go build output
+/build/
+!/build/
+!/build/appicon.png
+/bin/
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+*.log
+
+# Wails platform build products (keep tracked metadata/assets under build/)
+/build/bin/
+/build/windows/*.exe
+/build/windows/*.dll
+/build/windows/*.pdb
+/build/windows/installer/
+
+# Frontend dependencies and generated assets
+/frontend/node_modules/
+/frontend/dist/
+/frontend/package.json.md5
+
+# Local environment and IDE settings
+.env
+.env.*
+!.env.example
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,196 @@
+:root {
+  /* System default font family - native, crisp, zero webfont overhead */
+  --font-family-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", system-ui, sans-serif;
+
+  /* Typography scale */
+  --font-size-2xs: 11px;
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 22px;
+  --font-size-2xl: 26px;
+  --font-size-3xl: 30px;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* Corner radii */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Light Theme - Clean Blue & High Contrast Neutral core */
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --color-bg-canvas: #f8fafc;
+  --color-bg-surface: #ffffff;
+  --color-bg-surface-elevated: #f1f5f9;
+  --color-bg-surface-hover: #f1f5f9;
+
+  --color-border-subtle: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+  --color-border-focus: #2563eb;
+
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-active: #1e40af;
+  --color-primary-soft: #eff6ff;
+  --color-primary-soft-hover: #dbeafe;
+  --color-primary-soft-border: #bfdbfe;
+  --color-primary-glow: rgba(37, 99, 235, 0.16);
+  --color-primary-contrast: #ffffff;
+
+  /* High contrast text hierarchy (WCAG AA compliant) */
+  --color-text-primary: #0f172a;       /* 15.4:1 contrast on white */
+  --color-text-secondary: #334155;     /* 8.5:1 contrast on white */
+  --color-text-muted: #64748b;         /* 4.6:1 contrast on white (WCAG AA pass) */
+  --color-text-inverted: #ffffff;
+
+  /* Semantic status colors with high-contrast text companions */
+  --color-success: #059669;
+  --color-success-text: #047857;
+  --color-success-soft: #ecfdf5;
+  --color-success-border: #a7f3d0;
+
+  --color-warning: #d97706;
+  --color-warning-text: #b45309;
+  --color-warning-soft: #fffbeb;
+  --color-warning-border: #fde68a;
+
+  --color-danger: #dc2626;
+  --color-danger-text: #b91c1c;
+  --color-danger-soft: #fef2f2;
+  --color-danger-border: #fecaca;
+
+  --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --shadow-modal: 0 24px 48px -8px rgba(15, 23, 42, 0.18), 0 12px 24px -6px rgba(15, 23, 42, 0.1);
+  --shadow-primary: 0 4px 14px 0 rgba(37, 99, 235, 0.28);
+}
+
+/* Dark Theme - Midnight Slate with Vivid Electric Blue accent */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-bg-canvas: #0b0f19;
+  --color-bg-surface: #131b2e;
+  --color-bg-surface-elevated: #1a243a;
+  --color-bg-surface-hover: #222f4b;
+
+  --color-border-subtle: #24324d;
+  --color-border-strong: #364869;
+  --color-border-focus: #60a5fa;
+
+  --color-primary: #3b82f6;
+  --color-primary-hover: #60a5fa;
+  --color-primary-active: #2563eb;
+  --color-primary-soft: rgba(59, 130, 246, 0.15);
+  --color-primary-soft-hover: rgba(59, 130, 246, 0.24);
+  --color-primary-soft-border: rgba(59, 130, 246, 0.35);
+  --color-primary-glow: rgba(59, 130, 246, 0.28);
+  --color-primary-contrast: #ffffff;
+
+  /* High contrast text hierarchy in dark mode (WCAG AA compliant) */
+  --color-text-primary: #f8fafc;       /* 15.0:1 contrast on surface */
+  --color-text-secondary: #cbd5e1;     /* 9.8:1 contrast on surface */
+  --color-text-muted: #94a3b8;         /* 5.4:1 contrast on surface (WCAG AA pass) */
+  --color-text-inverted: #0f172a;
+
+  /* Semantic status colors in dark mode */
+  --color-success: #34d399;
+  --color-success-text: #6ee7b7;
+  --color-success-soft: rgba(52, 211, 153, 0.14);
+  --color-success-border: rgba(52, 211, 153, 0.32);
+
+  --color-warning: #fbbf24;
+  --color-warning-text: #fde68a;
+  --color-warning-soft: rgba(251, 191, 36, 0.14);
+  --color-warning-border: rgba(251, 191, 36, 0.32);
+
+  --color-danger: #f87171;
+  --color-danger-text: #fca5a5;
+  --color-danger-soft: rgba(248, 113, 113, 0.14);
+  --color-danger-border: rgba(248, 113, 113, 0.32);
+
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.45), 0 1px 2px -1px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.55), 0 2px 4px -2px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.65), 0 4px 6px -4px rgba(0, 0, 0, 0.45);
+  --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.85);
+  --shadow-primary: 0 4px 18px 0 rgba(59, 130, 246, 0.35);
+}
+
+/* System Dark Theme Preference */
+@media (prefers-color-scheme: dark) {
+  :root[data-theme='system'] {
+    color-scheme: dark;
+
+    --color-bg-canvas: #0b0f19;
+    --color-bg-surface: #131b2e;
+    --color-bg-surface-elevated: #1a243a;
+    --color-bg-surface-hover: #222f4b;
+
+    --color-border-subtle: #24324d;
+    --color-border-strong: #364869;
+    --color-border-focus: #60a5fa;
+
+    --color-primary: #3b82f6;
+    --color-primary-hover: #60a5fa;
+    --color-primary-active: #2563eb;
+    --color-primary-soft: rgba(59, 130, 246, 0.15);
+    --color-primary-soft-hover: rgba(59, 130, 246, 0.24);
+    --color-primary-soft-border: rgba(59, 130, 246, 0.35);
+    --color-primary-glow: rgba(59, 130, 246, 0.28);
+    --color-primary-contrast: #ffffff;
+
+    --color-text-primary: #f8fafc;
+    --color-text-secondary: #cbd5e1;
+    --color-text-muted: #94a3b8;
+    --color-text-inverted: #0f172a;
+
+    --color-success: #34d399;
+    --color-success-text: #6ee7b7;
+    --color-success-soft: rgba(52, 211, 153, 0.14);
+    --color-success-border: rgba(52, 211, 153, 0.32);
+
+    --color-warning: #fbbf24;
+    --color-warning-text: #fde68a;
+    --color-warning-soft: rgba(251, 191, 36, 0.14);
+    --color-warning-border: rgba(251, 191, 36, 0.32);
+
+    --color-danger: #f87171;
+    --color-danger-text: #fca5a5;
+    --color-danger-soft: rgba(248, 113, 113, 0.14);
+    --color-danger-border: rgba(248, 113, 113, 0.32);
+
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.35);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.45), 0 1px 2px -1px rgba(0, 0, 0, 0.35);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.55), 0 2px 4px -2px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.65), 0 4px 6px -4px rgba(0, 0, 0, 0.45);
+    --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.85);
+    --shadow-primary: 0 4px 18px 0 rgba(59, 130, 246, 0.35);
+  }
+}
+
